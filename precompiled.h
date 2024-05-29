@@ -31,12 +31,14 @@
 // regamedll API
 #include <regamedll_api.h>
 #include "regamedll_api.h"
+#include <ex_regamedll_api.h>
 #include <mapinfo.h>
 #include <studio.h>
 
 // rehlds API
 #include <rehlds_api.h>
 #include "rehlds_api.h"
+#include <ex_rehlds_api.h>
 
 // AmxModX API
 #include "amxxmodule.h"
@@ -46,11 +48,10 @@
 
 // Other
 #include <main.h>
-#include <api_config.h>
-#include <hook_manager.h>
-#include <entity_callback_dispatcher.h>
+#include "api_config.h"
+#include "api_config.h"
+#include "hook_manager.h"
+#include "hook_callback.h"
+#include "entity_callback_dispatcher.h"
 
-#include <dllapi.h>
-#include <ex_rehlds_api.h>
-#include <ex_regamedll_api.h>
 //#include "sdk_util.cpp"

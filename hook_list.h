@@ -93,77 +93,77 @@ struct hooklist_t
 
 enum EngineFunc
 {
-	RH_SV_StartSound = BEGIN_FUNC_REGION(engine),
-	RH_SV_DropClient,
-	RH_SV_ActivateServer,
-	RH_Cvar_DirectSet,
-	RH_SV_WriteFullClientUpdate,
-	RH_GetEntityInit,
-	RH_ClientConnected,
-	RH_SV_ConnectClient,
-	RH_SV_EmitPings,
-	RH_ED_Alloc,
-	RH_ED_Free,
-	RH_Con_Printf,
-	RH_SV_CheckUserInfo,
-	RH_PF_precache_generic_I,
-	RH_PF_precache_model_I,
-	RH_PF_precache_sound_I,
-	RH_EV_Precache,
-	RH_SV_AddResource,
-	RH_SV_ClientPrintf,
-	RH_SV_AllowPhysent,
-	RH_ExecuteServerStringCmd,
+	RFH_SV_StartSound = BEGIN_FUNC_REGION(engine),
+	RFH_SV_DropClient,
+	RFH_SV_ActivateServer,
+	RFH_Cvar_DirectSet,
+	RFH_SV_WriteFullClientUpdate,
+	RFH_GetEntityInit,
+	RFH_ClientConnected,
+	RFH_SV_ConnectClient,
+	RFH_SV_EmitPings,
+	RFH_ED_Alloc,
+	RFH_ED_Free,
+	RFH_Con_Printf,
+	RFH_SV_CheckUserInfo,
+	RFH_PF_precache_generic_I,
+	RFH_PF_precache_model_I,
+	RFH_PF_precache_sound_I,
+	RFH_EV_Precache,
+	RFH_SV_AddResource,
+	RFH_SV_ClientPrintf,
+	RFH_SV_AllowPhysent,
+	RFH_ExecuteServerStringCmd,
 
 	// [...]
 };
 
 enum GamedllFunc
 {
-	RG_GetForceCamera = BEGIN_FUNC_REGION(gamedll),
-	RG_PlayerBlind,
-	RG_RadiusFlash_TraceLine,
-	RG_RoundEnd,
+	RFG_GetForceCamera = BEGIN_FUNC_REGION(gamedll),
+	RFG_PlayerBlind,
+	RFG_RadiusFlash_TraceLine,
+	RFG_RoundEnd,
 
-	RG_PM_Move,
-	RG_PM_AirMove,
-	RG_HandleMenu_ChooseAppearance,
-	RG_HandleMenu_ChooseTeam,
-	RG_ShowMenu,
-	RG_ShowVGUIMenu,
+	RFG_PM_Move,
+	RFG_PM_AirMove,
+	RFG_HandleMenu_ChooseAppearance,
+	RFG_HandleMenu_ChooseTeam,
+	RFG_ShowMenu,
+	RFG_ShowVGUIMenu,
 
-	RG_BuyGunAmmo,
-	RG_BuyWeaponByWeaponID,
+	RFG_BuyGunAmmo,
+	RFG_BuyWeaponByWeaponID,
 
-	RG_ThrowHeGrenade,
-	RG_ThrowFlashbang,
-	RG_ThrowSmokeGrenade,
-	RG_PlantBomb,
-	RG_IsPenetrableEntity,
+	RFG_ThrowHeGrenade,
+	RFG_ThrowFlashbang,
+	RFG_ThrowSmokeGrenade,
+	RFG_PlantBomb,
+	RFG_IsPenetrableEntity,
 
-	RG_SpawnHeadGib,
-	RG_SpawnRandomGibs,
+	RFG_SpawnHeadGib,
+	RFG_SpawnRandomGibs,
 
-	RG_CreateWeaponBox,
-	RG_PM_LadderMove,
-	RG_PM_WaterJump,
-	RG_PM_CheckWaterJump,
-	RG_PM_Jump,
-	RG_PM_Duck,
-	RG_PM_UnDuck,
-	RG_PM_PlayStepSound,
-	RG_PM_AirAccelerate,
-	RG_ClearMultiDamage,
-	RG_AddMultiDamage,
-	RG_ApplyMultiDamage,
-	RG_BuyItem,
+	RFG_CreateWeaponBox,
+	RFG_PM_LadderMove,
+	RFG_PM_WaterJump,
+	RFG_PM_CheckWaterJump,
+	RFG_PM_Jump,
+	RFG_PM_Duck,
+	RFG_PM_UnDuck,
+	RFG_PM_PlayStepSound,
+	RFG_PM_AirAccelerate,
+	RFG_ClearMultiDamage,
+	RFG_AddMultiDamage,
+	RFG_ApplyMultiDamage,
+	RFG_BuyItem,
 
 	// [...]
 };
 
 enum GamedllFunc_CBaseAnimating
 {
-	RG_CBaseAnimating_ResetSequenceInfo = BEGIN_FUNC_REGION(animating),
+	RFG_CBaseAnimating_ResetSequenceInfo = BEGIN_FUNC_REGION(animating),
 
 	// [...]
 };
@@ -171,99 +171,99 @@ enum GamedllFunc_CBaseAnimating
 enum GamedllFunc_CBasePlayer
 {
 	// CBasePlayer virtual
-	RG_CBasePlayer_Spawn = BEGIN_FUNC_REGION(player),
-	RG_CBasePlayer_Precache,
-	RG_CBasePlayer_ObjectCaps,
-	RG_CBasePlayer_Classify,
-	RG_CBasePlayer_TraceAttack,
-	RG_CBasePlayer_TakeDamage,
-	RG_CBasePlayer_TakeHealth,
-	RG_CBasePlayer_Killed,
-	RG_CBasePlayer_AddPoints,
-	RG_CBasePlayer_AddPointsToTeam,
-	RG_CBasePlayer_AddPlayerItem,
-	RG_CBasePlayer_RemovePlayerItem,
-	RG_CBasePlayer_GiveAmmo,
-	RG_CBasePlayer_ResetMaxSpeed,
-	RG_CBasePlayer_Jump,
-	RG_CBasePlayer_Duck,
-	RG_CBasePlayer_PreThink,
-	RG_CBasePlayer_PostThink,
-	RG_CBasePlayer_UpdateClientData,
-	RG_CBasePlayer_ImpulseCommands,
-	RG_CBasePlayer_RoundRespawn,
-	RG_CBasePlayer_Blind,
+	RFG_CBasePlayer_Spawn = BEGIN_FUNC_REGION(player),
+	RFG_CBasePlayer_Precache,
+	RFG_CBasePlayer_ObjectCaps,
+	RFG_CBasePlayer_Classify,
+	RFG_CBasePlayer_TraceAttack,
+	RFG_CBasePlayer_TakeDamage,
+	RFG_CBasePlayer_TakeHealth,
+	RFG_CBasePlayer_Killed,
+	RFG_CBasePlayer_AddPoints,
+	RFG_CBasePlayer_AddPointsToTeam,
+	RFG_CBasePlayer_AddPlayerItem,
+	RFG_CBasePlayer_RemovePlayerItem,
+	RFG_CBasePlayer_GiveAmmo,
+	RFG_CBasePlayer_ResetMaxSpeed,
+	RFG_CBasePlayer_Jump,
+	RFG_CBasePlayer_Duck,
+	RFG_CBasePlayer_PreThink,
+	RFG_CBasePlayer_PostThink,
+	RFG_CBasePlayer_UpdateClientData,
+	RFG_CBasePlayer_ImpulseCommands,
+	RFG_CBasePlayer_RoundRespawn,
+	RFG_CBasePlayer_Blind,
 
-	RG_CBasePlayer_SetClientUserInfoModel,
-	RG_CBasePlayer_SetClientUserInfoName,
-	RG_CBasePlayer_Observer_IsValidTarget,
-	RG_CBasePlayer_SetAnimation,
-	RG_CBasePlayer_GiveDefaultItems,
-	RG_CBasePlayer_GiveNamedItem,
-	RG_CBasePlayer_AddAccount,
-	RG_CBasePlayer_GiveShield,
-	RG_CBasePlayer_DropPlayerItem,
-	RG_CBasePlayer_HasRestrictItem,
+	RFG_CBasePlayer_SetClientUserInfoModel,
+	RFG_CBasePlayer_SetClientUserInfoName,
+	RFG_CBasePlayer_Observer_IsValidTarget,
+	RFG_CBasePlayer_SetAnimation,
+	RFG_CBasePlayer_GiveDefaultItems,
+	RFG_CBasePlayer_GiveNamedItem,
+	RFG_CBasePlayer_AddAccount,
+	RFG_CBasePlayer_GiveShield,
+	RFG_CBasePlayer_DropPlayerItem,
+	RFG_CBasePlayer_HasRestrictItem,
 
-	RG_CBasePlayer_DropShield,
-	RG_CBasePlayer_OnSpawnEquip,
-	RG_CBasePlayer_Radio,
-	RG_CBasePlayer_Disappear,
-	RG_CBasePlayer_MakeVIP,
-	RG_CBasePlayer_MakeBomber,
-	RG_CBasePlayer_StartObserver,
-	RG_CBasePlayer_GetIntoGame,
-	RG_CBasePlayer_StartDeathCam,
-	RG_CBasePlayer_SwitchTeam,
-	RG_CBasePlayer_CanSwitchTeam,
-	RG_CBasePlayer_ThrowGrenade,
-	RG_CBasePlayer_SetSpawnProtection,
-	RG_CBasePlayer_RemoveSpawnProtection,
-	RG_CBasePlayer_HintMessageEx,
-	RG_CBasePlayer_UseEmpty,
-	RG_CBasePlayer_DropIdlePlayer,
+	RFG_CBasePlayer_DropShield,
+	RFG_CBasePlayer_OnSpawnEquip,
+	RFG_CBasePlayer_Radio,
+	RFG_CBasePlayer_Disappear,
+	RFG_CBasePlayer_MakeVIP,
+	RFG_CBasePlayer_MakeBomber,
+	RFG_CBasePlayer_StartObserver,
+	RFG_CBasePlayer_GetIntoGame,
+	RFG_CBasePlayer_StartDeathCam,
+	RFG_CBasePlayer_SwitchTeam,
+	RFG_CBasePlayer_CanSwitchTeam,
+	RFG_CBasePlayer_ThrowGrenade,
+	RFG_CBasePlayer_SetSpawnProtection,
+	RFG_CBasePlayer_RemoveSpawnProtection,
+	RFG_CBasePlayer_HintMessageEx,
+	RFG_CBasePlayer_UseEmpty,
+	RFG_CBasePlayer_DropIdlePlayer,
 
-	RG_CBasePlayer_Observer_SetMode,
-	RG_CBasePlayer_Observer_FindNextPlayer,
+	RFG_CBasePlayer_Observer_SetMode,
+	RFG_CBasePlayer_Observer_FindNextPlayer,
 
-	RG_CBasePlayer_Pain,
-	RG_CBasePlayer_DeathSound,
-	RG_CBasePlayer_JoiningThink,
+	RFG_CBasePlayer_Pain,
+	RFG_CBasePlayer_DeathSound,
+	RFG_CBasePlayer_JoiningThink,
 
-	RG_CBasePlayer_CheckTimeBasedDamage,
-	RG_CBasePlayer_EntSelectSpawnPoint,
+	RFG_CBasePlayer_CheckTimeBasedDamage,
+	RFG_CBasePlayer_EntSelectSpawnPoint,
 
 	// [...]
 };
 
 enum GamedllFunc_CGrenade
 {
-	RG_CGrenade_DefuseBombStart = BEGIN_FUNC_REGION(grenade),
-	RG_CGrenade_DefuseBombEnd,
-	RG_CGrenade_ExplodeHeGrenade,
-	RG_CGrenade_ExplodeFlashbang,
-	RG_CGrenade_ExplodeSmokeGrenade,
-	RG_CGrenade_ExplodeBomb,
+	RFG_CGrenade_DefuseBombStart = BEGIN_FUNC_REGION(grenade),
+	RFG_CGrenade_DefuseBombEnd,
+	RFG_CGrenade_ExplodeHeGrenade,
+	RFG_CGrenade_ExplodeFlashbang,
+	RFG_CGrenade_ExplodeSmokeGrenade,
+	RFG_CGrenade_ExplodeBomb,
 
 	// [...]
 };
 
 enum GamedllFunc_CWeaponBox
 {
-	RG_CWeaponBox_SetModel = BEGIN_FUNC_REGION(weaponbox),
+	RFG_CWeaponBox_SetModel = BEGIN_FUNC_REGION(weaponbox),
 
 	// [...]
 };
 
 enum GamedllFunc_CBasePlayerWeapon
 {
-	RG_CBasePlayerWeapon_CanDeploy = BEGIN_FUNC_REGION(weapon),
-	RG_CBasePlayerWeapon_DefaultDeploy,
-	RG_CBasePlayerWeapon_DefaultReload,
-	RG_CBasePlayerWeapon_DefaultShotgunReload,
-	RG_CBasePlayerWeapon_ItemPostFrame,
-	RG_CBasePlayerWeapon_KickBack,
-	RG_CBasePlayerWeapon_SendWeaponAnim,
+	RFG_CBasePlayerWeapon_CanDeploy = BEGIN_FUNC_REGION(weapon),
+	RFG_CBasePlayerWeapon_DefaultDeploy,
+	RFG_CBasePlayerWeapon_DefaultReload,
+	RFG_CBasePlayerWeapon_DefaultShotgunReload,
+	RFG_CBasePlayerWeapon_ItemPostFrame,
+	RFG_CBasePlayerWeapon_KickBack,
+	RFG_CBasePlayerWeapon_SendWeaponAnim,
 
 	// [...]
 };
@@ -271,59 +271,59 @@ enum GamedllFunc_CBasePlayerWeapon
 enum GamedllFunc_CSGameRules
 {
 	// CSGameRules virtual
-	RG_CSGameRules_FShouldSwitchWeapon = BEGIN_FUNC_REGION(gamerules),
-	RG_CSGameRules_GetNextBestWeapon,
-	RG_CSGameRules_FlPlayerFallDamage,
-	RG_CSGameRules_FPlayerCanTakeDamage,
-	RG_CSGameRules_PlayerSpawn,
-	RG_CSGameRules_FPlayerCanRespawn,
-	RG_CSGameRules_GetPlayerSpawnSpot,
-	RG_CSGameRules_ClientUserInfoChanged,
-	RG_CSGameRules_PlayerKilled,
-	RG_CSGameRules_DeathNotice,
-	RG_CSGameRules_CanHavePlayerItem,
-	RG_CSGameRules_DeadPlayerWeapons,
-	RG_CSGameRules_ServerDeactivate,
-	RG_CSGameRules_CheckMapConditions,
-	RG_CSGameRules_CleanUpMap,
-	RG_CSGameRules_RestartRound,
-	RG_CSGameRules_CheckWinConditions,
-	RG_CSGameRules_RemoveGuns,
-	RG_CSGameRules_GiveC4,
-	RG_CSGameRules_ChangeLevel,
-	RG_CSGameRules_GoToIntermission,
-	RG_CSGameRules_BalanceTeams,
-	RG_CSGameRules_OnRoundFreezeEnd,
-	RG_CSGameRules_CanPlayerHearPlayer,
-	RG_CSGameRules_Think,
-	RG_CSGameRules_TeamFull,
-	RG_CSGameRules_TeamStacked,
-	RG_CSGameRules_PlayerGotWeapon,
+	RFG_CSGameRules_FShouldSwitchWeapon = BEGIN_FUNC_REGION(gamerules),
+	RFG_CSGameRules_GetNextBestWeapon,
+	RFG_CSGameRules_FlPlayerFallDamage,
+	RFG_CSGameRules_FPlayerCanTakeDamage,
+	RFG_CSGameRules_PlayerSpawn,
+	RFG_CSGameRules_FPlayerCanRespawn,
+	RFG_CSGameRules_GetPlayerSpawnSpot,
+	RFG_CSGameRules_ClientUserInfoChanged,
+	RFG_CSGameRules_PlayerKilled,
+	RFG_CSGameRules_DeathNotice,
+	RFG_CSGameRules_CanHavePlayerItem,
+	RFG_CSGameRules_DeadPlayerWeapons,
+	RFG_CSGameRules_ServerDeactivate,
+	RFG_CSGameRules_CheckMapConditions,
+	RFG_CSGameRules_CleanUpMap,
+	RFG_CSGameRules_RestartRound,
+	RFG_CSGameRules_CheckWinConditions,
+	RFG_CSGameRules_RemoveGuns,
+	RFG_CSGameRules_GiveC4,
+	RFG_CSGameRules_ChangeLevel,
+	RFG_CSGameRules_GoToIntermission,
+	RFG_CSGameRules_BalanceTeams,
+	RFG_CSGameRules_OnRoundFreezeEnd,
+	RFG_CSGameRules_CanPlayerHearPlayer,
+	RFG_CSGameRules_Think,
+	RFG_CSGameRules_TeamFull,
+	RFG_CSGameRules_TeamStacked,
+	RFG_CSGameRules_PlayerGotWeapon,
 
 	// [...]
 };
 
 enum GamedllFunc_CGib
 {
-	RG_CGib_Spawn = BEGIN_FUNC_REGION(gib),
-	RG_CGib_BounceGibTouch,
-	RG_CGib_WaitTillLand,
+	RFG_CGib_Spawn = BEGIN_FUNC_REGION(gib),
+	RFG_CGib_BounceGibTouch,
+	RFG_CGib_WaitTillLand,
 
 	// [...]
 };
 
 enum GamedllFunc_CBaseEntity
 {
-	RG_CBaseEntity_FireBullets = BEGIN_FUNC_REGION(cbaseentity),
-	RG_CBaseEntity_FireBuckshots,
-	RG_CBaseEntity_FireBullets3,
+	RFG_CBaseEntity_FireBullets = BEGIN_FUNC_REGION(cbaseentity),
+	RFG_CBaseEntity_FireBuckshots,
+	RFG_CBaseEntity_FireBullets3,
 
 	// [...]
 };
 
 enum GamedllFunc_CBotManager
 {
-	RG_CBotManager_OnEvent = BEGIN_FUNC_REGION(botmanager),
+	RFG_CBotManager_OnEvent = BEGIN_FUNC_REGION(botmanager),
 
 	// [...]
 };
