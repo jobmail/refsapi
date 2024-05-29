@@ -559,26 +559,3 @@ void CBasePlayerWeapon_ItemPostFrame(IReGameHook_CBasePlayerWeapon_ItemPostFrame
 void CBasePlayerWeapon_KickBack(IReGameHook_CBasePlayerWeapon_KickBack *chain, CBasePlayerWeapon *pthis, float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max, float lateral_max, int direction_change);
 void CBasePlayerWeapon_SendWeaponAnim(IReGameHook_CBasePlayerWeapon_SendWeaponAnim *chain, CBasePlayerWeapon *pthis, int iAnim, int skiplocal);
 
-/*
-* VTC functions
-*/
-extern int g_iClientStartSpeak;
-extern int g_iClientStopSpeak;
-
-void OnClientStartSpeak(size_t clientIndex);
-void OnClientStopSpeak(size_t clientIndex);
-
-/*
-* ReChecker functions
-*/
-
-using CmdExec_t = hookdata_t<IRecheckerHook_CmdExec *, IResourceBuffer *>;
-void CmdExec_AMXX(CmdExec_t *chain, IGameClient *cl, const char *filename, char *cmd, uint32 responseHash);
-void CmdExec(IRecheckerHook_CmdExec *chain, IGameClient *cl, IResourceBuffer *res, char *cmd, uint32 responseHash);
-
-using FileConsistencyProcess_t = hookdata_t<IRecheckerHook_FileConsistencyProcess *, IResourceBuffer *>;
-void FileConsistencyProcess_AMXX(FileConsistencyProcess_t *data, IGameClient *cl, const char *filename, const char *cmd, ResourceType_e type, uint32 responseHash, bool isBreak);
-void FileConsistencyProcess(IRecheckerHook_FileConsistencyProcess *chain, IGameClient *cl, IResourceBuffer *res, ResourceType_e typeFind, uint32 responseHash);
-
-void FileConsistencyFinal(IRecheckerHook_FileConsistencyFinal *chain, IGameClient *cl);
-
