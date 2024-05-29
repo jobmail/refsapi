@@ -1,4 +1,4 @@
-HLSDK = include/hlsdk
+CSSDK = include/cssdk
 METAMOD = include/metamod
 
 NAME = refsapi
@@ -11,8 +11,8 @@ LINK = -ldl
 
 OPT_FLAGS = -O3 -msse3 -flto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC
 
-INCLUDE = -I. -I$(HLSDK)/common -I$(HLSDK)/dlls -I$(HLSDK)/engine \
-		-I$(HLSDK)/game_shared -I$(HLSDK)/pm_shared -I$(HLSDK)/public -I$(METAMOD)
+INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
+		-I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude -Icommon
 
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
@@ -27,7 +27,7 @@ $(BIN_DIR)/%.o: %.c
 all:
 	mkdir -p $(BIN_DIR)
 
-	$(MAKE) $(NAME) && strip -x $(BIN_DIR)/$(NAME)_mm_i386.so
+	$(MAKE) $(NAME) && strip -x $(BIN_DIR)/$(NAME)_amxx_i386.so
 
 $(NAME): $(OBJ_LINUX)
 	$(COMPILER) $(INCLUDE) $(CFLAGS) $(OBJ_LINUX) $(LINK) -o$(BIN_DIR)/$(NAME)_amxx_i386.so
@@ -42,4 +42,4 @@ default: all
 
 clean:
 	rm -rf Release/*.o
-	rm -rf Release/$(NAME)_mm_i386.so
+	rm -rf Release/$(NAME)_amxx_i386.so
