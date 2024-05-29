@@ -1,5 +1,9 @@
 #pragma once
 
+template <typename T, size_t N>
+char(&ArraySizeHelper(T(&array)[N]))[N];
+#define arraysize(array) (sizeof(ArraySizeHelper(array)))
+
 extern char g_szMapName[32];
 extern playermove_t* g_pMove;
 extern int gmsgSendAudio;
