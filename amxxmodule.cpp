@@ -22,8 +22,8 @@ static amxx_module_info_s g_ModuleInfo =
 	Plugin_info.version,
 	FALSE,
 	Plugin_info.logtag,
-	"reapi",
-	"reapi"
+	"refsapi",
+	"refsapi"
 };
 
 // Storage for the requested functions
@@ -161,13 +161,10 @@ C_DLLEXPORT int AMXX_Attach(PFN_REQ_FNPTR reqFnptrFunc)
 
 	OnAmxxAttach();
 
-	RegisterNatives_HookChains();
-	RegisterNatives_Members();
-	RegisterNatives_Misc();
-	RegisterNatives_VTC();
-	RegisterNatives_Rechecker();
-	RegisterNatives_Reunion();
-	RegisterNatives_Common();
+	//RegisterNatives_HookChains();
+	//RegisterNatives_Members();
+	//RegisterNatives_Misc();
+	//RegisterNatives_Common();
 
 	return AMXX_OK;
 }
@@ -179,14 +176,8 @@ C_DLLEXPORT int AMXX_Detach()
 
 C_DLLEXPORT int AMXX_PluginsLoaded()
 {
-	int iFwd = g_amxxapi.RegisterForward("__reapi_version_check", ET_IGNORE, FP_CELL, FP_CELL, FP_DONE);
-	g_amxxapi.ExecuteForward(iFwd, REAPI_VERSION_MAJOR, REAPI_VERSION_MINOR);
-
-	if (api_cfg.hasVTC()) {
-
-		g_iClientStartSpeak = g_amxxapi.RegisterForward("VTC_OnClientStartSpeak", ET_IGNORE, FP_CELL, FP_DONE);
-		g_iClientStopSpeak = g_amxxapi.RegisterForward("VTC_OnClientStopSpeak", ET_IGNORE, FP_CELL, FP_DONE);
-	}
+	//int iFwd = g_amxxapi.RegisterForward("__reapi_version_check", ET_IGNORE, FP_CELL, FP_CELL, FP_DONE);
+	//g_amxxapi.ExecuteForward(iFwd, REAPI_VERSION_MAJOR, REAPI_VERSION_MINOR);
 
 	return AMXX_OK;
 }
