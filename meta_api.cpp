@@ -24,7 +24,7 @@ C_DLLEXPORT int Meta_Query(char *interfaceVersion, plugin_info_t **plinfo, mutil
 {
 	*plinfo = &Plugin_info;
 	gpMetaUtilFuncs = pMetaUtilFuncs;
-	return TRUE;
+	return true;
 }
 
 META_FUNCTIONS gMetaFunctionTable =
@@ -48,12 +48,14 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 
 	if (meta_init_rehlds_api())
 		g_engfuncs.pfnServerPrint("ReHLDS API successfully initialized.\n");
-
+	
+	GET_HOOK_TABLES(PLID, &g_pengfuncsTable, nullptr, nullptr);
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
-	return TRUE;
+	
+	return true;
 }
 
 C_DLLEXPORT int Meta_Detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason)
 {
-	return TRUE;
+	return true;
 }

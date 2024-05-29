@@ -1,4 +1,4 @@
-#include <extdll.h>
+meta_init_rehlds_api#include <extdll.h>
 #include <meta_api.h>
 #include "ex_rehlds_api.h"
 
