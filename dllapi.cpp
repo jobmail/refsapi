@@ -1,15 +1,15 @@
-#include <extdll.h>
-#include <meta_api.h>
+#include <precompiled.h>
 
-DLL_FUNCTIONS g_DllFunctionTable =
+DLL_FUNCTIONS *g_pFunctionTable;
+DLL_FUNCTIONS g_FunctionTable =
 {
 	NULL,					// pfnGameInit
-	NULL,					// pfnSpawn
+	&DispatchSpawn,			// pfnSpawn
 	NULL,					// pfnThink
 	NULL,					// pfnUse
 	NULL,					// pfnTouch
 	NULL,					// pfnBlocked
-	NULL,					// pfnKeyValue
+	&KeyValue,				// pfnKeyValue
 	NULL,					// pfnSave
 	NULL,					// pfnRestore
 	NULL,					// pfnSetAbsBox
@@ -17,7 +17,7 @@ DLL_FUNCTIONS g_DllFunctionTable =
 	NULL,					// pfnSaveReadFields
 	NULL,					// pfnSaveGlobalState
 	NULL,					// pfnRestoreGlobalState
-	NULL,					// pfnResetGlobalState
+	&ResetGlobalState,		// pfnResetGlobalState
 	NULL,					// pfnClientConnect
 	NULL,					// pfnClientDisconnect
 	NULL,					// pfnClientKill
@@ -55,7 +55,7 @@ DLL_FUNCTIONS g_DllFunctionTable =
 	NULL,					// pfnAllowLagCompensation
 };
 
-DLL_FUNCTIONS g_DllFunctionTable_Post =
+DLL_FUNCTIONS g_FunctionTable_Post =
 {
 	NULL,					// pfnGameInit
 	NULL,					// pfnSpawn
@@ -78,8 +78,8 @@ DLL_FUNCTIONS g_DllFunctionTable_Post =
 	NULL,					// pfnClientPutInServer
 	NULL,					// pfnClientCommand
 	NULL,					// pfnClientUserInfoChanged
-	NULL,					// pfnServerActivate
-	NULL,					// pfnServerDeactivate
+	&ServerActivate_Post,	// pfnServerActivate
+	&ServerDeactivate_Post,	// pfnServerDeactivate
 	NULL,					// pfnPlayerPreThink
 	NULL,					// pfnPlayerPostThink
 	NULL,					// pfnStartFrame
@@ -111,7 +111,7 @@ DLL_FUNCTIONS g_DllFunctionTable_Post =
 
 NEW_DLL_FUNCTIONS g_NewDllFunctionTable =
 {
-	NULL,					//! pfnOnFreeEntPrivateData()	Called right before the object's memory is freed.  Calls its destructor.
+	&OnFreeEntPrivateData,	//! pfnOnFreeEntPrivateData()	Called right before the object's memory is freed.  Calls its destructor.
 	NULL,					//! pfnGameShutdown()
 	NULL,					//! pfnShouldCollide()
 	NULL,					//! pfnCvarValue()
@@ -139,7 +139,8 @@ C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersi
 		return false;
 	}
 
-	memcpy(pFunctionTable, &g_DllFunctionTable, sizeof(DLL_FUNCTIONS));
+	memcpy(pFunctionTable, &g_FunctionTable, sizeof(DLL_FUNCTIONS));
+	g_pFunctionTable = pFunctionTable;
 	return true;
 }
 
@@ -155,7 +156,7 @@ C_DLLEXPORT int GetEntityAPI2_Post(DLL_FUNCTIONS *pFunctionTable, int *interface
 		return false;
 	}
 
-	memcpy(pFunctionTable, &g_DllFunctionTable_Post, sizeof(DLL_FUNCTIONS));
+	memcpy(pFunctionTable, &g_FunctionTable_Post, sizeof(DLL_FUNCTIONS));
 	return true;
 }
 

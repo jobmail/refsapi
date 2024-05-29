@@ -1,6 +1,4 @@
-#include <extdll.h>
-#include <meta_api.h>
-#include "ex_rehlds_api.h"
+#include <precompiled.h>
 
 meta_globals_t *gpMetaGlobals;
 gamedll_funcs_t *gpGamedllFuncs;
@@ -44,10 +42,10 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	gpMetaGlobals = pMGlobals;
 	gpGamedllFuncs = pGamedllFuncs;
 
-	g_engfuncs.pfnServerPrint("\n################\n# Hello World! #\n################\n\n");
+	if (!OnMetaAttach())
+		return false;
 
-	if (meta_init_rehlds_api())
-		g_engfuncs.pfnServerPrint("ReHLDS API successfully initialized.\n");
+	g_engfuncs.pfnServerPrint("\n################\n# Hello World! #\n################\n\n");
 	
 	GET_HOOK_TABLES(PLID, &g_pengfuncsTable, nullptr, nullptr);
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
@@ -57,5 +55,6 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 
 C_DLLEXPORT int Meta_Detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason)
 {
+	OnMetaDetach();
 	return true;
 }
