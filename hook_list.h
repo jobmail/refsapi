@@ -32,7 +32,6 @@ extern hook_t hooklist_gamedll[];
 extern hook_t hooklist_animating[];
 extern hook_t hooklist_player[];
 extern hook_t hooklist_gamerules[];
-extern hook_t hooklist_rechecker[];
 extern hook_t hooklist_grenade[];
 extern hook_t hooklist_weaponbox[];
 extern hook_t hooklist_weapon[];
@@ -60,7 +59,6 @@ struct hooklist_t
 			CASE(animating)
 			CASE(player)
 			CASE(gamerules)
-			CASE(rechecker)
 			CASE(grenade)
 			CASE(weaponbox)
 			CASE(weapon)
@@ -84,7 +82,6 @@ struct hooklist_t
 		ht_animating,
 		ht_player,
 		ht_gamerules,
-		ht_rechecker,
 		ht_grenade,
 		ht_weaponbox,
 		ht_weapon,
@@ -327,15 +324,6 @@ enum GamedllFunc_CBaseEntity
 enum GamedllFunc_CBotManager
 {
 	RG_CBotManager_OnEvent = BEGIN_FUNC_REGION(botmanager),
-
-	// [...]
-};
-
-enum ReCheckerFunc
-{
-	RC_FileConsistencyProcess = BEGIN_FUNC_REGION(rechecker),
-	RC_FileConsistencyFinal,
-	RC_CmdExec,
 
 	// [...]
 };
