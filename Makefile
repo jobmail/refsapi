@@ -9,7 +9,7 @@ OBJECTS = *.cpp
 
 LINK = -ldl
 
-OPT_FLAGS = -O3 -msse3 -flto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC
+OPT_FLAGS = -O3 -msse3 -flto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
 INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 		-I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude -Icommon
@@ -17,7 +17,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -g -DNDEBUG -Dlinux -D__linux__ -D__USE_GNU -std=gnu++11 -shared -m32
+CFLAGS += -g -DNDEBUG -Dlinux -D__linux__ -D__USE_GNU -std=gnu++14 -shared -m32
 
 OBJ_LINUX := $(OBJECTS:%.c=$(BIN_DIR)/%.o)
 
