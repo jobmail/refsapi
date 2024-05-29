@@ -16,6 +16,7 @@
 
 // cssdk
 #include <extdll.h>
+#include <interface.h>
 #include <eiface.h>
 
 // rewrite on own custom preprocessor definitions INDEXENT and ENTINDEX from cbase.h
