@@ -1,7 +1,7 @@
 #pragma once
 
 #define ENUM_COUNT(e)               (sizeof(e) / sizeof(int))
-#define MAX_REG_MSGS                33
+#define MAX_REG_MSGS                256
 
 typedef void (*funEventCall)(void*);
 
