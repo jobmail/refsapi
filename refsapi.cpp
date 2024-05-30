@@ -45,7 +45,7 @@ int	R_RegUserMsg_Post(const char *pszName, int iSize) {
 
 		if (strcmp(g_user_msg[i].name, pszName) == 0) {
 
-            UTIL_ServerPrint("RegUserMsg: %s\n", STRING(pszName));
+            UTIL_ServerPrint("RegUserMsg: %s\n", pszName);
 
 			int id = META_RESULT_ORIG_RET(int);
 			
@@ -64,7 +64,9 @@ int	R_RegUserMsg_Post(const char *pszName, int iSize) {
 
         }
 
-	 }
+	}
+
+    SERVER_PRINT("[DEBUG] R_RegUserMsg_Post() <===\n");
 
 	RETURN_META_VALUE(MRES_IGNORED, 0);
 }
