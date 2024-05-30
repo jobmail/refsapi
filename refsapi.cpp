@@ -43,6 +43,8 @@ void R_ClientDisconnect(edict_t *pEntity) {
 
     int id = ENTINDEX(pEntity);
 
+    SERVER_PRINT("[DEBUG] ClientDisconnect() ===>");
+
 	CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
     if (pPlayer) {
@@ -56,6 +58,8 @@ void R_ClientDisconnect(edict_t *pEntity) {
         g_PlayersNum[g_Clients[id]->team]--;
     }
 
+    SERVER_PRINT("[DEBUG] ClientDisconnect() <===");
+
 	RETURN_META(MRES_IGNORED);
 }
 
@@ -64,6 +68,8 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
     char buffer[1024];
 
     int id = ENTINDEX(cl->GetEdict());    
+
+    SERVER_PRINT("[DEBUG] SV_DropClient_RH() ===>");
 
 	Q_strcpy_s(buffer, (char*)format);
 
@@ -82,6 +88,8 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
     }
 
     chain->callNext(cl, crash, buffer);
+
+    SERVER_PRINT("[DEBUG] SV_DropClient_RH() <===");
 
 }
 
