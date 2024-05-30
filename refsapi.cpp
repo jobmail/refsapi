@@ -65,7 +65,7 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
     int id = ENTINDEX(cl->GetEdict());    
 
-	strcpy_s(buffer, sizeof(buffer), format);
+	Q_strcpy_s(buffer, (char*)format);
 
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
