@@ -7,16 +7,17 @@
 // version GLIBCXX_3.4.16 and bigger, keeping binary compatibility with libstdc++ 4.6.1.
 namespace std
 {
-
+/*
 #if __cpp_exceptions
 	logic_error::logic_error(const char *__arg) : exception(), _M_msg(__arg) {}
 	out_of_range::out_of_range(const char *__arg) : logic_error(__arg) {}
 	out_of_range::~out_of_range() _GLIBCXX_USE_NOEXCEPT {}
 #endif // #if __cpp_exceptions
-
+*/
 	// We shouldn't be throwing exceptions at all, but it sadly turns out we call STL (inline) functions that do.
 	void __throw_out_of_range_fmt(const char *fmt, ...)
 	{
+	/*
 	#if __cpp_exceptions
 		va_list ap;
 		char buf[1024]; // That should be big enough.
@@ -28,8 +29,9 @@ namespace std
 
 		throw std::out_of_range(buf);
 	#else
+	*/
 		abort();
-	#endif
+	//#endif
 	}
 }; // namespace std
 
@@ -40,11 +42,13 @@ namespace std
 extern "C"
 void __cxa_throw_bad_array_new_length()
 {
+	/*
 #if __cpp_exceptions
 	throw std::bad_array_new_length();
 #else
+*/
 	abort();
-#endif
+//#endif
 }
 
 #if defined(__INTEL_COMPILER) && __cplusplus >= 201402L
