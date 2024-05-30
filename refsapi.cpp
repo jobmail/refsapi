@@ -31,7 +31,6 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
         SERVER_PRINT("[DEBUG] R_ClientPutInServer_Post() ===>\n");
 
         UTIL_ServerPrint("PutInserver_Post(): %s <%s>\n", STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()));
-
     }
 
     SET_META_RESULT(MRES_IGNORED);
@@ -39,16 +38,13 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
 int	R_RegUserMsg_Post(const char *pszName, int iSize) {
 
-    SERVER_PRINT("[DEBUG] R_RegUserMsg_Post() ===>\n");
-
-	for (auto& msg : g_user_msg) {      //(int i = 0; g_user_msg[i].name;	i++) {
+	for (auto& msg : g_user_msg) {
 
 		if (strcmp(msg.name, pszName) == 0) {
 
 			int id = META_RESULT_ORIG_RET(int);
 
-            UTIL_ServerPrint("RegUserMsg: id = %d, %s", id, pszName);
-
+            UTIL_ServerPrint("[DEBUG] RegUserMsg: id = %d, %s\n", id, pszName);
 
             *msg.id = id;
 
@@ -62,13 +58,8 @@ int	R_RegUserMsg_Post(const char *pszName, int iSize) {
             }
 
 			break;
-
         }
-
 	}
-
-    SERVER_PRINT("[DEBUG] R_RegUserMsg_Post() <===\n");
-
 	RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
@@ -157,28 +148,26 @@ void R_MessageEnd_Post(void) {
 
 void Client_TeamInfo(void* mValue) {
 
-    static int index;
+    static int id;
     char* msg;
 
     switch (mState++) {
     
         case 0:
 
-			index = *(int*)mValue;
+			id = *(int*)mValue;
 		
         	break;
 
         case 1:
 		
-        	if (index < 1 || index > gpGlobals->maxClients) break;
+        	if (id < 1 || id > gpGlobals->maxClients) break;
 		
         	msg = (char*)mValue;
 			
             if (!msg) break;
 
-            SERVER_PRINT("[DEBUG] Client_TeamInfo() ===>\n");
-
-            //UTIL_ServerPrint("TeamInfo: id = %d, team = %s\n", index, STRING(msg));
+            UTIL_ServerPrint("TeamInfo: id = %d, team = %s\n", id, msg);
 
 			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
             //strcpy(pPlayer->m_szTeamName, msg);
