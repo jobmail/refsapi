@@ -171,6 +171,7 @@ void Client_TeamInfo(void* mValue) {
 
 			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
             //strcpy(pPlayer->m_szTeamName, msg);
+            break;
     
     }
 
