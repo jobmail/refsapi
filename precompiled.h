@@ -55,5 +55,6 @@
 #include "hook_callback.h"
 #include "entity_callback_dispatcher.h"
 
+#include <map>
 #include "refsapi.h"
 //#include "sdk_util.cpp"
