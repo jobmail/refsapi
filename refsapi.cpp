@@ -158,8 +158,8 @@ void Client_TeamInfo(void* mValue) {
             if (!msg) break;
 
             SERVER_PRINT("[DEBUG] Client_TeamInfo() ===>\n");
-            
-            UTIL_ServerPrint("TeamInfo: id = %d, team = %s\n", index, STRING(msg));
+
+            //UTIL_ServerPrint("TeamInfo: id = %d, team = %s\n", index, STRING(msg));
 
 			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
             //strcpy(pPlayer->m_szTeamName, msg);
