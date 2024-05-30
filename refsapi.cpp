@@ -18,6 +18,7 @@ struct g_RegUserMsg
 } g_user_msg[] =
 {
 	{ "TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false },
+    { "", 0, 0, false },
 };
 
 // BEGIN ===>
@@ -41,14 +42,14 @@ int	R_RegUserMsg_Post(const char *pszName, int iSize) {
 
     SERVER_PRINT("[DEBUG] R_RegUserMsg_Post() ===>\n");
 
-	for (int i = 0; g_user_msg[i].name;	++i) {
+	for (int i = 0; g_user_msg[i].name;	i) {
 
 		if (strcmp(g_user_msg[i].name, pszName) == 0) {
 
-            UTIL_ServerPrint("RegUserMsg: %s\n", pszName);
-
 			int id = META_RESULT_ORIG_RET(int);
-			
+
+            UTIL_ServerPrint("RegUserMsg: id = %d, %s\n", id, pszName);
+
             *g_user_msg[i].id =	id;
 
             if (g_user_msg[i].endmsg) {
