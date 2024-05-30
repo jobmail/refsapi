@@ -39,9 +39,13 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
 int	R_RegUserMsg_Post(const char *pszName, int iSize) {
 
+    SERVER_PRINT("[DEBUG] R_RegUserMsg_Post() ===>\n");
+
 	for (int i = 0; g_user_msg[i].name;	++i) {
 
 		if (strcmp(g_user_msg[i].name, pszName) == 0) {
+
+            UTIL_ServerPrint("RegUserMsg: %s\n", STRING(pszName));
 
 			int id = META_RESULT_ORIG_RET(int);
 			
