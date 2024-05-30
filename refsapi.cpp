@@ -244,7 +244,7 @@ void Client_TeamInfo(void* mValue) {
 			
             if (!msg) break;
 
-            UTIL_ServerPrint("TeamInfo: id = %d, team = %s\n", id, msg);
+            UTIL_ServerPrint("TeamInfo: id = %d, team = %s", id, msg);
 
             switch (msg[0]) {
                 
@@ -262,6 +262,8 @@ void Client_TeamInfo(void* mValue) {
 
                 default: new_team = TEAM_UNASSIGNED;
             }
+
+            UTIL_ServerPrint(" new_team = %d", new_team);
 
             if (g_Clients[id]->is_connected && g_Clients[id]->team != new_team) {
 
