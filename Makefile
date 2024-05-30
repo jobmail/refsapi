@@ -5,7 +5,7 @@ NAME = refsapi
 
 COMPILER = g++
 
-OBJECTS = *.cpp include/cssdk/public/interface.cpp common/*.cpp
+OBJECTS = *.cpp common/info.cpp common/stdc++compat.cpp include/cssdk/public/interface.cpp
 
 LINK = -ldl -m32 -s -Llib/linux32
 
@@ -17,7 +17,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -g0 -DNDEBUG -Dlinux -D__linux__ -std=gnu++14 -shared -m32 -D_GLIBCXX_USE_CXX11_ABI=0 -DHAVE_STRONG_TYPEDEF
+CFLAGS += -g0 -DNDEBUG -Dlinux -D__linux__ -std=gnu++14 -m32 -D_GLIBCXX_USE_CXX11_ABI=0 -DHAVE_STRONG_TYPEDEF
 
 OBJ_LINUX := $(OBJECTS:%.c=$(BIN_DIR)/%.o)
 
