@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #define ENUM_COUNT(e)               (sizeof(e) / sizeof(int))
 #define MAX_REG_MSGS                256
 #define MAX_PLAYERS                 32
