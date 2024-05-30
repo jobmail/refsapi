@@ -1,5 +1,6 @@
 #include <extdll.h>
 #include <meta_api.h>
+#include <refsapi.h>
 
 enginefuncs_t g_EngineFunctionsTable =
 {
@@ -221,16 +222,16 @@ enginefuncs_t g_EngineFunctionsTable_Post =
 	NULL,		// pfnLightStyle()
 	NULL,		// pfnDecalIndex()
 	NULL,		// pfnPointContents()
-	NULL,		// pfnMessageBegin()
-	NULL,		// pfnMessageEnd()
-	NULL,		// pfnWriteByte()
-	NULL,		// pfnWriteChar()
-	NULL,		// pfnWriteShort()
-	NULL,		// pfnWriteLong()
-	NULL,		// pfnWriteAngle()
-	NULL,		// pfnWriteCoord()
-	NULL,		// pfnWriteString()
-	NULL,		// pfnWriteEntity()
+	R_MessageBegin_Post,		// pfnMessageBegin()
+	R_MessageEnd_Post,		// pfnMessageEnd()
+	R_WriteByte_Post,		// pfnWriteByte()
+	R_WriteChar_Post,		// pfnWriteChar()
+	R_WriteShort_Post,		// pfnWriteShort()
+	R_WriteLong_Post,		// pfnWriteLong()
+	R_WriteAngle_Post,		// pfnWriteAngle()
+	R_WriteCoord_Post,		// pfnWriteCoord()
+	R_WriteString_Post,		// pfnWriteString()
+	R_WriteEntity_Post,		// pfnWriteEntity()
 	NULL,		// pfnCVarRegister()
 	NULL,		// pfnCVarGetFloat()
 	NULL,		// pfnCVarGetString()
@@ -250,7 +251,7 @@ enginefuncs_t g_EngineFunctionsTable_Post =
 	NULL,		// pfnPEntityOfEntIndex()
 	NULL,		// pfnFindEntityByVars()
 	NULL,		// pfnGetModelPtr()
-	NULL,		// pfnRegUserMsg()
+	R_RegUserMsg_Post,		// pfnRegUserMsg()
 	NULL,		// pfnAnimationAutomove()
 	NULL,		// pfnGetBonePosition()
 	NULL,		// pfnFunctionFromName()
