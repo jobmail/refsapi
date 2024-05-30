@@ -5,7 +5,7 @@ NAME = refsapi
 
 COMPILER = g++
 
-OBJECTS = *.cpp common/info.cpp common/stdc++compat.cpp include/cssdk/public/interface.cpp
+OBJECTS = *.cpp include/cssdk/public/interface.cpp
 
 LINK = -ldl -m32 -s -Llib/linux32
 
