@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <rehlds_api.h>
 
 #define ENUM_COUNT(e)               (sizeof(e) / sizeof(int))
 #define MAX_REG_MSGS                256
