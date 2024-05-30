@@ -67,8 +67,11 @@ int	R_RegUserMsg_Post(const char *pszName, int iSize) {
 
 void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed) {
 
+    mState = 0;
+
 	function = modMsgs[msg_type];
-	endfunction = modMsgsEnd[msg_type];
+	
+    endfunction = modMsgsEnd[msg_type];
 
 	RETURN_META(MRES_IGNORED);
 }
