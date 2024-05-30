@@ -1,6 +1,6 @@
 #include <precompiled.h>
 
-DLL_FUNCTIONS *g_pFunctionTable;
+DLL_FUNCTIONS *g_pFunctionTable, *g_pFunctionTable_Post;
 DLL_FUNCTIONS g_FunctionTable =
 {
 	NULL,					// pfnGameInit
@@ -141,6 +141,7 @@ C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersi
 
 	memcpy(pFunctionTable, &g_FunctionTable, sizeof(DLL_FUNCTIONS));
 	g_pFunctionTable = pFunctionTable;
+
 	return true;
 }
 
@@ -157,6 +158,8 @@ C_DLLEXPORT int GetEntityAPI2_Post(DLL_FUNCTIONS *pFunctionTable, int *interface
 	}
 
 	memcpy(pFunctionTable, &g_FunctionTable_Post, sizeof(DLL_FUNCTIONS));
+	g_pFunctionTable_Post = pFunctionTable;
+
 	return true;
 }
 

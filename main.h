@@ -42,3 +42,7 @@ inline void EWRITE_ENTITY(int iValue) { (*g_pengfuncsTable->pfnWriteEntity)(iVal
 
 void UTIL_ServerPrint(const char *fmt, ...);
 extern void NORETURN UTIL_SysError(const char *fmt, ...);
+
+enum 
+
+extern int g_players_num[];
