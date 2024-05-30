@@ -2,22 +2,50 @@
 
 #define ENUM_COUNT(e)               (sizeof(e) / sizeof(int))
 #define MAX_REG_MSGS                256
+#define MAX_PLAYERS                 32
 
 typedef void (*funEventCall)(void*);
 
 enum RFS_TEAMS {
+
     TEAM_UNASSIGNED,
     TEAM_TERRORIST,
     TEAM_CT,
     TEAM_SPECTRATOR,
     TEAM_DEAD_TT,
     TEAM_DEAD_CT
+
 };
 
-extern int gi_players_num[ENUM_COUNT(RFS_TEAMS)];
+struct g_RegUserMsg {
+
+	const char* name;
+	int* id;
+	funEventCall func;
+    bool endmsg;
+
+};
+
+struct g_ClientsTrie {
+
+    std::map<std::string, int> name_t;
+    std::map<std::string, int> authid_t;
+
+};
+
+struct sClients {
+
+    bool is_connected;
+    RFS_TEAMS team;
+};
+
+
+extern int g_PlayersNum[ENUM_COUNT(RFS_TEAMS)];
 extern int mState;
 
 void R_ClientPutInServer_Post(edict_t *pEntity);
+void R_ClientDisconnect(edict_t *pEntity);
+void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
 
 int	 R_RegUserMsg_Post(const char *pszName, int iSize);
 void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
