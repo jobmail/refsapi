@@ -73,35 +73,40 @@ void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict
 	
     endfunction = modMsgsEnd[msg_type];
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void R_WriteByte_Post(int iValue) {
 
 	if (function) (*function)((void *)&iValue);
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void R_WriteChar_Post(int iValue) {
 
 	if (function) (*function)((void *)&iValue);
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void R_WriteShort_Post(int iValue) {
 
 	if (function) (*function)((void *)&iValue);
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void R_WriteLong_Post(int iValue) {
 
 	if (function) (*function)((void *)&iValue);
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void R_WriteAngle_Post(float flValue) {
@@ -115,28 +120,32 @@ void R_WriteCoord_Post(float flValue) {
 
 	if (function) (*function)((void *)&flValue);
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void R_WriteString_Post(const char *sz) {
 
 	if (function) (*function)((void *)sz);
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void R_WriteEntity_Post(int iValue) {
 
 	if (function) (*function)((void *)&iValue);
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void R_MessageEnd_Post(void) {
 
 	if (endfunction) (*endfunction)(NULL);
 
-	RETURN_META(MRES_IGNORED);
+	//RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
 
 void Client_TeamInfo(void* mValue) {
