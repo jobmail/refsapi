@@ -18,7 +18,6 @@ struct g_RegUserMsg
 } g_user_msg[] =
 {
 	{ "TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false },
-    { 0, 0, 0, false },
 };
 
 // BEGIN ===>
@@ -42,7 +41,7 @@ int	R_RegUserMsg_Post(const char *pszName, int iSize) {
 
     SERVER_PRINT("[DEBUG] R_RegUserMsg_Post() ===>\n");
 
-	for (auto& msg : g_user_msg) {//(int i = 0; g_user_msg[i].name;	i++) {
+	for (auto& msg : g_user_msg) {      //(int i = 0; g_user_msg[i].name;	i++) {
 
 		if (strcmp(msg.name, pszName) == 0) {
 
