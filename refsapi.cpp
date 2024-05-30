@@ -263,9 +263,9 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
-            UTIL_ServerPrint(" new_team = %d", new_team);
-
             if (g_Clients[id]->is_connected && g_Clients[id]->team != new_team) {
+
+                UTIL_ServerPrint("[DEBUG] Team Changed!!!");
 
                 g_PlayersNum[g_Clients[id]->team]++;
 
