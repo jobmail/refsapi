@@ -10,6 +10,5 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
         UTIL_ServerPrint("PutInserver_Post(): %s <%s>", pPlayer->pev->netname, GETPLAYERAUTHID(pPlayer->edict()));
 	
     }
-
-	RETURN_META(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
 }
