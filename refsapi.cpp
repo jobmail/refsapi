@@ -91,8 +91,6 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
     if (g_Clients[id].is_connected) {
 
-        CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
-
         g_Clients[id].is_connected =
             
             g_Clients[id].is_bot = false;
