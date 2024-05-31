@@ -162,9 +162,9 @@ void Client_TeamInfo(void* mValue) {
 
                 UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
-                g_PlayersNum[g_Clients[id].team]--;
+                g_PlayersNum[(int)g_Clients[id].team]--;
 
-                g_PlayersNum[new_team]++;
+                g_PlayersNum[(int)new_team]++;
 
                 g_Clients[id].team = new_team;
 
