@@ -45,20 +45,7 @@ void R_ClientDisconnect(edict_t *pEntity) {
 
     SERVER_PRINT("[DEBUG] ClientDisconnect() ===>");
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
-
-    if (pPlayer) {
-
-        if (!pPlayer->IsBot())
-
-            UTIL_ServerPrint("[DEBUG] ClientDisconnect(): id = %d, name = %s authid = %s\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()));
-        
-        g_Clients[id].is_connected = false;
-
-        g_PlayersNum[g_Clients[id].team]--;
-    }
-
-    SERVER_PRINT("[DEBUG] ClientDisconnect() <===");
+	Client_Disconnected(id, false, 0);
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -73,19 +60,7 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
 	Q_strcpy_s(buffer, (char*)format);
 
-    CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
-
-    if (pPlayer) {
-
-        if (!pPlayer->IsBot())
-
-            UTIL_ServerPrint("[DEBUG] DropClient(): id = %d, name = %s authid = %s\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()));
-
-        g_Clients[id].is_connected = false;
-
-        g_PlayersNum[g_Clients[id].team]--;
-
-    }
+    Client_Disconnected(id, crash, buffer);
 
     chain->callNext(cl, crash, buffer);
 
@@ -265,7 +240,7 @@ void Client_TeamInfo(void* mValue) {
 
             if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
 
-                UTIL_ServerPrint("[DEBUG] Team changed!!!");
+                UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
                 g_PlayersNum[g_Clients[id].team]++;
 
@@ -275,9 +250,7 @@ void Client_TeamInfo(void* mValue) {
 
                 UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
 
-            } else
-
-                UTIL_ServerPrint("[DEBUG] Team not changed...");
+            }
 
 			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
             //strcpy(pPlayer->m_szTeamName, msg);
