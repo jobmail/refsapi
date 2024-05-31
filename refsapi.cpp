@@ -65,13 +65,9 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
 void R_ClientDisconnect(edict_t *pEntity) {
 
-    /*
-    int id = ENTINDEX(pEntity);
-
     SERVER_PRINT("[DEBUG] ClientDisconnect() ===>\n");
 
-	Client_Disconnected(id, false, 0);
-    */
+	Client_Disconnected(ENTINDEX(pEntity), false, 0);
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -80,18 +76,18 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 	
     char buffer[1024];
 
-    int id = ENTINDEX(cl->GetEdict());    
-
     SERVER_PRINT("[DEBUG] SV_DropClient_RH() ===>\n");
 
 	Q_strcpy_s(buffer, (char*)format);
 
-    Client_Disconnected(id, crash, buffer);
+    Client_Disconnected(ENTINDEX(cl->GetEdict()), crash, buffer);
 
     chain->callNext(cl, crash, buffer);
 }
 
 void Client_Disconnected(int id, bool crash, char *format) {
+
+    if (crash) return;
 
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
