@@ -57,6 +57,8 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 		msg.id = GET_USER_MSG_ID(PLID, msg.pszName, NULL);
 	}
 
+	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
+
 	SET_META_RESULT(MRES_IGNORED);
 }
 
