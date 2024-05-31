@@ -9,7 +9,7 @@
 
 typedef void (*funEventCall)(void*);
 
-enum RFS_TEAMS {
+typedef enum {
 
     TEAM_UNASSIGNED,
     TEAM_TERRORIST,
@@ -18,7 +18,7 @@ enum RFS_TEAMS {
     TEAM_DEAD_TT,
     TEAM_DEAD_CT
 
-};
+} eRFS_TEAMS;
 
 struct g_RegUserMsg {
 
@@ -39,12 +39,12 @@ struct g_ClientsTrie {
 struct sClients {
 
     bool is_connected;
-    RFS_TEAMS team;
+    eRFS_TEAMS team;
 
 };
 
 
-extern int g_PlayersNum[ENUM_COUNT(RFS_TEAMS)];
+extern int g_PlayersNum[ENUM_COUNT(eRFS_TEAMS)];
 extern int mState;
 
 void R_ClientPutInServer_Post(edict_t *pEntity);
