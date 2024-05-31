@@ -18,7 +18,7 @@ DLL_FUNCTIONS g_FunctionTable =
 	NULL,					// pfnSaveGlobalState
 	NULL,					// pfnRestoreGlobalState
 	&ResetGlobalState,		// pfnResetGlobalState
-	NULL,					// pfnClientConnect
+	&R_ClientConnect,		// pfnClientConnect
 	&R_ClientDisconnect,	// pfnClientDisconnect
 	NULL,					// pfnClientKill
 	NULL,					// pfnClientPutInServer
