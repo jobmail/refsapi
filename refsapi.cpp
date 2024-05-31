@@ -2,7 +2,7 @@
 
 int gmsgTeamInfo;
 int mState;
-int g_PlayersNum[ENUM_COUNT(eRFS_TEAMS)];
+int g_PlayersNum[6];
 
 sClients g_Clients[MAX_PLAYERS + 1];
 
