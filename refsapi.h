@@ -39,6 +39,7 @@ struct g_ClientsTrie {
 struct sClients {
 
     bool is_connected;
+    bool is_bot;
     eRFS_TEAMS team;
 
 };
