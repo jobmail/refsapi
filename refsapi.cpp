@@ -30,6 +30,15 @@ edict_t* R_ED_Alloc(IRehldsHook_ED_Alloc* chain) {
 	return origin;
 }
 
+int R_Spawn(edict_t *pEntity) {
+
+    int id = ENTINDEX(pEntity);
+
+    UTIL_ServerPrint("[DEBUG] Spawn(): id = %d\n", id);
+
+    RETURN_META_VALUE(MRES_IGNORED, 0);
+}
+
 void R_ClientPutInServer_Post(edict_t *pEntity) {
 
     int id = ENTINDEX(pEntity);
