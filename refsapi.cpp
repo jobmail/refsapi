@@ -23,7 +23,7 @@ edict_t* R_ED_Alloc(IRehldsHook_ED_Alloc* chain) {
 
     int id = ENTINDEX(origin);
 
-    if (id > 0 || id <= gpGlobals->maxClients)
+    if (id > 0 && id <= gpGlobals->maxClients)
 
         UTIL_ServerPrint("[DEBUG] ED_Alloc(): id = %d", id);
 
