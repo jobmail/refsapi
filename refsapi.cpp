@@ -17,7 +17,7 @@ g_RegUserMsg g_user_msg[] =
 	{ "TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false },
 };
 
-edict_t* R_ED_Alloc(IRehldsHook_ED_Alloc* chain) {
+edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
 
     auto origin = chain->callNext();
 
