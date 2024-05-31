@@ -7,7 +7,7 @@ CAPI_Config::CAPI_Config() : m_api_rehlds(false), m_api_regame(false) {
 }
 
 void CAPI_Config::FailedReGameDllAPI() {
-	
+
 	m_api_regame = false;
 }
 
@@ -22,6 +22,8 @@ void CAPI_Config::Init() {
 		g_engfuncs.pfnServerPrint("[REFSAPI] ReHLDS API successfully initialized.\n");
 
 		g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
+
+		g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc);
 	}
 	
 	if	(m_api_regame)
