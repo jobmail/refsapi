@@ -148,9 +148,9 @@ void Client_TeamInfo(void* mValue) {
 
                 CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-                if (pPlayer->IsBot()) {
+                UTIL_ServerPrint("TeamInfo: id = %d, is_bot = %d\n", id, pPlayer->IsBot());
 
-                    UTIL_ServerPrint("TeamInfo: bot connected\n");
+                if (pPlayer->IsBot()) {
 
                     g_Clients[id].is_connected = true;
 
