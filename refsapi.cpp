@@ -87,8 +87,6 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
 void Client_Disconnected(int id, bool crash, char *format) {
 
-    UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d, crash = %d, \n", id, 0/*g_Clients[id].is_connected*/, crash);
-
     if (is_valid_index(id) && g_Clients[id].is_connected) {
 
         g_Clients[id].is_connected =
