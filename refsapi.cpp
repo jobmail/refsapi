@@ -25,7 +25,7 @@ edict_t* R_ED_Alloc(IRehldsHook_ED_Alloc* chain) {
 
     if (id > 0 && id <= gpGlobals->maxClients)
 
-        UTIL_ServerPrint("[DEBUG] ED_Alloc(): id = %d", id);
+        UTIL_ServerPrint("[DEBUG] ED_Alloc(): id = %d\n", id);
 
 	return origin;
 }
