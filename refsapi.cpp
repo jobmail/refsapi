@@ -156,7 +156,7 @@ void Client_TeamInfo(void* mValue) {
                     g_PlayersNum[new_team]++;
                 }
 
-            } else if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
+            } else if (g_Clients[id].is_connected && new_team != TEAM_UNASSIGNED && g_Clients[id].team != new_team) {
 
                 UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
