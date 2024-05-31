@@ -76,7 +76,7 @@ edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *ne
 
     auto original = chain->callNext(netname);
 
-    UTIL_ServerPrint("[DEBUG] CreateFakeClient_Post(): id = %d, name = %s\n", original, netname);
+    UTIL_ServerPrint("[DEBUG] CreateFakeClient_Post(): id = %d, name = %s\n", ENTINDEX(original), netname);
 
     return original;
 }
