@@ -57,7 +57,11 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 		msg.id = GET_USER_MSG_ID(PLID, msg.pszName, NULL);
 	}
 
-	//memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
+	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
+
+	g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
+	g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
+	g_RehldsHookchains->CreateFakeClient()->registerHook(CreateFakeClient_RH);
 
 	SET_META_RESULT(MRES_IGNORED);
 }
@@ -73,6 +77,10 @@ void ServerDeactivate_Post()
 
 	g_pFunctionTable->pfnSpawn = DispatchSpawn;
 	g_pFunctionTable->pfnKeyValue = KeyValue;
+
+	g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
+	g_RehldsHookchains->ED_Alloc()->unregisterHook(ED_Alloc_RH);
+	g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
 
 	SET_META_RESULT(MRES_IGNORED);
 }
