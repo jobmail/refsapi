@@ -219,7 +219,7 @@ void Client_TeamInfo(void* mValue) {
 			
             if (!msg) break;
 
-            UTIL_ServerPrint("TeamInfo: id = %d, team = %s", id, msg);
+            UTIL_ServerPrint("TeamInfo: id = %d, team = %s\n", id, msg);
 
             switch (msg[0]) {
                 
