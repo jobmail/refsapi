@@ -148,7 +148,7 @@ void Client_TeamInfo(void* mValue) {
 
                 CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-                UTIL_ServerPrint("TeamInfo: id = %d, is_bot = %d\n", id, pPlayer->IsBot());
+                UTIL_ServerPrint("TeamInfo: id = %d, is_bot = %d, authid = %s\n", id, pPlayer->IsBot(), GETPLAYERAUTHID(pPlayer->edict()));
 
                 if (pPlayer->IsBot()) {
 
