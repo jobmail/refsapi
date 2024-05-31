@@ -39,6 +39,15 @@ int R_Spawn(edict_t *pEntity) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
+qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]) {
+
+    int id = ENTINDEX(pEntity);
+
+    UTIL_ServerPrint("[DEBUG] R_ClientConnect(): id = %d, name = %s, host = %s\n", id, pszName, pszAddress);
+
+	RETURN_META_VALUE(MRES_IGNORED, true);
+}
+
 void R_ClientPutInServer_Post(edict_t *pEntity) {
 
     int id = ENTINDEX(pEntity);
@@ -63,13 +72,11 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
     RETURN_META(MRES_IGNORED);
 }
 
-qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]) {
+edict_t* R_CreateFakeClient_Post (const char *netname) {
 
-    int id = ENTINDEX(pEntity);
+    UTIL_ServerPrint("[DEBUG] CreateFakeClient_Post(): name = %s\n", netname);
 
-    UTIL_ServerPrint("[DEBUG] R_ClientConnect(): id = %d, name = %s, host = %s\n", id, pszName, pszAddress);
-
-	RETURN_META_VALUE(MRES_IGNORED, true);
+    RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
 void R_ClientDisconnect(edict_t *pEntity) {
