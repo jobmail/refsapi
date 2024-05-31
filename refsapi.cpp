@@ -265,7 +265,7 @@ void Client_TeamInfo(void* mValue) {
 
             if (g_Clients[id]->is_connected && g_Clients[id]->team != new_team) {
 
-                UTIL_ServerPrint("[DEBUG] Team Changed!!!");
+                UTIL_ServerPrint("[DEBUG] Team changed!!!");
 
                 g_PlayersNum[g_Clients[id]->team]++;
 
@@ -275,7 +275,9 @@ void Client_TeamInfo(void* mValue) {
 
                 UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
 
-            }
+            } else
+
+                UTIL_ServerPrint("[DEBUG] Team not changed...");
 
 			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
             //strcpy(pPlayer->m_szTeamName, msg);
