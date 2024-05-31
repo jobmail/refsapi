@@ -65,9 +65,9 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
 void R_ClientDisconnect(edict_t *pEntity) {
 
-    /*
     SERVER_PRINT("[DEBUG] R_ClientDisconnect() ===>\n");
 
+    /*
 	Client_Disconnected(ENTINDEX(pEntity), false, 0);
     */
 
