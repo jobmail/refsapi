@@ -142,9 +142,7 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
-            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
-
-            UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %d, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
+            //UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %d, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
 
             if (!g_Clients[id].is_connected) {
 
@@ -152,7 +150,7 @@ void Client_TeamInfo(void* mValue) {
 
                 g_Clients[id].is_bot = strcmp(GETPLAYERAUTHID(pPlayer->edict()), "BOT") == 0;
 
-                UTIL_ServerPrint("TeamInfo: id = %d, is_bot = %d, authid = %s\n", id, g_Clients[id].is_bot, GETPLAYERAUTHID(pPlayer->edict()));
+                UTIL_ServerPrint("[DEBUG] TeamInfo: id = %d, is_bot = %d, authid = %s, team_old = %d, team_new = %d\n", id, g_Clients[id].is_bot, GETPLAYERAUTHID(pPlayer->edict()), g_Clients[id].team, new_team);
 
                 g_Clients[id].is_connected = true;
 
@@ -169,6 +167,8 @@ void Client_TeamInfo(void* mValue) {
                 g_PlayersNum[new_team]++;
 
                 g_Clients[id].team = new_team;
+
+                UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
 
             }
 
