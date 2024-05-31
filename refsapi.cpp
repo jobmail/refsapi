@@ -47,7 +47,7 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-    if (!pPlayer->IsBot()) {
+    if (pPlayer != nullptr && !pPlayer->IsBot()) {
 
         g_Clients[id].is_connected = true;
 
@@ -148,13 +148,16 @@ void Client_TeamInfo(void* mValue) {
 
                     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-                    g_Clients[id].is_bot = pPlayer->IsBot() || strcmp(GETPLAYERAUTHID(pPlayer->edict()), "BOT") == 0;
+                    if (pPlayer != nullptr) {
 
-                    if (g_Clients[id].is_bot) {
+                        g_Clients[id].is_bot = pPlayer->IsBot() || strcmp(GETPLAYERAUTHID(pPlayer->edict()), "BOT") == 0;
 
-                        g_Clients[id].is_connected = true;
+                        if (g_Clients[id].is_bot) {
 
-                        g_PlayersNum[new_team]++;
+                            g_Clients[id].is_connected = true;
+
+                            g_PlayersNum[new_team]++;
+                        }
                     }
                 }
 
