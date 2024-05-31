@@ -9,7 +9,7 @@
 
 inline bool __is_valid_edict_index(size_t index) {
 
-    return index > 0 && index < gpGlobals->maxClients;
+    return index > 0 && index <= gpGlobals->maxClients;
 }
 
 typedef void (*funEventCall)(void*);
