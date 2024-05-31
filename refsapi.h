@@ -40,7 +40,7 @@ struct sClients {
 
     bool is_connected;
     RFS_TEAMS team;
-    
+
 };
 
 
@@ -64,7 +64,7 @@ void R_WriteEntity_Post(int iValue);
 void R_MessageEnd_Post(void);
 
 void Client_TeamInfo(void*);
-
+void Client_Disconnected(int id, bool crash, char *format);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
