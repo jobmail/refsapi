@@ -13,9 +13,9 @@ void CAPI_Config::FailedReGameDllAPI() {
 
 void CAPI_Config::Init() {
 
-	m_api_rehlds    = RehldsApi_Init();
+	m_api_rehlds = RehldsApi_Init();
 
-	m_api_regame    = RegamedllApi_Init();
+	m_api_regame = RegamedllApi_Init();
 
 	if (m_api_rehlds) {
 
@@ -34,7 +34,7 @@ void CAPI_Config::Init() {
 
 		g_ReGameHookchains->InstallGameRules()->registerHook(&InstallGameRules);
 
-	std::fill_n(g_PlayersNum, sizeof(g_PlayersNum), 0);
+	//std::fill_n(g_PlayersNum, sizeof(g_PlayersNum), 0);
 }
 
 void CAPI_Config::ServerDeactivate() const {
