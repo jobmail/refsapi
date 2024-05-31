@@ -24,6 +24,8 @@ void CAPI_Config::Init() {
 		g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
 
 		g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
+
+		//g_RehldsHookchains->CreateFakeClient()->registerHook
 	}	
 
 	if (m_api_regame) {
