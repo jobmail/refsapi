@@ -173,7 +173,7 @@ void Client_TeamInfo(void* mValue) {
 
                         if (g_Clients[id].is_bot) {
 
-                            UTIL_ServerPrint("[DEBUG] bot connected, id = %d\n");
+                            UTIL_ServerPrint("[DEBUG] bot connected, id = %d\n", id);
 
                             g_Clients[id].is_connected = true;
 
