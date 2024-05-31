@@ -43,6 +43,8 @@ void R_ClientPutInServer(edict_t *pEntity) {
 
 void R_ClientPutInServer_Post(edict_t *pEntity) {
 
+    RETURN_META(MRES_IGNORED);
+
 }
 
 void R_ClientDisconnect(edict_t *pEntity) {
