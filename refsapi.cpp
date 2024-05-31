@@ -47,17 +47,18 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
 	CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-    //if (!pPlayer->IsBot())
+    if (!pPlayer->IsBot()) {
 
-    g_Clients[id].is_connected = true;
+        g_Clients[id].is_connected = true;
 
-    g_Clients[id].team = TEAM_UNASSIGNED;
+        g_Clients[id].team = TEAM_UNASSIGNED;
 
-    g_PlayersNum[TEAM_UNASSIGNED]++;
+        g_PlayersNum[TEAM_UNASSIGNED]++;
 
-    UTIL_ServerPrint("[DEBUG] PutInserver_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()), g_Clients[id].team, g_Clients[id].is_connected);
+        UTIL_ServerPrint("[DEBUG] PutInserver_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()), g_Clients[id].team, g_Clients[id].is_connected);
 
-    UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+        UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+    }
 
     RETURN_META(MRES_IGNORED);
 }
@@ -92,11 +93,9 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-    if (!pPlayer->IsBot())
-
-        UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s authid = %s, crash = %d\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()), crash);
-
-    g_Clients[id].is_connected = false;
+    g_Clients[id].is_connected =
+        
+        g_Clients[id].is_bot = false;
 
     g_PlayersNum[g_Clients[id].team]--;
 
@@ -142,22 +141,21 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
-            //UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %d, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
-
             if (!g_Clients[id].is_connected) {
 
                 CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-                g_Clients[id].is_bot = strcmp(GETPLAYERAUTHID(pPlayer->edict()), "BOT") == 0;
+                g_Clients[id].is_bot = pPlayer->IsBot() || (GETPLAYERAUTHID(pPlayer->edict()), "BOT") == 0;
 
-                UTIL_ServerPrint("[DEBUG] TeamInfo: id = %d, is_bot = %d, authid = %s, team_old = %d, team_new = %d\n", id, g_Clients[id].is_bot, GETPLAYERAUTHID(pPlayer->edict()), g_Clients[id].team, new_team);
+                if (g_Clients[id].is_bot) {
 
-                g_Clients[id].is_connected = true;
+                    g_Clients[id].is_connected = true;
 
-                g_Clients[id].team = new_team;
+                    g_Clients[id].team = new_team;
 
-                g_PlayersNum[new_team]++;
-            
+                    g_PlayersNum[new_team]++;
+                }
+
             } else if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
 
                 UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
