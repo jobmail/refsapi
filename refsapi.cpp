@@ -229,7 +229,7 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
-            UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %s, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
+            UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %d, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
 
             if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
 
