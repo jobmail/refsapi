@@ -24,15 +24,14 @@ void CAPI_Config::Init() {
 		g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
 
 		g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
-	}
-	
-	if	(m_api_regame)
+	}	
+
+	if (m_api_regame) {
 
 		g_engfuncs.pfnServerPrint("[REFSAPI] ReGAME API successfully initialized.\n");
 
-	if (m_api_regame)
-
 		g_ReGameHookchains->InstallGameRules()->registerHook(&InstallGameRules);
+	}
 }
 
 void CAPI_Config::ServerDeactivate() const {
