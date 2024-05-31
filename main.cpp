@@ -51,6 +51,7 @@ void OnMetaDetach()
 void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 {
 	for (auto& msg : g_RegUserMsg) {
+		
 		msg.id = GET_USER_MSG_ID(PLID, msg.pszName, NULL);
 	}
 
