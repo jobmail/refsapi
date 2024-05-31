@@ -141,7 +141,7 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
-            UTIL_ServerPrint("[DEBUG] new_team = %s", msg);
+            UTIL_ServerPrint("[DEBUG] new_team = %s\n", msg);
 
             if (!g_Clients[id].is_connected) {
 
