@@ -72,11 +72,13 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
     RETURN_META(MRES_IGNORED);
 }
 
-edict_t* R_CreateFakeClient(const char *netname) {
+edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname) {
 
-    UTIL_ServerPrint("[DEBUG] CreateFakeClient_Post(): name = %s\n", netname);
+    auto original = chain->callNext(netname);
 
-    RETURN_META_VALUE(MRES_IGNORED, 0);
+    UTIL_ServerPrint("[DEBUG] CreateFakeClient_Post(): id = %d, name = %s\n", original, netname);
+
+    return original;
 }
 
 void R_ClientDisconnect(edict_t *pEntity) {

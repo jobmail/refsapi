@@ -25,7 +25,7 @@ void CAPI_Config::Init() {
 
 		g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
 
-		//g_RehldsHookchains->CreateFakeClient()->registerHook
+		g_RehldsHookchains->CreateFakeClient()->registerHook(CreateFakeClient_RH);
 	}	
 
 	if (m_api_regame) {
@@ -43,6 +43,8 @@ void CAPI_Config::ServerDeactivate() const {
 		g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
 
 		g_RehldsHookchains->ED_Alloc()->unregisterHook(ED_Alloc_RH);
+
+		g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
 
 	}
 	

@@ -107,7 +107,7 @@ enginefuncs_t g_EngineFunctionsTable =
 	NULL,		// pfnCvar_RegisterVariable()
 	NULL,		// pfnFadeClientVolume()
 	NULL,		// pfnSetClientMaxspeed()
-	&R_CreateFakeClient,		// pfnCreateFakeClient()
+	NULL,		// pfnCreateFakeClient()
 	NULL,		// pfnRunPlayerMove()
 	NULL,		// pfnNumberOfEntities()
 	NULL,		// pfnGetInfoKeyBuffer()
