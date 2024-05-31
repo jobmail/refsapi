@@ -194,7 +194,7 @@ void Client_TeamInfo(void* mValue) {
 
     static int id;
     char* msg;
-    RFS_TEAMS new_team;
+    eRFS_TEAMS new_team;
 
     switch (mState++) {
     
