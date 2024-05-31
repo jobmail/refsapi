@@ -45,7 +45,7 @@ struct sClients {
 };
 
 
-extern int g_PlayersNum[ENUM_COUNT(eRFS_TEAMS)];
+extern int g_PlayersNum[6];
 extern int mState;
 
 void R_ClientPutInServer(edict_t *pEntity);
