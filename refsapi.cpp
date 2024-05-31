@@ -148,17 +148,15 @@ void Client_TeamInfo(void* mValue) {
 
                 CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-                UTIL_ServerPrint("TeamInfo: id = %d, is_bot = %d, authid = %s\n", id, pPlayer->IsBot(), GETPLAYERAUTHID(pPlayer->edict()));
+                g_Clients[id].is_bot = strcmpi(GETPLAYERAUTHID(pPlayer->edict()), "bot") == 0;
 
-                if (pPlayer->IsBot()) {
+                UTIL_ServerPrint("TeamInfo: id = %d, is_bot = %d, authid = %s\n", id, g_Clients[id].is_bot, GETPLAYERAUTHID(pPlayer->edict()));
 
-                    g_Clients[id].is_connected = true;
+                g_Clients[id].is_connected = true;
 
-                    g_Clients[id].team = new_team;
+                g_Clients[id].team = new_team;
 
-                    g_PlayersNum[new_team]++;
-
-                }
+                g_PlayersNum[new_team]++;
             
             } else if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
 
