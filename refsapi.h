@@ -47,6 +47,7 @@ struct sClients {
 extern int g_PlayersNum[ENUM_COUNT(eRFS_TEAMS)];
 extern int mState;
 
+void R_ClientPutInServer(edict_t *pEntity);
 void R_ClientPutInServer_Post(edict_t *pEntity);
 void R_ClientDisconnect(edict_t *pEntity);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);

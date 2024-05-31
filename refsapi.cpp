@@ -17,7 +17,7 @@ g_RegUserMsg g_user_msg[] =
 	{ "TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false },
 };
 
-void R_ClientPutInServer_Post(edict_t *pEntity) {
+void R_ClientPutInServer(edict_t *pEntity) {
 
     int id = ENTINDEX(pEntity);
 
@@ -38,6 +38,11 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
     UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
 
     SET_META_RESULT(MRES_IGNORED);
+
+}
+
+void R_ClientPutInServer_Post(edict_t *pEntity) {
+
 }
 
 void R_ClientDisconnect(edict_t *pEntity) {
