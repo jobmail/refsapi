@@ -39,9 +39,9 @@ void CAPI_Config::ServerDeactivate() const {
 
 	if (m_api_rehlds) {
 
-		//g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
+		g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
 
-		//g_RehldsHookchains->ED_Alloc()->unregisterHook(R_ED_Alloc);
+		g_RehldsHookchains->ED_Alloc()->unregisterHook(R_ED_Alloc);
 
 	}
 	
