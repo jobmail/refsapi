@@ -40,11 +40,11 @@ void CAPI_Config::ServerDeactivate() const {
 
 	if (m_api_rehlds) {
 
-		g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
+		//g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
 
-		g_RehldsHookchains->ED_Alloc()->unregisterHook(ED_Alloc_RH);
+		//g_RehldsHookchains->ED_Alloc()->unregisterHook(ED_Alloc_RH);
 
-		g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
+		//g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
 
 	}
 	
