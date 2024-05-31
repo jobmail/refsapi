@@ -67,7 +67,7 @@ qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszA
 
     int id = ENTINDEX(pEntity);
 
-    UTIL_ServerPrint("[DEBUG] R_ClientConnect(): id = %d, name = %s, ip = %s\n", id, pszName, pszAddress);
+    UTIL_ServerPrint("[DEBUG] R_ClientConnect(): id = %d, name = %s, host = %s\n", id, pszName, pszAddress);
 
 	RETURN_META_VALUE(MRES_IGNORED, true);
 }
@@ -96,15 +96,20 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
 void Client_Disconnected(int id, bool crash, char *format) {
 
-    if (is_valid_index(id) && g_Clients[id].is_connected) {
+    if (is_valid_index(id)) {
+        
+        UTIL_ServerPrint("[DEBUG] R_ClientConnect():");
 
-        g_Clients[id].is_connected =
-            
-            g_Clients[id].is_bot = false;
+        if (g_Clients[id].is_connected) {
 
-        g_PlayersNum[g_Clients[id].team]--;
+            g_Clients[id].is_connected =
+                
+                g_Clients[id].is_bot = false;
 
-        UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+            g_PlayersNum[g_Clients[id].team]--;
+
+            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+        }
     }
 }
 
@@ -160,6 +165,8 @@ void Client_TeamInfo(void* mValue) {
                         g_Clients[id].is_bot = pPlayer->IsBot() || strcmp(GETPLAYERAUTHID(pPlayer->edict()), "BOT") == 0;
 
                         if (g_Clients[id].is_bot) {
+
+                            UTIL_ServerPrint("[DEBUG] bot connected, id = %d");
 
                             g_Clients[id].is_connected = true;
 
