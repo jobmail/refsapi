@@ -51,7 +51,7 @@ extern int g_PlayersNum[6];
 extern int mState;
 
 qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]);
-edict_t* R_CreateFakeClient_Post (const char *netname);
+edict_t* R_CreateFakeClient (const char *netname);
 void R_ClientPutInServer(edict_t *pEntity);
 void R_ClientPutInServer_Post(edict_t *pEntity);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
