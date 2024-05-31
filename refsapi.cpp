@@ -89,7 +89,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
     UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d, crash = %d, \n", id, 0/*g_Clients[id].is_connected*/, crash);
 
-    if (g_Clients[id].is_connected) {
+    if (is_valid_index(id) && g_Clients[id].is_connected) {
 
         g_Clients[id].is_connected =
             
@@ -117,7 +117,7 @@ void Client_TeamInfo(void* mValue) {
 
         case 1:
 		
-        	if (id < 1 || id > gpGlobals->maxClients) break;
+        	if (!is_valid_index(id)) break;
 		
         	msg = (char*)mValue;
 			
