@@ -21,7 +21,7 @@ void R_ClientPutInServer(edict_t *pEntity) {
 
     int id = ENTINDEX(pEntity);
 
-    SERVER_PRINT("[DEBUG] ClientPutInServer() ===>\n");
+    UTIL_ServerPrint("[DEBUG] ClientPutInServer(%d) ===>\n", id);
 
 	CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
