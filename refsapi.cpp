@@ -141,6 +141,8 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
+            UTIL_ServerPrint("[DEBUG] new_team = %s", msg);
+
             if (!g_Clients[id].is_connected) {
 
                 CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
