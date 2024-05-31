@@ -3,11 +3,10 @@
 #include <map>
 #include <rehlds_api.h>
 
-#define ENUM_COUNT(e)               (sizeof(e) / sizeof(int))
 #define MAX_REG_MSGS                256
 #define MAX_PLAYERS                 32
 #define IS_NULL
-#define is_valid_index(p)          (p > 0 && p < gpGlobals->maxClients)
+#define is_valid_index(id)          ((id > 0) && (id < gpGlobals->maxClients))
 
 typedef void (*funEventCall)(void*);
 
