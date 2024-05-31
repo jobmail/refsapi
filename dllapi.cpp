@@ -21,7 +21,7 @@ DLL_FUNCTIONS g_FunctionTable =
 	NULL,					// pfnClientConnect
 	&R_ClientDisconnect,	// pfnClientDisconnect
 	NULL,					// pfnClientKill
-	&R_ClientPutInServer,	// pfnClientPutInServer
+	NULL,					// pfnClientPutInServer
 	NULL,					// pfnClientCommand
 	NULL,					// pfnClientUserInfoChanged
 	NULL,					// pfnServerActivate
