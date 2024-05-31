@@ -23,15 +23,17 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
 	CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 	
-    if (!pPlayer->IsBot())
-
-        UTIL_ServerPrint("[DEBUG] PutInserver_Post(): id = %d, name = %s, authid = %s\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()));
+    //if (!pPlayer->IsBot())
 
     g_Clients[id].is_connected = true;
 
     g_Clients[id].team = TEAM_UNASSIGNED;
 
     g_PlayersNum[TEAM_UNASSIGNED]++;
+
+    UTIL_ServerPrint("[DEBUG] PutInserver_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()), g_Clients[id].team, g_Clients[id].is_connected);
+
+    UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
 
     SET_META_RESULT(MRES_IGNORED);
 }
@@ -62,6 +64,84 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
     chain->callNext(cl, crash, buffer);
 
     SERVER_PRINT("[DEBUG] SV_DropClient_RH() <===");
+
+}
+
+void Client_Disconnected(int id, bool crash, char *format) {
+
+    CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
+
+    if (!pPlayer->IsBot())
+
+        UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s authid = %s, crash = %d\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()), crash);
+
+    g_Clients[id].is_connected = false;
+
+    g_PlayersNum[g_Clients[id].team]--;
+
+    UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+}
+
+void Client_TeamInfo(void* mValue) {
+
+    static int id;
+    char* msg;
+    eRFS_TEAMS new_team;
+
+    switch (mState++) {
+    
+        case 0:
+
+			id = *(int*)mValue;
+		
+        	break;
+
+        case 1:
+		
+        	if (id < 1 || id > gpGlobals->maxClients) break;
+		
+        	msg = (char*)mValue;
+			
+            if (!msg) break;
+
+            switch (msg[0]) {
+                
+                case 'T': new_team = TEAM_TERRORIST;
+                
+                    break;
+
+                case 'C': new_team = TEAM_CT;
+                
+                    break;
+
+                case 'S': new_team = TEAM_SPECTRATOR;
+                    
+                    break;
+
+                default: new_team = TEAM_UNASSIGNED;
+            }
+
+            UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %d, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
+
+            if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
+
+                UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
+
+                g_PlayersNum[g_Clients[id].team]++;
+
+                g_PlayersNum[new_team]++;
+
+                g_Clients[id].team = new_team;
+
+                UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+
+            }
+
+			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
+            //strcpy(pPlayer->m_szTeamName, msg);
+            break;
+    
+    }
 
 }
 
@@ -173,82 +253,4 @@ void R_MessageEnd_Post(void) {
 
 	//RETURN_META(MRES_IGNORED);
     SET_META_RESULT(MRES_IGNORED);
-}
-
-void Client_Disconnected(int id, bool crash, char *format) {
-
-    CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
-
-    if (!pPlayer->IsBot())
-
-        UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s authid = %s, crash = %d\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()), crash);
-
-    g_Clients[id].is_connected = false;
-
-    g_PlayersNum[g_Clients[id].team]--;
-
-    UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
-}
-
-void Client_TeamInfo(void* mValue) {
-
-    static int id;
-    char* msg;
-    eRFS_TEAMS new_team;
-
-    switch (mState++) {
-    
-        case 0:
-
-			id = *(int*)mValue;
-		
-        	break;
-
-        case 1:
-		
-        	if (id < 1 || id > gpGlobals->maxClients) break;
-		
-        	msg = (char*)mValue;
-			
-            if (!msg) break;
-
-            switch (msg[0]) {
-                
-                case 'T': new_team = TEAM_TERRORIST;
-                
-                    break;
-
-                case 'C': new_team = TEAM_CT;
-                
-                    break;
-
-                case 'S': new_team = TEAM_SPECTRATOR;
-                    
-                    break;
-
-                default: new_team = TEAM_UNASSIGNED;
-            }
-
-            UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %d, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
-
-            if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
-
-                UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
-
-                g_PlayersNum[g_Clients[id].team]++;
-
-                g_PlayersNum[new_team]++;
-
-                g_Clients[id].team = new_team;
-
-                UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
-
-            }
-
-			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
-            //strcpy(pPlayer->m_szTeamName, msg);
-            break;
-    
-    }
-
 }
