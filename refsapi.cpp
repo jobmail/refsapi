@@ -67,7 +67,7 @@ qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszA
 
     int id = ENTINDEX(pEntity);
 
-    UTIL_ServerPrint("[DEBUG] R_ClientConnect(%d) ===>\n", id);
+    UTIL_ServerPrint("[DEBUG] R_ClientConnect(): id = %d, name = %s, ip = %s\n", id, pszName, pszAddress);
 
 	RETURN_META_VALUE(MRES_IGNORED, true);
 }
