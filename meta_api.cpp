@@ -15,7 +15,7 @@ plugin_info_t Plugin_info =
 	"https://dev-cs.ru",			// url
 	"REFSAPI",						// logtag
 	PT_ANYTIME,						// (when) loadable
-	PT_ANYTIME,						// (when) unloadable
+	PT_NEVER,						// (when) unloadable
 };
 
 C_DLLEXPORT int Meta_Query(char *interfaceVersion, plugin_info_t **plinfo, mutil_funcs_t *pMetaUtilFuncs)
