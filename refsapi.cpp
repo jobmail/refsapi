@@ -98,11 +98,7 @@ void Client_PutInServer(edict_t *pEntity, const char *netname) {
 
     int id = ENTINDEX(pEntity);
 
-    UTIL_ServerPrint("[DEBUG] Client_PutInServer(%d) ===>\n", id);
-
     if (is_valid_index(id)) {
-
-        SERVER_PRINT("[DEBUG] ZZZ\n");
 
         g_Clients[id].is_connected = true;
 
@@ -114,7 +110,6 @@ void Client_PutInServer(edict_t *pEntity, const char *netname) {
 
         UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
     }
-    SERVER_PRINT("[DEBUG] Client_PutInServer() <===\n");
 }
 
 void Client_Disconnected(int id, bool crash, char *format) {
