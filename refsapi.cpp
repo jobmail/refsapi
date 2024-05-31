@@ -67,9 +67,7 @@ void R_ClientDisconnect(edict_t *pEntity) {
 
     SERVER_PRINT("[DEBUG] R_ClientDisconnect() ===>\n");
 
-    /*
 	Client_Disconnected(ENTINDEX(pEntity), false, 0);
-    */
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -84,22 +82,25 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
     Client_Disconnected(ENTINDEX(cl->GetEdict()), crash, buffer);
 
-    chain->callNext(cl, crash, buffer);
+    chain->callNext(cl, crash, format);
 }
 
 void Client_Disconnected(int id, bool crash, char *format) {
 
-    UTIL_ServerPrint("[DEBUG] Client_Disconnected(): crash = %d\n", crash);
+    UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d, crash = %d, \n", id, g_Clients[id].is_connected, crash);
 
-    CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
+    if (g_Clients[id].is_connected) {
 
-    g_Clients[id].is_connected =
-        
-        g_Clients[id].is_bot = false;
+        CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-    g_PlayersNum[g_Clients[id].team]--;
+        g_Clients[id].is_connected =
+            
+            g_Clients[id].is_bot = false;
 
-    UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+        g_PlayersNum[g_Clients[id].team]--;
+
+        UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+    }
 }
 
 void Client_TeamInfo(void* mValue) {
