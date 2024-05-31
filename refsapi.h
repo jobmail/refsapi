@@ -3,7 +3,7 @@
 #include <map>
 #include <rehlds_api.h>
 
-#define MAX_REG_MSGS                256
+#define MAX_REG_MSGS                256 + 16
 #define MAX_PLAYERS                 32
 #define is_valid_index              __is_valid_edict_index
 
