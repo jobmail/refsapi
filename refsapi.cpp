@@ -142,6 +142,8 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
+            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+
             UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %d, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
 
             if (!g_Clients[id].is_connected) {
@@ -169,8 +171,6 @@ void Client_TeamInfo(void* mValue) {
                 g_Clients[id].team = new_team;
 
             }
-
-            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
 
 			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
             //strcpy(pPlayer->m_szTeamName, msg);
