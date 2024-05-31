@@ -63,6 +63,15 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
     RETURN_META(MRES_IGNORED);
 }
 
+qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]) {
+
+    int id = ENTINDEX(pEntity);
+
+    UTIL_ServerPrint("[DEBUG] R_ClientConnect(%d) ===>\n", id);
+
+	RETURN_META_VALUE(MRES_IGNORED, true);
+}
+
 void R_ClientDisconnect(edict_t *pEntity) {
 
     SERVER_PRINT("[DEBUG] R_ClientDisconnect() ===>\n");
@@ -102,7 +111,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
 void Client_TeamInfo(void* mValue) {
 
     static int id;
-    char* msg;
+    char *msg;
     eRFS_TEAMS new_team;
 
     switch (mState++) {
@@ -138,7 +147,7 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
-            UTIL_ServerPrint("[DEBUG] id = %d, old_team = %d, new_team = %d\n", id, g_Clients[id].team, new_team);
+            //UTIL_ServerPrint("[DEBUG] id = %d, old_team = %d, new_team = %d\n", id, g_Clients[id].team, new_team);
 
             if (!g_Clients[id].is_connected) {
 
