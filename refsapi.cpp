@@ -98,7 +98,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
     if (is_valid_index(id)) {
         
-        UTIL_ServerPrint("[DEBUG] R_ClientConnect():");
+        UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d", id, g_Clients[id].is_connected);
 
         if (g_Clients[id].is_connected) {
 
