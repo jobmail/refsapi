@@ -65,9 +65,11 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
 void R_ClientDisconnect(edict_t *pEntity) {
 
-    SERVER_PRINT("[DEBUG] ClientDisconnect() ===>\n");
+    /*
+    SERVER_PRINT("[DEBUG] R_ClientDisconnect() ===>\n");
 
 	Client_Disconnected(ENTINDEX(pEntity), false, 0);
+    */
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -87,7 +89,7 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
 void Client_Disconnected(int id, bool crash, char *format) {
 
-    SERVER_PRINT("[DEBUG] Client_Disconnected() ===>\n");
+    UTIL_ServerPrint("[DEBUG] Client_Disconnected(): crash = %d", crash);;
 
     if (crash) return;
 
