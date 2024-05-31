@@ -150,6 +150,8 @@ void Client_TeamInfo(void* mValue) {
 
                 if (pPlayer->IsBot()) {
 
+                    UTIL_ServerPrint("TeamInfo: bot connected\n");
+
                     g_Clients[id].is_connected = true;
 
                     g_Clients[id].team = new_team;
