@@ -50,11 +50,12 @@ struct sClients {
 extern int g_PlayersNum[6];
 extern int mState;
 
+qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]);
+edict_t* R_CreateFakeClient_Post (const char *netname);
 void R_ClientPutInServer(edict_t *pEntity);
 void R_ClientPutInServer_Post(edict_t *pEntity);
-qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]);
-void R_ClientDisconnect(edict_t *pEntity);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
+void R_ClientDisconnect(edict_t *pEntity);
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
 int R_Spawn(edict_t *pEntity);
 

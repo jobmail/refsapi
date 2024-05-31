@@ -279,7 +279,7 @@ enginefuncs_t g_EngineFunctionsTable_Post =
 	NULL,		// pfnCvar_RegisterVariable()
 	NULL,		// pfnFadeClientVolume()
 	NULL,		// pfnSetClientMaxspeed()
-	NULL,		// pfnCreateFakeClient()
+	&R_CreateFakeClient_Post,		// pfnCreateFakeClient()
 	NULL,		// pfnRunPlayerMove()
 	NULL,		// pfnNumberOfEntities()
 	NULL,		// pfnGetInfoKeyBuffer()
