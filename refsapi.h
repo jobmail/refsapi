@@ -53,7 +53,7 @@ void R_ClientPutInServer(edict_t *pEntity);
 void R_ClientPutInServer_Post(edict_t *pEntity);
 void R_ClientDisconnect(edict_t *pEntity);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
-edict_t* R_ED_Alloc(IRehldsHook_ED_Alloc* chain);
+edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
 int R_Spawn(edict_t *pEntity);
 
 int	 R_RegUserMsg_Post(const char *pszName, int iSize);
