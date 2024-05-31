@@ -87,6 +87,8 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
 void Client_Disconnected(int id, bool crash, char *format) {
 
+    SERVER_PRINT("[DEBUG] Client_Disconnected() ===>\n");
+
     if (crash) return;
 
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
