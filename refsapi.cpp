@@ -158,15 +158,15 @@ void Client_TeamInfo(void* mValue) {
 
                 g_Clients[id].team = new_team;
 
-                ++g_PlayersNum[new_team];
+                g_PlayersNum[new_team]++;
             
             } else if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
 
                 UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
-                --g_PlayersNum[g_Clients[id].team];
+                g_PlayersNum[g_Clients[id].team]--;
 
-                ++g_PlayersNum[new_team];
+                g_PlayersNum[new_team]++;
 
                 g_Clients[id].team = new_team;
 
