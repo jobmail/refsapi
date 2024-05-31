@@ -20,12 +20,6 @@ void CAPI_Config::Init() {
 	if (m_api_rehlds) {
 
 		g_engfuncs.pfnServerPrint("[REFSAPI] ReHLDS API successfully initialized.\n");
-
-		g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
-
-		g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
-
-		g_RehldsHookchains->CreateFakeClient()->registerHook(CreateFakeClient_RH);
 	}	
 
 	if (m_api_regame) {
@@ -37,16 +31,6 @@ void CAPI_Config::Init() {
 }
 
 void CAPI_Config::ServerDeactivate() const {
-
-	if (m_api_rehlds) {
-
-		g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
-
-		g_RehldsHookchains->ED_Alloc()->unregisterHook(ED_Alloc_RH);
-
-		g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
-
-	}
 	
 	if (m_api_regame)
 
