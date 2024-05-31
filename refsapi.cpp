@@ -25,7 +25,7 @@ edict_t* R_ED_Alloc(IRehldsHook_ED_Alloc* chain) {
 
     //if (id > 0 && id <= gpGlobals->maxClients)
 
-    UTIL_ServerPrint("[DEBUG] ED_Alloc(): id = %d\n", id);
+    //UTIL_ServerPrint("[DEBUG] ED_Alloc(): id = %d\n", id);
 
 	return origin;
 }
@@ -34,7 +34,7 @@ int R_Spawn(edict_t *pEntity) {
 
     int id = ENTINDEX(pEntity);
 
-    UTIL_ServerPrint("[DEBUG] Spawn(): id = %d\n", id);
+    //UTIL_ServerPrint("[DEBUG] Spawn(): id = %d\n", id);
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
@@ -144,19 +144,33 @@ void Client_TeamInfo(void* mValue) {
 
             UTIL_ServerPrint("TeamInfo: id = %d, is_connected = %d, team_old = %d, team_new = %d\n", id, g_Clients[id].is_connected, g_Clients[id].team, new_team);
 
-            if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
+            if (!g_Clients[id].is_connected) {
+
+                CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
+
+                if (pPlayer->IsBot()) {
+
+                    g_Clients[id].is_connected = true;
+
+                    g_Clients[id].team = new_team;
+
+                    g_PlayersNum[new_team]++;
+
+                }
+            
+            } else if (g_Clients[id].is_connected && g_Clients[id].team != new_team) {
 
                 UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
-                g_PlayersNum[g_Clients[id].team]++;
+                g_PlayersNum[g_Clients[id].team]--;
 
                 g_PlayersNum[new_team]++;
 
                 g_Clients[id].team = new_team;
 
-                UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
-
             }
+
+            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
 
 			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
             //strcpy(pPlayer->m_szTeamName, msg);
