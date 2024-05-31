@@ -102,6 +102,8 @@ void Client_PutInServer(edict_t *pEntity, const char *netname) {
 
     if (is_valid_index(id)) {
 
+        SERVER_PRINT("[DEBUG] ZZZ\n");
+
         g_Clients[id].is_connected = true;
 
         g_Clients[id].team = TEAM_UNASSIGNED;
