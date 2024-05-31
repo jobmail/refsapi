@@ -40,6 +40,7 @@ struct sClients {
 
     bool is_connected;
     RFS_TEAMS team;
+    
 };
 
 
