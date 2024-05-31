@@ -33,8 +33,6 @@ void CAPI_Config::Init() {
 	if (m_api_regame)
 
 		g_ReGameHookchains->InstallGameRules()->registerHook(&InstallGameRules);
-
-	//std::fill_n(g_PlayersNum, sizeof(g_PlayersNum), 0);
 }
 
 void CAPI_Config::ServerDeactivate() const {
