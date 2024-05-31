@@ -141,22 +141,28 @@ void Client_TeamInfo(void* mValue) {
                 default: new_team = TEAM_UNASSIGNED;
             }
 
-            UTIL_ServerPrint("[DEBUG] new_team = %s\n", msg);
+            //UTIL_ServerPrint("[DEBUG] new_team = %s\n", msg);
 
             if (!g_Clients[id].is_connected) {
 
-                CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
+                if (g_Clients[id].team == TEAM_UNASSIGNED) {
 
-                g_Clients[id].is_bot = pPlayer->IsBot() || strcmp(GETPLAYERAUTHID(pPlayer->edict()), "BOT") == 0;
+                    CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-                if (g_Clients[id].is_bot) {
+                    g_Clients[id].is_bot = pPlayer->IsBot() || strcmp(GETPLAYERAUTHID(pPlayer->edict()), "BOT") == 0;
 
-                    g_Clients[id].is_connected = true;
+                    if (g_Clients[id].is_bot) {
 
+                        g_Clients[id].is_connected = true;
+
+                        g_Clients[id].team = new_team;
+
+                        g_PlayersNum[new_team]++;
+                    }
+
+                } else
+                    
                     g_Clients[id].team = new_team;
-
-                    g_PlayersNum[new_team]++;
-                }
 
             } else if (g_Clients[id].is_connected && new_team != TEAM_UNASSIGNED && g_Clients[id].team != new_team) {
 
