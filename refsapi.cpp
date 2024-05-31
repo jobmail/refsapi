@@ -83,7 +83,7 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
 	Q_strcpy_s(buffer, (char*)format);
 
-    Client_Disconnected(id, crash, buffer);
+    //Client_Disconnected(id, crash, buffer);
 
     chain->callNext(cl, crash, buffer);
 }
@@ -98,7 +98,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
     g_Clients[id].is_connected = false;
 
-    /////////////////////g_PlayersNum[g_Clients[id].team]--;
+    g_PlayersNum[g_Clients[id].team]--;
 
     UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
 }
@@ -169,11 +169,8 @@ void Client_TeamInfo(void* mValue) {
                 g_Clients[id].team = new_team;
 
                 UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
-
             }
 
-			//CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(index);
-            //strcpy(pPlayer->m_szTeamName, msg);
             break;
     }
 }
