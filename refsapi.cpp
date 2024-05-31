@@ -32,7 +32,7 @@ edict_t* R_ED_Alloc(IRehldsHook_ED_Alloc* chain) {
 
 int R_Spawn(edict_t *pEntity) {
 
-    int id = ENTINDEX(pEntity);
+    //int id = ENTINDEX(pEntity);
 
     //UTIL_ServerPrint("[DEBUG] Spawn(): id = %d\n", id);
 
@@ -41,23 +41,26 @@ int R_Spawn(edict_t *pEntity) {
 
 void R_ClientPutInServer_Post(edict_t *pEntity) {
 
-    int id = ENTINDEX(pEntity);
+    if (!FNullEnt(pEntity)) {
 
-    UTIL_ServerPrint("[DEBUG] ClientPutInServer() ===>\n");
+        int id = ENTINDEX(pEntity);
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
+        UTIL_ServerPrint("[DEBUG] ClientPutInServer() ===>\n");
 
-    if (!pPlayer->IsBot()) {
+        CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-        g_Clients[id].is_connected = true;
+        if (!pPlayer->IsBot()) {
 
-        g_Clients[id].team = TEAM_UNASSIGNED;
+            g_Clients[id].is_connected = true;
 
-        g_PlayersNum[TEAM_UNASSIGNED]++;
+            g_Clients[id].team = TEAM_UNASSIGNED;
 
-        UTIL_ServerPrint("[DEBUG] PutInserver_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()), g_Clients[id].team, g_Clients[id].is_connected);
+            g_PlayersNum[TEAM_UNASSIGNED]++;
 
-        UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+            UTIL_ServerPrint("[DEBUG] PutInserver_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, STRING(pPlayer->pev->netname), GETPLAYERAUTHID(pPlayer->edict()), g_Clients[id].team, g_Clients[id].is_connected);
+
+            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+        }
     }
 
     RETURN_META(MRES_IGNORED);
@@ -67,7 +70,9 @@ void R_ClientDisconnect(edict_t *pEntity) {
 
     SERVER_PRINT("[DEBUG] R_ClientDisconnect() ===>\n");
 
-	Client_Disconnected(ENTINDEX(pEntity), false, 0);
+    if (!FNullEnt(pEntity))
+
+        Client_Disconnected(ENTINDEX(pEntity), false, 0);
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -89,7 +94,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
     UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d, crash = %d, \n", id, 0/*g_Clients[id].is_connected*/, crash);
 
-    if (is_valid_index(id) && g_Clients[id].is_connected) {
+    if (g_Clients[id].is_connected) {
 
         g_Clients[id].is_connected =
             
