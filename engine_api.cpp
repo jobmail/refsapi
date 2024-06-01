@@ -240,7 +240,7 @@ enginefuncs_t g_EngineFunctionsTable_Post =
 	NULL,		// pfnAlertMessage()
 	NULL,		// pfnEngineFprintf()
 	NULL,		// pfnPvAllocEntPrivateData()
-	NULL,		// pfnPvEntPrivateData()
+	&R_PvEntPrivateData_Post,		// pfnPvEntPrivateData()
 	NULL,		// pfnFreeEntPrivateData()
 	NULL,		// pfnSzFromIndex()
 	NULL,		// pfnAllocString()

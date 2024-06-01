@@ -25,6 +25,13 @@ edict_t* R_CreateNamedEntity(string_t className) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
+void* R_PvEntPrivateData_Post(edict_t *pEdict) {
+
+    UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
+
+    RETURN_META_VALUE(MRES_IGNORED, 0);
+}
+
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
 
     auto origin = chain->callNext();
