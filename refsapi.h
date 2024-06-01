@@ -49,13 +49,16 @@ struct sClients {
 
 };
 
-
+extern sClients g_Clients[MAX_PLAYERS + 1];
 extern int g_PlayersNum[6];
 extern int mState;
 
 edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
+
+void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib);
+void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapConditions *chain);
 
 qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]);
 void R_ClientPutInServer(edict_t *pEntity);
