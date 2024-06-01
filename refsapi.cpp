@@ -22,13 +22,16 @@ edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
 
     auto origin = chain->callNext();
 
+    UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s\n", ENTINDEX(origin), STRING(origin->v.classname));
+
+    /*
+    
     std::vector<int> v;
 
     char key[128];
     
     Q_strcpy_s(key, (char*)STRING(origin->v.classname));
 
-    UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s\n", ENTINDEX(origin), STRING(origin->v.classname));
 
     if (key[0]) {
 
@@ -50,6 +53,8 @@ edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
         UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s, count = %d\n", ENTINDEX(origin), key, v.size());
     }
 
+    */
+    
      //std::map<std::string, std::vector<int>>::const_iterator it;
 
     //entity.clear();
