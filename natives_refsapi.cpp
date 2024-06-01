@@ -7,7 +7,7 @@ cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
 
     for (int i = 0; i < sizeof(g_PlayersNum); i++) {
 
-        if (i < 5)
+        if (i < 4)
 
             total += g_PlayersNum[i];
 
