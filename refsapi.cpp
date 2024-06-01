@@ -1,4 +1,5 @@
 #include "precompiled.h"
+#include <regamedll_api.h>
 
 int gmsgTeamInfo;
 int mState;
@@ -71,11 +72,11 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
 }
 
 void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib) {
-    /*
+
     if (g_Clients[pPlayer->entindex()].is_connected && pPlayer->m_iTeam >= 1 && pPlayer->m_iTeam <=2)
 
         g_PlayersNum[TEAM_DEAD_TT + pPlayer->m_iTeam - 1]++;
-    */
+
     chain->callNext(pPlayer, pevAttacker, iGib);
 }
 
