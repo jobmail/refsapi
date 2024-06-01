@@ -5,17 +5,15 @@ cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
 
     int total = 0;
 
-    cell* dest;
-
-    for (int i = 0; i < PARAMS_COUNT && i < sizeof(g_PlayersNum); i++) {
+    for (int i = 0; i < sizeof(g_PlayersNum); i++) {
 
         if (i < 5)
 
             total += g_PlayersNum[i];
 
-        if ((dest = getAmxAddr(amx, params[i + 1])) != nullptr)
+        if (i < PARAMS_COUNT)
         
-            *dest = g_PlayersNum[i];
+            *getAmxAddr(amx, params[i + 1]) = g_PlayersNum[i];
     }
     
     return total;
