@@ -59,6 +59,7 @@ extern int mState;
 edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
+void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict);
 
 void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib);
 void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapConditions *chain);
