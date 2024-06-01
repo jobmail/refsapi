@@ -22,7 +22,7 @@ edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
 
     auto origin = chain->callNext();
 
-    UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s\n", ENTINDEX(origin), STRING(origin->v.classname));
+    UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s\n", ENTINDEX(origin), origin->v.classname);
 
     /*
     
