@@ -12,13 +12,6 @@ inline bool __is_valid_edict_index(size_t index) {
     return index > 0 && index <= gpGlobals->maxClients;
 }
 
-inline std::vector<int>* v_entities() {
-
-    std::vector<int> v;
-
-    return &v;
-}
-
 typedef void (*funEventCall)(void*);
 
 typedef enum {
