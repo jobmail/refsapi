@@ -28,6 +28,8 @@ edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
     
     Q_strcpy_s(key, (char*)STRING(origin->v.classname));
 
+    UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s\n", ENTINDEX(origin), STRING(origin->v.classname));
+
     if (key[0]) {
 
         if (g_Tries.entities.find(key) != g_Tries.entities.end())
