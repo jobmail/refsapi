@@ -60,7 +60,7 @@ edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
 void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib);
 void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapConditions *chain);
 
-qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]);
+qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128]);
 void R_ClientPutInServer(edict_t *pEntity);
 void R_ClientPutInServer_Post(edict_t *pEntity);
 void R_ClientDisconnect(edict_t *pEntity);
