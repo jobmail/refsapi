@@ -61,6 +61,24 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
     RETURN_META(MRES_IGNORED);
 }
 
+void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapConditions *chain) {
+
+    g_PlayersNum[TEAM_DEAD_TT] =
+    
+        g_PlayersNum[TEAM_DEAD_CT] = 0;
+
+    chain->callNext();
+}
+
+void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib) {
+
+    if (g_Clients[pPlayer->entindex()].is_connected && pPlayer->m_iTeam >= 1 && pPlayer->m_iTeam <=2)
+
+        g_PlayersNum[TEAM_DEAD_TT + pPlayer->m_iTeam - 1]++;
+
+    chain->callNext(pPlayer, pevAttacker, iGib);
+}
+
 edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname) {
 
     edict_t *pEntity = chain->callNext(netname);
