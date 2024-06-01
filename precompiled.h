@@ -31,14 +31,14 @@
 
 // regamedll API
 #include <regamedll_api.h>
-#include "regamedll_api.h"
-#include <ex_regamedll_api.h>
+//#include "regamedll_api.h"
+#include "ex_regamedll_api.h"
 #include <mapinfo.h>
 #include <studio.h>
 
 // rehlds API
 #include <rehlds_api.h>
-#include "rehlds_api.h"
+//#include "rehlds_api.h"
 #include <ex_rehlds_api.h>
 
 // AmxModX API
