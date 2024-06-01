@@ -25,7 +25,7 @@ edict_t* R_CreateNamedEntity(string_t className) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
-void* R_PvEntPrivateData(edict_t *pEdict) {
+void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
     UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
 
