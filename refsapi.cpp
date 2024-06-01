@@ -61,10 +61,6 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
     RETURN_META(MRES_IGNORED);
 }
 
-// CBasePlayer::Killed hook
-typedef IHookChainClass<void, class CBasePlayer, struct entvars_s *, int> IReGameHook_CBasePlayer_Killed;
-typedef IHookChainRegistryClass<void, class CBasePlayer, struct entvars_s *, int> IReGameHookRegistry_CBasePlayer_Killed;
-
 void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapConditions *chain) {
 
     g_PlayersNum[TEAM_DEAD_TT] =

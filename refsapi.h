@@ -2,6 +2,7 @@
 
 #include <map>
 #include <rehlds_api.h>
+#include <regamedll_api.h>
 
 #define MAX_REG_MSGS                256 + 16
 #define MAX_PLAYERS                 32
