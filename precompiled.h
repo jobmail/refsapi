@@ -56,4 +56,6 @@
 #include "entity_callback_dispatcher.h"
 
 #include "refsapi.h"
+#include "natives_helper.h"
+#include "natives_refsapi.h"
 //#include "sdk_util.cpp"
