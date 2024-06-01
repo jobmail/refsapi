@@ -18,11 +18,18 @@ g_RegUserMsg g_user_msg[] =
 	{ "TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false },
 };
 
+edict_t* R_CreateNamedEntity(string_t className) {
+
+    UTIL_ServerPrint("[DEBUG] R_CreateNamedEntity(): classname = %s\n", STRING(className));
+
+    RETURN_META_VALUE(MRES_IGNORED, 0);
+}
+
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
 
     auto origin = chain->callNext();
 
-    UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s\n", ENTINDEX(origin), origin->v.classname);
+    //UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s\n", ENTINDEX(origin), origin->v.classname);
 
     /*
     

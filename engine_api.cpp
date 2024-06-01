@@ -27,7 +27,7 @@ enginefuncs_t g_EngineFunctionsTable =
 	NULL,		// pfnAngleVectors()
 	NULL,		// pfnCreateEntity()
 	NULL,		// pfnRemoveEntity()
-	NULL,		// pfnCreateNamedEntity()
+	&R_CreateNamedEntity,		// pfnCreateNamedEntity()
 	NULL,		// pfnMakeStatic()
 	NULL,		// pfnEntIsOnFloor()
 	NULL,		// pfnDropToFloor()

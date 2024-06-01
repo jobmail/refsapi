@@ -68,6 +68,7 @@ void R_ClientPutInServer(edict_t *pEntity);
 void R_ClientPutInServer_Post(edict_t *pEntity);
 void R_ClientDisconnect(edict_t *pEntity);
 int R_Spawn(edict_t *pEntity);
+edict_t* R_CreateNamedEntity(string_t className);
 
 int	 R_RegUserMsg_Post(const char *pszName, int iSize);
 void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
