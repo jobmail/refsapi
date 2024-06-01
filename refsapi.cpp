@@ -60,7 +60,12 @@ void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
 void R_FreeEntPrivateData(edict_t *pEdict) {
 
-    UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
+    RETURN_META(MRES_IGNORED);    
+}
+
+void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
+
+    UTIL_ServerPrint("[DEBUG] ED_Free_RH(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
 
     char key[128];
     
@@ -80,12 +85,13 @@ void R_FreeEntPrivateData(edict_t *pEdict) {
 
                 v.erase(it);
 
-                UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): classname = %s, count = %d\n", key, v.size());
+                UTIL_ServerPrint("[DEBUG] ED_Free_RH(): classname = %s, count = %d\n", key, v.size());
             }
         }
     }
 
-    RETURN_META(MRES_IGNORED);    
+    chain->callNext(pEdict);
+
 }
 
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
