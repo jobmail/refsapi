@@ -22,33 +22,30 @@ edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
 
     auto origin = chain->callNext();
 
-    if (!FNullEnt(origin)) {
+    std::vector<int> v;
 
-        std::vector<int> v;
+    char key[128];
+    
+    Q_strcpy_s(key, (char*)STRING(origin->v.classname));
 
-        char key[128];
+    if (key[0]) {
+
+        if (g_Tries.entities.find(key) != g_Tries.entities.end())
+
+            v = g_Tries.entities[key];
+
+        else
+
+            v.clear();
         
-        Q_strcpy_s(key, (char*)STRING(origin->v.classname));
+        if (v.size() < v.max_size()) {
 
-        if (key[0]) {
+            v.push_back(ENTINDEX(origin));
 
-            if (g_Tries.entities.find(key) != g_Tries.entities.end())
-
-                v = g_Tries.entities[key];
-
-            else
-
-                v.clear();
-            
-            if (v.size() < v.max_size()) {
-
-                v.push_back(ENTINDEX(origin));
-
-                g_Tries.entities[key] = v;
-            }
-
-            UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s, count = %d\n", ENTINDEX(origin), key, v.size());
+            g_Tries.entities[key] = v;
         }
+
+        UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s, count = %d\n", ENTINDEX(origin), key, v.size());
     }
 
      //std::map<std::string, std::vector<int>>::const_iterator it;
