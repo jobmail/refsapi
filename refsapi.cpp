@@ -20,7 +20,7 @@ g_RegUserMsg g_user_msg[] =
 
 edict_t* R_CreateNamedEntity(string_t className) {
 
-    UTIL_ServerPrint("[DEBUG] R_CreateNamedEntity(): classname = %s\n", STRING(className));
+    //UTIL_ServerPrint("[DEBUG] R_CreateNamedEntity(): classname = %s\n", STRING(className));
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
@@ -28,6 +28,33 @@ edict_t* R_CreateNamedEntity(string_t className) {
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
     UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
+
+        std::vector<int> v;
+
+    char key[128];
+    
+    Q_strcpy_s(key, (char*)STRING(pEdict->v.classname));
+
+
+    if (key[0]) {
+
+        if (g_Tries.entities.find(key) != g_Tries.entities.end())
+
+            v = g_Tries.entities[key];
+
+        else
+
+            v.clear();
+        
+        if (v.size() < v.max_size()) {
+
+            v.push_back(ENTINDEX(pEdict));
+
+            g_Tries.entities[key] = v;
+        }
+
+        UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): classname = %s, count = %d\n", key, v.size());
+    }
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
