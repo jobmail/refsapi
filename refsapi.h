@@ -1,10 +1,15 @@
 #pragma once
 
+// C
+#include <string.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>			    // for strncpy(), etc
+
 #include <map>
 #include <rehlds_api.h>
 #include <regamedll_api.h>
-#include <mapinfo.h>
-#include <studio.h>
 
 #define MAX_REG_MSGS                256 + 16
 #define MAX_PLAYERS                 32
