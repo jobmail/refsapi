@@ -29,14 +29,13 @@ void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
     UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
 
-        std::vector<int> v;
-
     char key[128];
     
     Q_strcpy_s(key, (char*)STRING(pEdict->v.classname));
 
-
     if (key[0]) {
+
+        std::vector<int> v;
 
         if (g_Tries.entities.find(key) != g_Tries.entities.end())
 
@@ -57,6 +56,36 @@ void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
     }
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
+}
+
+void R_FreeEntPrivateData(edict_t *pEdict) {
+
+    UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
+
+    char key[128];
+    
+    Q_strcpy_s(key, (char*)STRING(pEdict->v.classname));
+
+    if (key[0]) {
+
+        std::vector<int> v;
+
+        std::vector<int>::iterator it;
+    
+        if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
+
+            v = g_Tries.entities[key];
+
+            if ((it = std::find(v.begin(), v.end(), ENTINDEX(pEdict))) != v.end()) {
+
+                v.erase(it);
+
+                UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): classname = %s, count = %d\n", key, v.size());
+            }
+        }
+    }
+
+    RETURN_META(MRES_IGNORED);    
 }
 
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {

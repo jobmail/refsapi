@@ -72,6 +72,7 @@ edict_t* R_CreateNamedEntity(string_t className);
 
 
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb);
+void R_FreeEntPrivateData(edict_t *pEdict);
 
 int	 R_RegUserMsg_Post(const char *pszName, int iSize);
 void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
