@@ -5,6 +5,7 @@ int mState;
 int g_PlayersNum[6];
 
 sClients g_Clients[MAX_PLAYERS + 1];
+sTries g_Tries;
 
 funEventCall modMsgsEnd[MAX_REG_MSGS];
 funEventCall modMsgs[MAX_REG_MSGS];
@@ -20,6 +21,44 @@ g_RegUserMsg g_user_msg[] =
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
 
     auto origin = chain->callNext();
+
+    if (!FNullEnt(origin)) {
+
+        std::vector<int> v;
+
+        char key[128];
+        
+        Q_strcpy_s(key, (char*)STRING(origin->v.classname));
+
+        if (key[0]) {
+
+            if (g_Tries.entities.find(key) != g_Tries.entities.end())
+
+                v = g_Tries.entities[key];
+
+            else
+
+                v.clear();
+            
+            if (v.size() < v.max_size()) {
+
+                v.push_back(ENTINDEX(origin));
+
+                g_Tries.entities[key] = v;
+            }
+
+            UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s, count = %d\n", ENTINDEX(origin), key, v.size());
+        }
+    }
+
+     //std::map<std::string, std::vector<int>>::const_iterator it;
+
+    //entity.clear();
+
+    //origin->v.classname
+
+    //std::vector <int> v;
+    //v.size();
 
     //int id = ENTINDEX(origin);
 

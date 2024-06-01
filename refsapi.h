@@ -12,6 +12,13 @@ inline bool __is_valid_edict_index(size_t index) {
     return index > 0 && index <= gpGlobals->maxClients;
 }
 
+inline std::vector<int>* v_entities() {
+
+    std::vector<int> v;
+
+    return &v;
+}
+
 typedef void (*funEventCall)(void*);
 
 typedef enum {
@@ -34,11 +41,13 @@ struct g_RegUserMsg {
 
 };
 
-struct g_ClientsTrie {
+struct sTries {
 
-    std::map<std::string, int> name_t;
-    std::map<std::string, int> authid_t;
-
+    std::map<std::string, int> names;
+    std::map<std::string, int> authids;
+    std::map<std::string, std::vector<int>> entities;
+    std::map<std::string, std::vector<int>> ips;
+    std::map<int, std::vector<int>> ips_int;
 };
 
 struct sClients {
@@ -50,6 +59,7 @@ struct sClients {
 };
 
 extern sClients g_Clients[MAX_PLAYERS + 1];
+extern sTries g_Tries;
 extern int g_PlayersNum[6];
 extern int mState;
 
