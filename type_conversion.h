@@ -14,8 +14,7 @@ extern IRehldsServerStatic* g_RehldsSvs;
 
 inline size_t indexOfEdict(const edict_t* ed)
 {
-	auto index = ed - g_pEdicts;
-	return index > 0 ? index : 0;
+	return ed ? ed - g_pEdicts : 0;
 }
 
 inline size_t indexOfEdict(const entvars_t* pev)
