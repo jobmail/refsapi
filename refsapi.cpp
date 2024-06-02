@@ -130,6 +130,15 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
     }
 }
 
+CBaseEntity* CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem *chain, CBasePlayer *pPlayer, const char *classname) {
+
+    auto origin = chain->callNext(pPlayer, classname);
+
+    UTIL_ServerPrint("[DEBUG] GiveNamedItem_RG(): id = %d, item = %d, classname = %s\n", pPlayer->entindex(), origin->entindex(), classname);
+
+    return origin;
+}
+
 qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem) {
 
     auto result = chain->callNext(pPlayer, pItem);
