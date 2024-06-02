@@ -50,11 +50,11 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
     CHECK_ISENTITY(arg_entity);
 
-    int entity_index = params[arg_entity];
-
-    edict_t* pEdict = INDEXENT(entity_index);
+    edict_t* pEdict = INDEXENT(params[arg_entity]);
 
     if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr)) {
+
+        UTIL_ServerPrint("[DEBUG] found: ent = %d, classname = %s\n", params[arg_entity], STRING(pEdict->v.classname));
 
         Q_strcpy_s((char*)getAmxAddr(amx, params[arg_name]), (char*)STRING(pEdict->v.classname));
 
