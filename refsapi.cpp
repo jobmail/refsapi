@@ -78,7 +78,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
     int owner_index = ENTINDEX(pEdict->v.owner);
 
-    //UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
+    UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     char key[128];
     
@@ -99,7 +99,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
                 v.erase(it_value);
 
-                //UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): classname = %s, count = %d\n", key, v.size());
+                UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): classname = %s, count = %d\n", key, v.size());
 
                 if (v.size() > 0)
 
@@ -119,11 +119,12 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
         std::vector<int>::iterator it_value;
 
-        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end())
+        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
-                v.erase(it_value);
-        
-        UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): item = %d, owner = %d\n", entity_index, owner_index);
+            UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): remove entity = %d, from owner = %d", entity_index, owner_index);
+
+            v.erase(it_value);
+        }
     }
 }
 
@@ -147,9 +148,12 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
             
             v = g_Tries.player_entities[owner_index];
 
-            if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end())
+            if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
+
+                UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d", entity_index, owner_index);
 
                 v.erase(it_value);
+            }
         }
 
         UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner_index);
