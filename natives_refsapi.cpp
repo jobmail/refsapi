@@ -32,7 +32,9 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
         std::vector<int> v = g_Tries.player_entities[id];
 
-        int max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
+        int max_size = min((int)v.size(), (int)(*getAmxAddr(amx, params[arg_ent_arr_size])));
+
+        UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): max_size = %d", max_size);
 
         for (; i < max_size; i++)
 
