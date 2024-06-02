@@ -174,7 +174,7 @@ int R_Spawn(edict_t *pEntity) {
 
     //int id = ENTINDEX(pEntity);
 
-    //UTIL_ServerPrint("[DEBUG] Spawn(): id = %d\n", id);
+    UTIL_ServerPrint("[DEBUG] Spawn(): id = %d, owner = %d\n", ENTINDEX(pEntity), ENTINDEX(pEntity->v.owner));
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
