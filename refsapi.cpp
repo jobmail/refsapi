@@ -27,7 +27,7 @@ edict_t* R_CreateNamedEntity(string_t className) {
 
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
-    //UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+    UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     char key[128];
     
@@ -52,7 +52,7 @@ void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
             g_Tries.entities[key] = v;
         }
 
-        //UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): classname = %s, count = %d\n", key, v.size());
+        UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): classname = %s, count = %d\n", key, v.size());
     }
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
