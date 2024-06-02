@@ -72,13 +72,13 @@ void* R_PvEntPrivateData_Post(edict_t *pEdict) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
-void Free_EntPrivateData(edict_t *pEdict) {
+void Free_EntPrivateData(edict_t *pEdict, char* prefix) {
 
     int entity_index = ENTINDEX(pEdict);
 
     int owner_index = ENTINDEX(pEdict->v.owner);
 
-    UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
+    UTIL_ServerPrint("[DEBUG] %s: entity = %d, classname = %s, owner = %d\n", prefix, entity_index, STRING(pEdict->v.classname), owner_index);
 
     char key[128];
     
@@ -99,7 +99,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
                 v.erase(it_value);
 
-                UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): classname = %s, count = %d\n", key, v.size());
+                UTIL_ServerPrint("[DEBUG] %s: classname = %s, count = %d\n", prefix, key, v.size());
 
                 if (v.size() > 0)
 
@@ -167,7 +167,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
 void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
 
-    Free_EntPrivateData(pEdict);
+    Free_EntPrivateData(pEdict, "ED_Free_RH");
 
     chain->callNext(pEdict);
 }

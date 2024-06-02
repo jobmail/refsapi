@@ -94,7 +94,7 @@ void R_MessageEnd_Post(void);
 void Client_TeamInfo(void*);
 void Client_PutInServer(edict_t *pEntity, const char *netname);
 void Client_Disconnected(int id, bool crash, char *format);
-void Free_EntPrivateData(edict_t *pEdict);
+void Free_EntPrivateData(edict_t *pEdict, char* prefix);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
