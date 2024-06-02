@@ -167,6 +167,8 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
 void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
 
+    Free_EntPrivateData(pEdict);
+
     chain->callNext(pEdict);
 }
 
