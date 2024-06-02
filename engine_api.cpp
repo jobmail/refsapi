@@ -69,7 +69,7 @@ enginefuncs_t g_EngineFunctionsTable =
 	NULL,		// pfnEngineFprintf()
 	&R_PvAllocEntPrivateData,		// pfnPvAllocEntPrivateData()
 	&R_PvEntPrivateData,		// pfnPvEntPrivateData()
-	&R_FreeEntPrivateData,		// pfnFreeEntPrivateData()
+	NULL,		// pfnFreeEntPrivateData()
 	NULL,		// pfnSzFromIndex()
 	NULL,		// pfnAllocString()
 	NULL,		// pfnGetVarsOfEnt()

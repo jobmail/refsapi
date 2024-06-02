@@ -72,7 +72,7 @@ void* R_PvEntPrivateData_Post(edict_t *pEdict) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
-void R_FreeEntPrivateData(edict_t *pEdict) {
+void Free_EntPrivateData(edict_t *pEdict) {
 
     UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
@@ -106,8 +106,6 @@ void R_FreeEntPrivateData(edict_t *pEdict) {
             }
         }
     }
-
-    RETURN_META(MRES_IGNORED);    
 }
 
 void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
