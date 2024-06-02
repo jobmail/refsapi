@@ -72,7 +72,7 @@ void* R_PvEntPrivateData_Post(edict_t *pEdict) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
-void Free_EntPrivateData(edict_t *pEdict, char* prefix) {
+void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
 
     if (pEdict == nullptr || pEdict->pvPrivateData == nullptr) return;
 
