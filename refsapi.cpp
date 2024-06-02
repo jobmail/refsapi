@@ -82,7 +82,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
     char key[128];
     
-    Q_strcpy_s(key, (char*)STRING(pEdict->v.classname));
+    Q_strcpy_s(key, (char*)STRING(pEdict->v.classname ));
 
     // REMOVE NAMED_ENTITIES
     if (key[0]) {
