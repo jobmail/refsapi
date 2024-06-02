@@ -27,7 +27,7 @@ edict_t* R_CreateNamedEntity(string_t className) {
 
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
-    UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), pEdict->v.owner);
+    UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     char key[128];
     
@@ -65,7 +65,7 @@ void R_FreeEntPrivateData(edict_t *pEdict) {
 
 void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
 
-    UTIL_ServerPrint("[DEBUG] ED_Free_RH(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), pEdict->v.owner);
+    UTIL_ServerPrint("[DEBUG] ED_Free_RH(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     char key[128];
     
