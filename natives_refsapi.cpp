@@ -28,7 +28,7 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     int id = *getAmxAddr(amx, params[arg_index]);
 
-    UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): id = %d", id);
+    UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): id = %d\n", id);
 
     if (is_valid_index(id)) {
 
@@ -36,7 +36,7 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
         int max_size = min((int)v.size(), (int)(*getAmxAddr(amx, params[arg_ent_arr_size])));
 
-        UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): max_size = %d", max_size);
+        UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): max_size = %d\n", max_size);
 
         for (; i < max_size; i++)
 
