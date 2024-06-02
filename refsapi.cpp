@@ -118,15 +118,11 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
         std::vector<int>::iterator it_value;
 
-        int wb_index, owner_index = ENTINDEX(pItem->pev->owner), entity_index = pItem->entindex();
+        int owner_index = ENTINDEX(pItem->pev->owner), entity_index = pItem->entindex();
 
         g_Tries.player_entities[pPlayer->entindex()].push_back(entity_index);
 
-        if (is_valid_index(owner_index)) {
-
-            if ((wb_index = ENTINDEX(pItem->pev->owner->v.owner)) > 0)
-
-                owner_index = wb_index;
+        if (is_valid_index(owner_index) || is_valid_index(owner_index = ENTINDEX(pItem->pev->owner->v.owner))) {
             
             v = g_Tries.player_entities[owner_index];
 
