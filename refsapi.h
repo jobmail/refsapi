@@ -39,8 +39,9 @@ struct sTries {
     std::map<std::string, int> names;
     std::map<std::string, int> authids;
     std::map<std::string, std::vector<int>> entities;
-    std::map<std::string, std::vector<int>> ips;
-    std::map<int, std::vector<int>> ips_int;
+    std::vector<int> player_entities[MAX_PLAYERS + 1];
+    //std::map<std::string, std::vector<int>> ips;
+    //std::map<int, std::vector<int>> ips_int;
 };
 
 struct sClients {
