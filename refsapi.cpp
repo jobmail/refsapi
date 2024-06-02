@@ -207,9 +207,9 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
     
         g_PlayersNum[TEAM_DEAD_CT] = 0;
 
-    for (int i = 0; i <= gpGlobals->maxClients; i++)
+    //for (int i = 0; i <= gpGlobals->maxClients; i++)
 
-        g_Tries.player_entities[i].clear();
+        //g_Tries.player_entities[i].clear();
 
     chain->callNext();
 }
