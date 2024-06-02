@@ -74,6 +74,8 @@ void* R_PvEntPrivateData_Post(edict_t *pEdict) {
 
 void Free_EntPrivateData(edict_t *pEdict, char* prefix) {
 
+    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr) return;
+
     int entity_index = ENTINDEX(pEdict);
 
     int owner_index = ENTINDEX(pEdict->v.owner);
@@ -121,7 +123,7 @@ void Free_EntPrivateData(edict_t *pEdict, char* prefix) {
 
         if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
-            UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): remove entity = %d, from owner = %d\n", entity_index, owner_index);
+            UTIL_ServerPrint("[DEBUG] %s: remove entity = %d, from owner = %d\n", prefix, entity_index, owner_index);
 
             v.erase(it_value);
         }
