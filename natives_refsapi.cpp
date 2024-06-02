@@ -24,24 +24,21 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
     
     enum args_e { arg_count, arg_index, arg_ent_arr, arg_ent_arr_size};
 
+    CHECK_ISPLAYER(arg_index);
+
+    int id = params[arg_index];
+
     int i = 0;
 
-    int id = *getAmxAddr(amx, params[arg_index]);
+    std::vector<int> v = g_Tries.player_entities[id];
 
-    UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): id = %d\n", id);
+    int max_size = min((int)v.size(), (int)(*getAmxAddr(amx, params[arg_ent_arr_size])));
 
-    if (is_valid_index(id)) {
+    UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): max_size = %d\n", max_size);
 
-        std::vector<int> v = g_Tries.player_entities[id];
+    for (; i < max_size; i++)
 
-        int max_size = min((int)v.size(), (int)(*getAmxAddr(amx, params[arg_ent_arr_size])));
-
-        UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): max_size = %d\n", max_size);
-
-        for (; i < max_size; i++)
-
-            *(getAmxAddr(amx, params[arg_ent_arr]) + i) = v[i];
-    }
+        *(getAmxAddr(amx, params[arg_ent_arr]) + i) = v[i];
 
     return i;
 }
@@ -51,18 +48,17 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
     enum args_e { arg_count, arg_entity, arg_name, arg_name_len};
 
-    int entity_index = *getAmxAddr(amx, params[arg_entity]);
+    CHECK_ISENTITY(arg_entity);
 
-    if (entity_index > 0) {
+    int entity_index = params[arg_entity];
 
-        edict_t* pEdict = INDEXENT(entity_index);
+    edict_t* pEdict = INDEXENT(entity_index);
 
-        if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr)) {
+    if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr)) {
 
-            Q_strcpy_s((char*)getAmxAddr(amx, params[arg_name]), (char*)STRING(pEdict->v.classname));
+        Q_strcpy_s((char*)getAmxAddr(amx, params[arg_name]), (char*)STRING(pEdict->v.classname));
 
-            return TRUE;
-        }
+        return TRUE;
     }
 
     return FALSE;
@@ -73,9 +69,9 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     enum args_e { arg_count, arg_classname, arg_owner, arg_ent_arr, arg_ent_arr_size};
 
-    int owner_index = *getAmxAddr(amx, params[arg_owner]);
+    int owner_index = params[arg_owner];
+
     int result = 0;
-    int i = 0;
 
     char* key = (char*)getAmxAddr(amx, params[arg_classname]);
 
@@ -85,9 +81,9 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
         int max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
 
-        for (; i < max_size; i++) {
+        for (int i; i < max_size; i++) {
 
-            if (owner_index > 0) {
+            if (is_valid_index(owner_index)) {
 
                 edict_t* pEdict = INDEXENT(v[i]);
 
