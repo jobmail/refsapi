@@ -60,8 +60,8 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
 
 	g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
-	g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
-	g_RehldsHookchains->ED_Free()->registerHook(ED_Free_RH);
+	//g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
+	//g_RehldsHookchains->ED_Free()->registerHook(ED_Free_RH);
 	g_RehldsHookchains->CreateFakeClient()->registerHook(CreateFakeClient_RH);
 
 	g_ReGameHookchains->CBasePlayer_Killed()->registerHook(CBasePlayer_Killed_RG);
@@ -83,8 +83,8 @@ void ServerDeactivate_Post()
 	g_pFunctionTable->pfnKeyValue = KeyValue;
 
 	g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
-	g_RehldsHookchains->ED_Alloc()->unregisterHook(ED_Alloc_RH);
-	g_RehldsHookchains->ED_Free()->unregisterHook(ED_Free_RH);
+	//g_RehldsHookchains->ED_Alloc()->unregisterHook(ED_Alloc_RH);
+	//g_RehldsHookchains->ED_Free()->unregisterHook(ED_Free_RH);
 	g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
 
 	g_ReGameHookchains->CBasePlayer_Killed()->unregisterHook(CBasePlayer_Killed_RG);
