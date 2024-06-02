@@ -133,7 +133,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
     auto result = chain->callNext(pPlayer, pItem);
 
-    UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, result = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), result, STRING(pItem->pev->classname), ENTINDEX(pItem->pev->owner));
+    UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, result = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), result, pItem->entindex(), STRING(pItem->pev->classname), ENTINDEX(pItem->pev->owner));
 
     return result;
 }
