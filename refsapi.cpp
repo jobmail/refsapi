@@ -27,7 +27,7 @@ edict_t* R_CreateNamedEntity(string_t className) {
 
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
-    UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): id = %d, classname = %s, owner\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), pEdict->v.owner);
+    UTIL_ServerPrint("[DEBUG] R_PvEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), pEdict->v.owner);
 
     char key[128];
     
