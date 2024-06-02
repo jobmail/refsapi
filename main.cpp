@@ -66,6 +66,7 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 
 	g_ReGameHookchains->CBasePlayer_Killed()->registerHook(CBasePlayer_Killed_RG);
 	g_ReGameHookchains->CSGameRules_CheckMapConditions()->registerHook(CSGameRules_CheckMapConditions_RG);
+	g_ReGameHookchains->CBasePlayer_AddPlayerItem()->registerHook(CBasePlayer_AddPlayerItem_RG);
 
 	SET_META_RESULT(MRES_IGNORED);
 }
@@ -89,6 +90,7 @@ void ServerDeactivate_Post()
 
 	g_ReGameHookchains->CBasePlayer_Killed()->unregisterHook(CBasePlayer_Killed_RG);
 	g_ReGameHookchains->CSGameRules_CheckMapConditions()->unregisterHook(CSGameRules_CheckMapConditions_RG);
+	g_ReGameHookchains->CBasePlayer_AddPlayerItem()->unregisterHook(CBasePlayer_AddPlayerItem_RG);
 
 	SET_META_RESULT(MRES_IGNORED);
 }

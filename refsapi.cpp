@@ -117,54 +117,6 @@ edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
 
     auto origin = chain->callNext();
 
-    //UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s\n", ENTINDEX(origin), origin->v.classname);
-
-    /*
-    
-    std::vector<int> v;
-
-    char key[128];
-    
-    Q_strcpy_s(key, (char*)STRING(origin->v.classname));
-
-
-    if (key[0]) {
-
-        if (g_Tries.entities.find(key) != g_Tries.entities.end())
-
-            v = g_Tries.entities[key];
-
-        else
-
-            v.clear();
-        
-        if (v.size() < v.max_size()) {
-
-            v.push_back(ENTINDEX(origin));
-
-            g_Tries.entities[key] = v;
-        }
-
-        UTIL_ServerPrint("[DEBUG] ED_Alloc(): ent = %d, classname = %s, count = %d\n", ENTINDEX(origin), key, v.size());
-    }
-
-    */
-    
-     //std::map<std::string, std::vector<int>>::const_iterator it;
-
-    //entity.clear();
-
-    //origin->v.classname
-
-    //std::vector <int> v;
-    //v.size();
-
-    //int id = ENTINDEX(origin);
-
-    //if (id > 0 && id <= gpGlobals->maxClients)
-
-    //UTIL_ServerPrint("[DEBUG] ED_Alloc(): id = %d\n", id);
-
 	return origin;
 }
 
@@ -175,6 +127,15 @@ int R_Spawn(edict_t *pEntity) {
     UTIL_ServerPrint("[DEBUG] Spawn(): id = %d, owner = %d\n", ENTINDEX(pEntity), ENTINDEX(pEntity->v.owner));
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
+}
+
+qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem) {
+
+    auto result = chain->callNext(pPlayer, pItem);
+
+    UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, item_owner = %d", pPlayer->entindex(), ENTINDEX(pItem->pev->owner));
+
+    return result;
 }
 
 qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]) {
