@@ -75,17 +75,25 @@ void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
 
         std::vector<int> v;
 
-        std::vector<int>::iterator it;
+        std::vector<int>::iterator it_value;
     
         if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
             v = g_Tries.entities[key];
 
-            if ((it = std::find(v.begin(), v.end(), ENTINDEX(pEdict))) != v.end()) {
+            if ((it_value = std::find(v.begin(), v.end(), ENTINDEX(pEdict))) != v.end()) {
 
-                v.erase(it);
+                v.erase(it_value);
 
                 UTIL_ServerPrint("[DEBUG] ED_Free_RH(): classname = %s, count = %d\n", key, v.size());
+
+                if (v.size() > 0)
+
+                    g_Tries.entities[key] = v;                    
+
+                else
+
+                    g_Tries.entities.erase(key);
             }
         }
     }
