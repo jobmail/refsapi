@@ -56,7 +56,7 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
         UTIL_ServerPrint("[DEBUG] found: ent = %d, classname = %s\n", params[arg_entity], STRING(pEdict->v.classname));
 
-        Q_strcpy_s((char*)*getAmxAddr(amx, params[arg_name]), (char*)STRING(pEdict->v.classname));
+        Q_memcpy(getAmxAddr(amx, params[arg_name]), STRING(pEdict->v.classname), params[arg_name_len]);
 
         return TRUE;
     }
