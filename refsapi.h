@@ -75,7 +75,6 @@ edict_t* R_CreateNamedEntity(string_t className);
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb);
 void* R_PvEntPrivateData(edict_t *pEdict);
 void* R_PvEntPrivateData_Post(edict_t *pEdict);
-void R_FreeEntPrivateData(edict_t *pEdict);
 
 int	 R_RegUserMsg_Post(const char *pszName, int iSize);
 void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
@@ -92,6 +91,7 @@ void R_MessageEnd_Post(void);
 void Client_TeamInfo(void*);
 void Client_PutInServer(edict_t *pEntity, const char *netname);
 void Client_Disconnected(int id, bool crash, char *format);
+void Free_EntPrivateData(edict_t *pEdict);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];

@@ -152,11 +152,11 @@ void ResetGlobalState()
 void OnFreeEntPrivateData(edict_t *pEdict)
 {
 	CBaseEntity *pEntity = getPrivate<CBaseEntity>(pEdict);
-	if (!pEntity) {
-		return;
+	if (pEntity) {
+		Free_EntPrivateData(pEdict);	//RefsAPI
+		EntityCallbackDispatcher().DeleteExistingCallbacks(pEntity);
 	}
 
-	EntityCallbackDispatcher().DeleteExistingCallbacks(pEntity);
 	SET_META_RESULT(MRES_IGNORED);
 }
 
