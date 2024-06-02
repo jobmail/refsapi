@@ -123,7 +123,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
                 v.erase(it_value);
         
-        UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): item = %d, owner = %d", entity_index, owner_index);
+        UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): item = %d, owner = %d\n", entity_index, owner_index);
     }
 }
 
