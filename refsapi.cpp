@@ -74,12 +74,17 @@ void* R_PvEntPrivateData_Post(edict_t *pEdict) {
 
 void Free_EntPrivateData(edict_t *pEdict) {
 
-    UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+    int entity_index = ENTINDEX(pEdict);
+
+    int owner_index = ENTINDEX(pEdict->v.owner);
+
+    UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     char key[128];
     
     Q_strcpy_s(key, (char*)STRING(pEdict->v.classname));
 
+    // REMOVE NAMED_ENTITIES
     if (key[0]) {
 
         std::vector<int> v;
@@ -90,7 +95,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
             v = g_Tries.entities[key];
 
-            if ((it_value = std::find(v.begin(), v.end(), ENTINDEX(pEdict))) != v.end()) {
+            if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
                 v.erase(it_value);
 
@@ -106,6 +111,18 @@ void Free_EntPrivateData(edict_t *pEdict) {
             }
         }
     }
+
+    // REMOVE PLAYER_ENTITIES
+    if (is_valid_index(owner_index)) {
+
+        std::vector<int> v = g_Tries.player_entities[owner_index];
+
+        std::vector<int>::iterator it_value;
+
+        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end())
+
+                v.erase(it_value);
+    }
 }
 
 qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem) {
@@ -118,7 +135,9 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
         std::vector<int>::iterator it_value;
 
-        int owner_index = ENTINDEX(pItem->pev->owner), entity_index = pItem->entindex();
+        int entity_index = pItem->entindex();
+
+        int owner_index = ENTINDEX(pItem->pev->owner);
 
         g_Tries.player_entities[pPlayer->entindex()].push_back(entity_index);
 
@@ -185,6 +204,10 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
     g_PlayersNum[TEAM_DEAD_TT] =
     
         g_PlayersNum[TEAM_DEAD_CT] = 0;
+
+    for (int i = 0; i <= gpGlobals->maxClients; i++)
+
+        g_Tries.player_entities[i].clear();
 
     chain->callNext();
 }
