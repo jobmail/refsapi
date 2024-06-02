@@ -65,6 +65,13 @@ void* R_PvEntPrivateData(edict_t *pEdict) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
+void* R_PvEntPrivateData_Post(edict_t *pEdict) {
+
+    UTIL_ServerPrint("[DEBUG] XXXXXXXXXXXXXXXXXXXX: R_PvEntPrivateData_Post");
+
+    RETURN_META_VALUE(MRES_IGNORED, 0);
+}
+
 void R_FreeEntPrivateData(edict_t *pEdict) {
 
     RETURN_META(MRES_IGNORED);    
