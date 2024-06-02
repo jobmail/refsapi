@@ -19,6 +19,7 @@ cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
     return total;
 }
 
+// native rf_get_user_weapons(const id, ent[], ent_size);
 cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
     
     enum args_e { arg_count, arg_index, arg_ent_arr, arg_ent_arr_size};
@@ -41,6 +42,7 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
     return i;
 }
 
+// native rf_get_weaponname(const ent, name[], name_len);
 cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
     enum args_e { arg_count, arg_entity, arg_name, arg_name_len};
@@ -62,10 +64,13 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
     return FALSE;
 }
 
+// native rf_get_ent_by_class(const classname[], const id, ent[], ent_size);
 cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     enum args_e { arg_count, arg_classname, arg_owner, arg_ent_arr, arg_ent_arr_size};
 
+    int owner_index = *getAmxAddr(amx, params[arg_owner]);
+    int result = 0;
     int i = 0;
 
     char* key = (char*)getAmxAddr(amx, params[arg_classname]);
@@ -76,12 +81,24 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
         int max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
 
-        for (; i < max_size; i++)
+        for (; i < max_size; i++) {
+
+            if (owner_index > 0) {
+
+                edict_t* pEdict = INDEXENT(v[i]);
+
+                if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr) && ENTINDEX(pEdict->v.owner) != owner_index)
+
+                    continue;
+            }
 
             *(getAmxAddr(amx, params[arg_ent_arr]) + i) = v[i];
+
+            result++;
+        }
     }
 
-    return i;
+    return result;
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
