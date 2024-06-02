@@ -156,6 +156,9 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
             }
         }
 
+        // FIX OWNER
+        pItem->pev->owner = pPlayer->edict();
+
         UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner_index);
     }
 
