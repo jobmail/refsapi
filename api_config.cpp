@@ -39,7 +39,7 @@ void CAPI_Config::Init() {
 		
 		cvar.flags = (FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED);
 		
-		cvar.string = "1";
+		cvar.string = (char*)"1";
 
 		CVAR_REGISTER(&cvar);
 
