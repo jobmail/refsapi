@@ -28,6 +28,27 @@ void CAPI_Config::Init() {
 
 		g_ReGameHookchains->InstallGameRules()->registerHook(&InstallGameRules);
 	}
+
+	cvar_t* pCvar = CVAR_GET_POINTER(REFSAPI_CVAR);
+	
+	if (pCvar == nullptr) {
+
+		cvar_t cvar;
+
+		cvar.name = REFSAPI_CVAR;
+		
+		cvar.flags = (FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED);
+		
+		cvar.string = "1";
+
+		CVAR_REGISTER(&cvar);
+
+		pCvar = CVAR_GET_POINTER(REFSAPI_CVAR);
+
+		if (pCvar != nullptr)
+
+			g_engfuncs.pfnCvar_DirectSet(pCvar, "1");
+	}
 }
 
 void CAPI_Config::ServerDeactivate() const {
