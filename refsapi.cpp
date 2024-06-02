@@ -121,7 +121,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
         if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
-            UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): remove entity = %d, from owner = %d", entity_index, owner_index);
+            UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): remove entity = %d, from owner = %d\n", entity_index, owner_index);
 
             v.erase(it_value);
         }
@@ -150,7 +150,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
             if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
-                UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d", entity_index, owner_index);
+                UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
 
                 v.erase(it_value);
             }
