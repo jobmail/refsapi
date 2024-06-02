@@ -27,7 +27,7 @@ edict_t* R_CreateNamedEntity(string_t className) {
 
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
-    UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+    //UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     char key[128];
     
@@ -52,7 +52,7 @@ void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
             g_Tries.entities[key] = v;
         }
 
-        UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): classname = %s, count = %d\n", key, v.size());
+        //UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): classname = %s, count = %d\n", key, v.size());
     }
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
@@ -78,7 +78,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
     int owner_index = ENTINDEX(pEdict->v.owner);
 
-    UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
+    //UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): id = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     char key[128];
     
@@ -99,7 +99,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
                 v.erase(it_value);
 
-                UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): classname = %s, count = %d\n", key, v.size());
+                //UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): classname = %s, count = %d\n", key, v.size());
 
                 if (v.size() > 0)
 
@@ -123,7 +123,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
                 v.erase(it_value);
         
-        UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): item = %d, owner = %d\n", entity_index, owner_index);
+        //UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): item = %d, owner = %d\n", entity_index, owner_index);
     }
 }
 
@@ -174,7 +174,7 @@ int R_Spawn(edict_t *pEntity) {
 
     //int id = ENTINDEX(pEntity);
 
-    UTIL_ServerPrint("[DEBUG] Spawn(): id = %d, owner = %d\n", ENTINDEX(pEntity), ENTINDEX(pEntity->v.owner));
+    //UTIL_ServerPrint("[DEBUG] Spawn(): id = %d, owner = %d\n", ENTINDEX(pEntity), ENTINDEX(pEntity->v.owner));
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
