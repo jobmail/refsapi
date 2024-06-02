@@ -28,6 +28,8 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     int id = *getAmxAddr(amx, params[arg_index]);
 
+    UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): id = %d", id);
+
     if (is_valid_index(id)) {
 
         std::vector<int> v = g_Tries.player_entities[id];
