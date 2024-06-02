@@ -122,6 +122,8 @@ void Free_EntPrivateData(edict_t *pEdict) {
         if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end())
 
                 v.erase(it_value);
+        
+        UTIL_ServerPrint("[DEBUG] R_FreeEntPrivateData(): item = %d, owner = %d", entity_index, owner_index);
     }
 }
 
