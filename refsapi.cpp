@@ -108,6 +108,37 @@ void Free_EntPrivateData(edict_t *pEdict) {
     }
 }
 
+qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem) {
+
+    auto result = chain->callNext(pPlayer, pItem);
+
+    if (result) {
+
+        UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), ENTINDEX(pItem->pev->owner));
+
+        std::vector<int> v;
+
+        std::vector<int>::iterator it_value;
+
+        int owner_index = ENTINDEX(pItem->pev->owner), entity_index = pItem->entindex();
+
+        g_Tries.player_entities[pPlayer->entindex()].push_back(entity_index);
+
+        if (is_valid_index(owner_index)) {
+            
+            v = g_Tries.player_entities[owner_index];
+
+            if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end())
+
+                v.erase(it_value);
+        }
+        //FIX OWNER
+        pItem->pev->owner = pPlayer->edict();
+    }
+
+    return result;
+}
+
 void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
 
     chain->callNext(pEdict);
@@ -127,15 +158,6 @@ int R_Spawn(edict_t *pEntity) {
     UTIL_ServerPrint("[DEBUG] Spawn(): id = %d, owner = %d\n", ENTINDEX(pEntity), ENTINDEX(pEntity->v.owner));
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
-}
-
-qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem) {
-
-    auto result = chain->callNext(pPlayer, pItem);
-
-    UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, result = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), result, pItem->entindex(), STRING(pItem->pev->classname), ENTINDEX(pItem->pev->owner));
-
-    return result;
 }
 
 qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]) {
