@@ -144,9 +144,9 @@ CBaseEntity* CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem 
 
 qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem) {
 
-    auto result = chain->callNext(pPlayer, pItem);
+    auto origin = chain->callNext(pPlayer, pItem);
 
-    if (result) {
+    if (origin) {
 
         std::vector<int> v;
 
@@ -165,18 +165,6 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
             int result = acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
 
             UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, result);
-            /*
-            v = g_Tries.player_entities[owner_index];
-
-            if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
-
-                v.erase(it_value);
-
-                g_Tries.player_entities[owner_index] = v;
-
-                UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
-            }
-            */
         }
         // FIX OWNER
         pItem->pev->owner = pPlayer->edict();
@@ -184,7 +172,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
         UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner_index);
     }
 
-    return result;
+    return origin;
 }
 
 void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
