@@ -73,7 +73,9 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     int result = 0;
 
-    char* key = (char*)getAmxAddr(amx, params[arg_classname]);
+    char classname[256];
+
+    const char* key = getAmxString(amx, params[arg_classname], classname); //(char*)getAmxAddr(amx, params[arg_classname]);
 
     if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
