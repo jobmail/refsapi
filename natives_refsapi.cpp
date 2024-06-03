@@ -25,11 +25,13 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     CHECK_ISPLAYER(arg_index);
 
-    std::vector<int> v = g_Tries.player_entities[params[arg_index]];
+    std::vector<cell> v = g_Tries.player_entities[params[arg_index]];
 
     int max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
 
-    Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v.data(), max_size);
+    if (max_size > 0)
+    
+        Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v.data(), max_size);
 
     return max_size;
 }
@@ -66,9 +68,9 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     edict_t* pEdict;
 
-    std::vector<int> v;
+    std::vector<cell> v;
 
-    std::vector<int>::iterator it_value;
+    std::vector<cell>::iterator it_value;
 
     char classname[256];
 
