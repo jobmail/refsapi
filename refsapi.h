@@ -10,6 +10,7 @@
 #define MAX_PLAYERS                 32
 #define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN         (sizeof(WP_CLASS_PREFIX) - 1)
+#define C_COUNT(x)                  (cell)(sizeof(x)/sizeof(cell))
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
 #define is_valid_index              __is_valid_edict_index
 
@@ -62,7 +63,7 @@ struct sClients {
 
 extern sClients g_Clients[MAX_PLAYERS + 1];
 extern sTries g_Tries;
-extern int g_PlayersNum[6];
+extern cell g_PlayersNum[6];
 extern int mState;
 
 edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
