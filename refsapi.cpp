@@ -67,9 +67,9 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     // ADD WP_ENTITIES
     if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
-        key = key.substr(WP_CLASS_PREFIX_LEN);
+        g_Tries.wp_entities.push_back(entity_index);
 
-        result = acs_trie_add(&g_Tries.wp_entities, key, entity_index);
+        result = g_Tries.wp_entities.size();
 
         UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
     }
@@ -111,9 +111,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // REMOVE WP_ENTITIES
     if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
-        key = key.substr(WP_CLASS_PREFIX_LEN);
-
-        result = acs_trie_remove(&g_Tries.wp_entities, key, entity_index);
+        result = acs_vector_remove(&g_Tries.wp_entities, entity_index);
 
         UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
     }

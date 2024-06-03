@@ -100,7 +100,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
                 UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): STEP_1");
 
-                //acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
+                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
 
                 continue;
             }
@@ -113,34 +113,29 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
         // CHECK WEAPON
         if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX)) {
 
-            std::string wp_key = key.substr(sizeof(WP_CLASS_PREFIX));
+            v = g_Tries.wp_entities;
 
-            if (g_Tries.wp_entities.find(wp_key) != g_Tries.wp_entities.end()) {
+            for (const int& i : v) {
 
-                v = g_Tries.wp_entities[wp_key];
+                pEdict = INDEXENT(v[i]);
 
-                for (const int& i : v) {
+                if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
-                    pEdict = INDEXENT(v[i]);
+                // CHECK CREATION CLASSNAME
+                if (key == STRING(pEdict->v.classname)) {
 
-                    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
+                    UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = <%s> was changed from <%d>", v[i], STRING(pEdict->v.classname), g_Tries.classnames[v[i]]);
 
-                    // CHECK CREATION CLASSNAME
-                    if (key == STRING(pEdict->v.classname)) {
+                    *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
 
-                        UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = <%s> was changed from <%d>", v[i], STRING(pEdict->v.classname), g_Tries.classnames[v[i]]);
+                    result++;
 
-                        *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
+                    // TRANSFER CLASSNAME
+                    if (key != g_Tries.classnames[v[i]]) {
 
-                        result++;
-
-                        // TRANSFER CLASSNAME
-                        if (key != g_Tries.classnames[v[i]]) {
-
-                            UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): STEP_2");
-                            
-                            //acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[v[i]], key, v[i]);
-                        }
+                        UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): STEP_2");
+                        
+                        acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[v[i]], key, v[i]);
                     }
                 }
             }
