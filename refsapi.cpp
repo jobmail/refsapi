@@ -90,7 +90,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // CHECK ENTITY CREATION CLASS
     if (key != g_Tries.classnames[entity_index]) {
 
-        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s was changed from %s << WARNING !!!\n", entity_index, key.c_str(), g_Tries.classnames[entity_index]);
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s was changed from %s << WARNING !!!\n", entity_index, key.c_str(), g_Tries.classnames[entity_index].c_str());
 
         key = g_Tries.classnames[entity_index];
     }
