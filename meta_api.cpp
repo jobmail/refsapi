@@ -7,15 +7,15 @@ enginefuncs_t *g_pengfuncsTable;
 
 plugin_info_t Plugin_info =
 {
-	META_INTERFACE_VERSION,			// ifvers
-	"RefsAPI",						// name
-	"0.1",							// version
-	__DATE__,						// date
-	"Refresh",						// author
-	"https://dev-cs.ru",			// url
-	"REFSAPI",						// logtag
-	PT_ANYTIME,						// (when) loadable
-	PT_NEVER,						// (when) unloadable
+	META_INTERFACE_VERSION,							// ifvers
+	"RefsAPI",										// name
+	"1.0.1",										// version
+	__DATE__,										// date
+	"Refresh",										// author
+	"https://github.com/jobmail/refsapi",			// url
+	"REFSAPI",										// logtag
+	PT_ANYTIME,										// (when) loadable
+	PT_NEVER,										// (when) unloadable
 };
 
 C_DLLEXPORT int Meta_Query(char *interfaceVersion, plugin_info_t **plinfo, mutil_funcs_t *pMetaUtilFuncs)
