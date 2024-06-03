@@ -56,21 +56,24 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     std::string key = STRING(pEdict->v.classname);
 
-    int start_pos = acs_trie_add(&g_Tries.entities, key, entity_index);
+    // ADD ENTITIES
+    int result = acs_trie_add(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, start_pos);
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, result);
 
+    // ADD CLASSNAMES
     g_Tries.classnames[entity_index] = key;
 
-    start_pos = key.find("_");
+    // ADD WP_ENTITIES
+    result = key.find("_");
 
-    if (start_pos != std::string::npos && key.length() > (start_pos + 1)) {
+    if (result != std::string::npos && key.length() > (result + 1)) {
 
-        key = key.substr(start_pos + 1);
+        key = key.substr(result + 1);
 
-        start_pos = acs_trie_add(&g_Tries.wp_entities, key, entity_index);
+        result = acs_trie_add(&g_Tries.wp_entities, key, entity_index);
 
-        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, start_pos);
+        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, result);
     }
 }
 
@@ -85,16 +88,8 @@ void Free_EntPrivateData(edict_t *pEdict) {
     UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     std::string key = STRING(pEdict->v.classname);
-    /*
-    char key[256];
-    Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
-    */
 
-    // REMOVE NAMED_ENTITIES
-    std::vector<int> v;
-
-    std::vector<int>::iterator it_value;
-
+    // CHECK ENTITY CREATION CLASS
     if (key != g_Tries.classnames[entity_index]) {
 
         UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s was changed from %s << WARNING !!!\n", entity_index, key, g_Tries.classnames[entity_index]);
@@ -102,30 +97,15 @@ void Free_EntPrivateData(edict_t *pEdict) {
         key = g_Tries.classnames[entity_index];
     }
 
+    // REMOVE ENTITIES
     int count = acs_trie_remove(&g_Tries.entities, key, entity_index);
 
     UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, count);
 
     // REMOVE PLAYER_ENTITIES
-    if (is_valid_index(owner_index)) {
+    if (is_valid_index(owner_index))
 
         acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
-        
-        /*
-        std::vector<int> v = g_Tries.player_entities[owner_index];
-
-        std::vector<int>::iterator it_value;
-
-        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
-
-            v.erase(it_value);
-
-            g_Tries.player_entities[owner_index] = v;
-
-            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
-        }
-        */
-    }
 
     g_Tries.classnames.erase(entity_index);
 }
@@ -141,6 +121,8 @@ CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerIt
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index)) {
 
+        acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
+        /*
         std::vector<int> v = g_Tries.player_entities[owner_index];
 
         std::vector<int>::iterator it_value;
@@ -153,6 +135,7 @@ CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerIt
 
             UTIL_ServerPrint("[DEBUG] CreateWeaponBox_RG: remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
         }
+        */
     }
 
     return origin;
