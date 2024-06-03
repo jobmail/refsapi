@@ -56,30 +56,6 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     std::string key = STRING(pEdict->v.classname);
 
-    /*
-    char key[256];
-    Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
-    */
-
-    /*
-    std::vector<int> v;
-
-    if (g_Tries.entities.find(key) != g_Tries.entities.end())
-
-        v = g_Tries.entities[key];
-
-    else
-
-        v.clear();
-    
-    if (v.size() < v.max_size()) {
-
-        v.push_back(entity_index);
-
-        g_Tries.entities[key] = v;
-    }
-    */
-
     int start_pos = acs_trie_add(&g_Tries.entities, key, entity_index);
 
     UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, start_pos);
@@ -108,9 +84,11 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
     UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
+    std::string key = STRING(pEdict->v.classname);
+    /*
     char key[256];
-    
     Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
+    */
 
     // REMOVE NAMED_ENTITIES
     std::vector<int> v;
@@ -121,9 +99,14 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
         UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s was changed from %s << WARNING !!!\n", entity_index, key, g_Tries.classnames[entity_index]);
 
-        Q_strnlcpy(key, g_Tries.classnames[entity_index].c_str(), sizeof(key));
+        key = g_Tries.classnames[entity_index];
     }
 
+    acs_trie_remove(&g_Tries.entities, key, entity_index);
+
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, v.size());
+    
+    /*
     if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
         v = g_Tries.entities[key];
@@ -143,6 +126,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
                 g_Tries.entities.erase(key);
         }
     }
+    */
 
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index)) {
