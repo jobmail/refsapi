@@ -84,7 +84,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
     int owner_index = ENTINDEX(pEdict->v.owner);
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s, owner = %d\n", prefix, entity_index, STRING(pEdict->v.classname), owner_index);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     char key[256];
     
@@ -103,7 +103,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
             v.erase(it_value);
 
-            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", prefix, entity_index, key, v.size());
+            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, v.size());
 
             if (v.size() > 0)
 
@@ -128,7 +128,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
             g_Tries.player_entities[owner_index] = v;
 
-            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d, from owner = %d, items_count = %d\n", prefix, entity_index, owner_index, v.size());
+            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
         }
     }
 }
