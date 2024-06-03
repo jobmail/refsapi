@@ -97,11 +97,11 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
 
             v = g_Tries.entities[key];
 
-            if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
+            while ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
                 v.erase(it_value);
 
-                UTIL_ServerPrint("[DEBUG] %s: classname = %s, count = %d\n", prefix, key, v.size());
+                UTIL_ServerPrint("[DEBUG] %s: classname = %s, left_count = %d\n", prefix, key, v.size());
 
                 if (v.size() > 0)
 
@@ -121,11 +121,11 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
 
         std::vector<int>::iterator it_value;
 
-        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
-
-            UTIL_ServerPrint("[DEBUG] %s: remove entity = %d, from owner = %d\n", prefix, entity_index, owner_index);
+        while ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
             v.erase(it_value);
+
+            UTIL_ServerPrint("[DEBUG] %s: remove entity = %d, from owner = %d, left_count = %d\n", prefix, entity_index, owner_index, v.size());
         }
     }
 }
@@ -170,7 +170,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
             
             v = g_Tries.player_entities[owner_index];
 
-            if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
+            while ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
                 UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
 
