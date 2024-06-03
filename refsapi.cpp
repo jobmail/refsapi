@@ -171,7 +171,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
             UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
         }
-        
+
         // FIX OWNER
         pItem->pev->owner = pPlayer->edict();
 
@@ -532,6 +532,8 @@ int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string k
 void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::string key_from, std::string key_to, int value) {
 
     acs_trie_remove(trie, key_from, value);
+    
+    g_Tries.classnames.erase(value);
     
     g_Tries.classnames[value] = key_to;
 
