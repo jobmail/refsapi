@@ -75,15 +75,44 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
 void Free_EntPrivateData(edict_t *pEdict) {
 
-    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || FStringNull(pEdict->v.classname)) return;
-
     int entity_index = ENTINDEX(pEdict);
 
     int owner_index = ENTINDEX(pEdict->v.owner);
 
+    std::string key;
+
+    // CHECK CREATION CLASSNAME
+    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || FStringNull(pEdict->v.classname)) {
+
+        if (g_Tries.classnames.find(entity_index) != g_Tries.classnames.end()) {
+
+            key = g_Tries.classnames[entity_index];
+
+            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): found deleted entity = %d with creation_classname = <%d> << WARNING !!!\n", entity_index, key);
+
+            // REMOVE FROM ENTITIES
+            if (!key.empty() && g_Tries.entities.find(key) != g_Tries.entities.end())
+
+                acs_vector_remove(&g_Tries.entities[key], entity_index);
+
+            // REMOVE PLAYER_ENTITIES
+            if (is_valid_index(owner_index))
+
+                acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
+            
+            // REMOVE WP_ENITITIES
+            acs_vector_remove(&g_Tries.wp_entities, entity_index);
+
+            // REMOVE CLASSNAME
+            g_Tries.classnames.erase(entity_index);
+
+            return;
+        }
+    }
+
     //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s>, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
-    std::string key = STRING(pEdict->v.classname);
+    key = STRING(pEdict->v.classname);
 
     // CHECK ENTITY CREATION CLASS
     if (key != g_Tries.classnames[entity_index]) {
@@ -532,7 +561,7 @@ int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string k
     return v.size();
 }
 
-void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::string key_from, std::string key_to, int value) {
+void acs_trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::string key_from, std::string key_to, int value) {
 
     acs_trie_remove(trie, key_from, value);
     
@@ -541,16 +570,16 @@ void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::strin
     acs_trie_add(trie, key_to, value);
 }
 
-int acs_vector_add(std::vector<int> *v, int value) {
+int acs_vector_add(std::vector<cell> *v, int value) {
 
     v->push_back(value);
 
     return v->size();
 }
 
-int acs_vector_remove(std::vector<int> *v, int value) {
+int acs_vector_remove(std::vector<cell> *v, int value) {
 
-    std::vector<int>::iterator it_value;
+    std::vector<cell>::iterator it_value;
 
     if ((it_value = std::find(v->begin(), v->end(), value)) != v->end())
 
