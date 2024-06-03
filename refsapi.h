@@ -132,3 +132,30 @@ int acs_trie_add(std::map<std::string, std::vector<int>>* trie, std::string key,
 
     return v.size();
 }
+
+int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string key, int value) {
+
+    std::vector<int> v;
+
+    std::vector<int>::iterator it_value;
+
+    if (trie->find(key) != trie->end()) {
+
+        v = (*trie)[key];
+
+        if ((it_value = std::find(v.begin(), v.end(), value)) != v.end()) {
+
+            v.erase(it_value);
+
+            if (v.size() > 0)
+
+                (*trie)[key] = v;                    
+
+            else
+
+               trie->erase(key);
+        }
+    }
+
+    return v.size();
+}
