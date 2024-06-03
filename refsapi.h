@@ -45,7 +45,7 @@ struct sTries {
     std::map<std::string, int> names;
     std::map<std::string, int> authids;
     std::map<std::string, std::vector<int>> entities;       // all entities
-    std::map<std::string, std::vector<int>> wp_entities;    // has classname weapon_*
+    std::vector<int> wp_entities;                           // has classname weapon_*
     std::map<int, std::string> classnames;
     std::vector<int> player_entities[MAX_PLAYERS + 1];
     //std::map<std::string, std::vector<int>> ips;
