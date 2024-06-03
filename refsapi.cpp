@@ -48,7 +48,7 @@ void* R_PvEntPrivateData_Post(edict_t *pEdict) {
 
 void Alloc_EntPrivateData(edict_t *pEdict) {
 
-    if (FStringNull(pEdict->v.classname)) return;
+    if (!FStringNull(pEdict->v.classname)) return;
 
     UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
