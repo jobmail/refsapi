@@ -10,7 +10,7 @@
 #define MAX_PLAYERS                 32
 #define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN         (sizeof(WP_CLASS_PREFIX) - 1)
-#define C_COUNT(x)                  (cell)(sizeof(x)/sizeof(cell))
+#define _COUNT(x)                  (size_t)(sizeof(x)/sizeof(cell))
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
 #define is_valid_index              __is_valid_edict_index
 
