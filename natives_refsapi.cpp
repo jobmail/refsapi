@@ -97,7 +97,8 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
             result++;
         }
     } else {
-        
+
+        // CHECK WEAPON
     }
 
     return result;
