@@ -20,7 +20,7 @@ g_RegUserMsg g_user_msg[] =
 
 edict_t* R_CreateNamedEntity(string_t className) {
 
-    //UTIL_ServerPrint("[DEBUG] R_CreateNamedEntity(): classname = %s\n", STRING(className));
+    //UTIL_ServerPrint("[DEBUG] R_CreateNamedEntity(): classname = <%s>\n", STRING(className));
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
@@ -50,7 +50,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     if (FStringNull(pEdict->v.classname)) return;
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     int entity_index = ENTINDEX(pEdict);
 
@@ -59,7 +59,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     // ADD ENTITIES
     int result = acs_trie_add(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key.c_str(), result);
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
 
     // ADD CLASSNAMES
     g_Tries.classnames[entity_index] = key;
@@ -71,7 +71,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
         result = acs_trie_add(&g_Tries.wp_entities, key, entity_index);
 
-        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key.c_str(), result);
+        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
     }
 }
 
@@ -83,14 +83,14 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
     int owner_index = ENTINDEX(pEdict->v.owner);
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s>, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     std::string key = STRING(pEdict->v.classname);
 
     // CHECK ENTITY CREATION CLASS
     if (key != g_Tries.classnames[entity_index]) {
 
-        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s was changed from %s << WARNING !!!\n", entity_index, key.c_str(), g_Tries.classnames[entity_index].c_str());
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s> was changed from <%s> << WARNING !!!\n", entity_index, key.c_str(), g_Tries.classnames[entity_index].c_str());
 
         key = g_Tries.classnames[entity_index];
     }
@@ -98,7 +98,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // REMOVE ENTITIES
     int result = acs_trie_remove(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, new_count = %d\n", entity_index, key.c_str(), result);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
 
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index))
@@ -115,7 +115,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
         result = acs_trie_remove(&g_Tries.wp_entities, key, entity_index);
 
-        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = %s, new_count = %d\n", key.c_str(), result);
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
     }
 }
 
@@ -146,7 +146,7 @@ CBaseEntity* CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem 
 
     auto origin = chain->callNext(pPlayer, classname);
 
-    //UTIL_ServerPrint("[DEBUG] GiveNamedItem_RG(): id = %d, item = %d, classname = %s\n", pPlayer->entindex(), origin->entindex(), classname);
+    //UTIL_ServerPrint("[DEBUG] GiveNamedItem_RG(): id = %d, item = %d, classname = <%s>\n", pPlayer->entindex(), origin->entindex(), classname);
 
     return origin;
 }
@@ -178,7 +178,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
         // FIX OWNER
         pItem->pev->owner = pPlayer->edict();
 
-        UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner_index);
+        UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = <%s>, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner_index);
     }
 
     return origin;
