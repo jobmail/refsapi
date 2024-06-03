@@ -45,12 +45,12 @@ struct sTries {
 
     std::map<std::string, int> names;
     std::map<std::string, int> authids;
-    std::map<std::string, std::vector<int>> entities;       // all entities
-    std::vector<int> wp_entities;                           // has classname weapon_*
+    std::map<std::string, std::vector<cell>> entities;       // all entities
+    std::vector<cell> wp_entities;                           // has classname weapon_*
     std::map<int, std::string> classnames;
-    std::vector<int> player_entities[MAX_PLAYERS + 1];
-    //std::map<std::string, std::vector<int>> ips;
-    //std::map<int, std::vector<int>> ips_int;
+    std::vector<cell> player_entities[MAX_PLAYERS + 1];
+    //std::map<std::string, std::vector<cell>> ips;
+    //std::map<int, std::vector<cell>> ips_int;
 };
 
 struct sClients {
@@ -108,11 +108,11 @@ void Client_Disconnected(int id, bool crash, char *format);
 void Alloc_EntPrivateData(edict_t *pEdict);
 void Free_EntPrivateData(edict_t *pEdict);
 
-int acs_trie_add(std::map<std::string, std::vector<int>>* trie, std::string key, int value);
-int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string key, int value);
-void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::string key_from, std::string key_to, int value);
-int acs_vector_add(std::vector<int> *v, int value);
-int acs_vector_remove(std::vector<int> *v, int value);
+int acs_trie_add(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
+int acs_trie_remove(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
+void acs_trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::string key_from, std::string key_to, int value);
+int acs_vector_add(std::vector<cell> *v, int value);
+int acs_vector_remove(std::vector<cell> *v, int value);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
