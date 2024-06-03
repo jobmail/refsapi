@@ -9,7 +9,7 @@ cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
 
     if (max_size > 0)
     
-        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, min(max_size, _COUNT(g_PlayersNum)));
+        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, min(max_size, sizeof(g_PlayersNum)));
     
     int total = g_PlayersNum[TEAM_TERRORIST] + g_PlayersNum[TEAM_CT];
 
@@ -27,7 +27,7 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     std::vector<cell> v = g_Tries.player_entities[params[arg_index]];
 
-    size_t max_size = min(_COUNT(v.size()), (size_t)*getAmxAddr(amx, params[arg_ent_arr_size]));
+    size_t max_size = min(v.size(), (size_t)*getAmxAddr(amx, params[arg_ent_arr_size]));
 
     if (max_size > 0)
     
