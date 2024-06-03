@@ -50,7 +50,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     if (FStringNull(pEdict->v.classname)) return;
 
-    //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     int entity_index = ENTINDEX(pEdict);
 
@@ -59,7 +59,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     // ADD ENTITIES
     int result = acs_trie_add(&g_Tries.entities, key, entity_index);
 
-    //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
 
     // ADD CLASSNAMES
     g_Tries.classnames[entity_index] = key;
@@ -69,7 +69,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
         result = acs_vector_add(&g_Tries.wp_entities, entity_index);
 
-        //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): WEAPONS, new_count = %d\n", result);
+        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): WEAPONS, new_count = %d\n", result);
     }
 }
 
@@ -110,14 +110,14 @@ void Free_EntPrivateData(edict_t *pEdict) {
         }
     }
 
-    //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s>, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s>, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     key = STRING(pEdict->v.classname);
 
     // CHECK ENTITY CREATION CLASS
     if (key != g_Tries.classnames[entity_index]) {
 
-        //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s> was changed from <%s> << WARNING !!!\n", entity_index, key.c_str(), g_Tries.classnames[entity_index].c_str());
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s> was changed from <%s> << WARNING !!!\n", entity_index, key.c_str(), g_Tries.classnames[entity_index].c_str());
 
         key = g_Tries.classnames[entity_index];
     }
@@ -125,7 +125,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // REMOVE ENTITIES
     int result = acs_trie_remove(&g_Tries.entities, key, entity_index);
 
-    //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
 
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index))
@@ -140,7 +140,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
         result = acs_vector_remove(&g_Tries.wp_entities, entity_index);
 
-        //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): WEAPONS, new_count = %d\n", result);
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): WEAPONS, new_count = %d\n", result);
     }
 }
 
