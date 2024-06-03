@@ -34,8 +34,6 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     int max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
 
-    //UTIL_ServerPrint("[DEBUG] rf_get_user_weapons(): max_size = %d\n", max_size);
-
     for (; i < max_size; i++)
 
         *(getAmxAddr(amx, params[arg_ent_arr]) + i) = v[i];
@@ -54,7 +52,7 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
     if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr)) {
 
-        UTIL_ServerPrint("[DEBUG] found: ent = %d, classname = %s\n", params[arg_entity], STRING(pEdict->v.classname));
+        //UTIL_ServerPrint("[DEBUG] found: ent = %d, classname = %s\n", params[arg_entity], STRING(pEdict->v.classname));
 
         g_amxxapi.SetAmxString(amx, params[arg_name], STRING(pEdict->v.classname), params[arg_name_len]);
 
@@ -75,7 +73,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     char classname[256];
 
-    const char* key = getAmxString(amx, params[arg_classname], classname); //(char*)getAmxAddr(amx, params[arg_classname]);
+    const char* key = getAmxString(amx, params[arg_classname], classname);
 
     if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
