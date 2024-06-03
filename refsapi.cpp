@@ -496,6 +496,8 @@ int acs_trie_add(std::map<std::string, std::vector<int>>* trie, std::string key,
 
         v.push_back(value);
 
+        (*trie).erase(key);
+
         (*trie)[key] = v;
     }
 
@@ -516,11 +518,13 @@ int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string k
 
             v.erase(it_value);
 
-            if (v.size() > 0)
+            if (v.size() > 0) {
+
+                (*trie).erase(key);
 
                 (*trie)[key] = v;                    
 
-            else
+            } else
 
                trie->erase(key);
         }
