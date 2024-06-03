@@ -101,7 +101,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
     if (key != g_Tries.classnames[entity_index]) {
 
-        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = %s was changed from %s\n", key, g_Tries.classnames[entity_index]);
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s was changed from %s << WARNING !!!\n", entity_index, key, g_Tries.classnames[entity_index]);
 
         Q_strnlcpy(key, g_Tries.classnames[entity_index].c_str(), sizeof(key));
     }
