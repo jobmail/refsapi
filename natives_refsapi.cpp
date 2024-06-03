@@ -47,8 +47,6 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
     if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr)) {
 
-        //UTIL_ServerPrint("[DEBUG] found: ent = %d, classname = %s\n", params[arg_entity], STRING(pEdict->v.classname));
-
         g_amxxapi.SetAmxString(amx, params[arg_name], STRING(pEdict->v.classname), params[arg_name_len]);
 
         return TRUE;
@@ -117,14 +115,10 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
                 // CHECK CREATION CLASSNAME
                 if (key == STRING(pEdict->v.classname)) {
 
-                    //g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = <%s> was changed from <%d>", it, STRING(pEdict->v.classname), g_Tries.classnames[it]);
-
                     *(getAmxAddr(amx, params[arg_ent_arr]) + result) = it;
 
                     // TRANSFER CLASSNAME
                     if (key != g_Tries.classnames[it]) {
-
-                        //g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_2");
                         
                         acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[it], key, it);
                     }
