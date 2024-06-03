@@ -130,6 +130,17 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
     }
 }
 
+qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem) {
+
+    auto origin = chain->callNext(pPlayer, pItem);
+
+    if (origin)
+
+        UTIL_ServerPrint("[DEBUG] CanHavePlayerItem_RG(): id = %d, entity = %d\n", pPlayer->entindex(), pItem->entindex());
+
+    return origin;
+}
+
 CBaseEntity* CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem *chain, CBasePlayer *pPlayer, const char *classname) {
 
     auto origin = chain->callNext(pPlayer, classname);
