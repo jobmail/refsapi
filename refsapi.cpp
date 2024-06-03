@@ -209,10 +209,8 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
                 g_Tries.player_entities[owner_index] = v;
 
                 UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
-
             }
         }
-
         // FIX OWNER
         pItem->pev->owner = pPlayer->edict();
 
