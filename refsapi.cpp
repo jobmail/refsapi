@@ -538,6 +538,8 @@ int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string k
 
 void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::string key_from, std::string key_to, int value) {
 
+    edict_t *pEntity = INDEXENT(value);
+
     acs_trie_remove(trie, key_from, value);
     
     g_Tries.classnames[value] = key_to;
