@@ -29,11 +29,11 @@ void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
     UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
-    char key[128];
-    
-    Q_strcpy_s(key, (char*)STRING(pEdict->v.classname));
+    if (!FStringNull(pEdict->v.classname)) {
 
-    if (key[0]) {
+        char key[256];
+        
+        Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
 
         std::vector<int> v;
 
@@ -54,7 +54,7 @@ void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
         UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): classname = %s, count = %d\n", key, v.size());
     }
-
+    
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
@@ -74,7 +74,7 @@ void* R_PvEntPrivateData_Post(edict_t *pEdict) {
 
 void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
 
-    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr) return;
+    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || FStringNull(pEdict->v.classname)) return;
 
     int entity_index = ENTINDEX(pEdict);
 
@@ -82,35 +82,32 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
 
     UTIL_ServerPrint("[DEBUG] %s: entity = %d, classname = %s, owner = %d\n", prefix, entity_index, STRING(pEdict->v.classname), owner_index);
 
-    char key[128];
+    char key[256];
     
-    Q_strcpy_s(key, (char*)STRING(pEdict->v.classname));
+    Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
 
     // REMOVE NAMED_ENTITIES
-    if (key[0]) {
+    std::vector<int> v;
 
-        std::vector<int> v;
+    std::vector<int>::iterator it_value;
 
-        std::vector<int>::iterator it_value;
-    
-        if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
+    if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
-            v = g_Tries.entities[key];
+        v = g_Tries.entities[key];
 
-            if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
+        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
 
-                v.erase(it_value);
+            v.erase(it_value);
 
-                UTIL_ServerPrint("[DEBUG] %s: remove entity = %d from classname = %s, left_count = %d\n", prefix, entity_index, key, v.size());
+            UTIL_ServerPrint("[DEBUG] %s: remove entity = %d from classname = %s, left_count = %d\n", prefix, entity_index, key, v.size());
 
-                if (v.size() > 0)
+            if (v.size() > 0)
 
-                    g_Tries.entities[key] = v;                    
+                g_Tries.entities[key] = v;                    
 
-                else
+            else
 
-                    g_Tries.entities.erase(key);
-            }
+                g_Tries.entities.erase(key);
         }
     }
 
