@@ -69,7 +69,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
         result = acs_vector_add(&g_Tries.wp_entities, entity_index);
 
-        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
+        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): WEAPONS, new_count = %d\n", result);
     }
 }
 
@@ -111,7 +111,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
         result = acs_vector_remove(&g_Tries.wp_entities, entity_index);
 
-        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): WEAPONS, new_count = %d\n", result);
     }
 }
 
