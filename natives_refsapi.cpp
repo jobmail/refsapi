@@ -19,9 +19,9 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
     
     enum args_e { arg_count, arg_index, arg_ent_arr, arg_ent_arr_size};
 
-    CHECK_ISPLAYER(arg_index);
-
     if (params[arg_ent_arr_size] < 1) return 0;
+
+    CHECK_ISPLAYER(arg_index);
 
     std::vector<int> v = g_Tries.player_entities[params[arg_index]];
 
