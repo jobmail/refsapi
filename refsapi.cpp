@@ -84,11 +84,14 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // CHECK CREATION CLASSNAME
     if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || FStringNull(pEdict->v.classname)) {
 
+        return;
+        
+        /*
         if (g_Tries.classnames.find(entity_index) != g_Tries.classnames.end()) {
 
             key = g_Tries.classnames[entity_index];
 
-            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): found deleted entity = %d with creation_classname = <%d> << WARNING !!!\n", entity_index, key);
+            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): found deleted entity = %d with creation_classname = <%s> << WARNING !!!\n", entity_index, key);
 
             // REMOVE FROM ENTITIES
             if (!key.empty() && g_Tries.entities.find(key) != g_Tries.entities.end())
@@ -108,6 +111,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
             return;
         }
+        */
     }
 
     //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s>, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
