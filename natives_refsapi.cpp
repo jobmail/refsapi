@@ -29,6 +29,8 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     size_t max_size = min(v.size(), (size_t)*getAmxAddr(amx, params[arg_ent_arr_size]));
 
+    UTIL_ServerPrint("[DEBUG] MAX_SIZE: v.size = %d, arr_size = %d", v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
+
     if (max_size > 0)
     
         Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v.data(), max_size);
