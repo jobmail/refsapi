@@ -71,34 +71,62 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     int result = 0;
 
+    edict_t* pEdict;
+
+    std::vector<int> v;
+
+    std::vector<int>::iterator it_value;
+
     char classname[256];
 
-    const char* key = getAmxString(amx, params[arg_classname], classname);
+    std::string key = getAmxString(amx, params[arg_classname], classname);
+
+    bool is_valid = is_valid_index(owner_index);
 
     if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
-        std::vector<int> v = g_Tries.entities[key];
+        v = g_Tries.entities[key];
 
         int max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
 
         for (int i; i < max_size; i++) {
 
-            if (is_valid_index(owner_index)) {
+            pEdict = INDEXENT(v[i]);
 
-                edict_t* pEdict = INDEXENT(v[i]);
+            if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
-                if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr) && ENTINDEX(pEdict->v.owner) != owner_index)
-
-                    continue;
-            }
-
-            *(getAmxAddr(amx, params[arg_ent_arr]) + i) = v[i];
+            *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
 
             result++;
         }
     } else {
-
         // CHECK WEAPON
+        if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX)) {
+
+            std::string wp_key = key.substr(sizeof(WP_CLASS_PREFIX));
+
+            if (g_Tries.wp_entities.find(wp_key) != g_Tries.wp_entities.end()) {
+
+                v = g_Tries.wp_entities[wp_key];
+
+                for (const int& i : v) {
+
+                    pEdict = INDEXENT(v[i]);
+
+                    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
+
+                    // CHECK CREATION CLASSNAME
+                    if (key == STRING(pEdict->v.classname)) {
+
+                        UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = %s was changed from %d", v[i], STRING(pEdict->v.classname), g_Tries.classnames[v[i]]);
+
+                        *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
+
+                        result++;
+                    }
+                }
+            }
+        }
     }
 
     return result;
