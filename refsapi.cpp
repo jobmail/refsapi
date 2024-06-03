@@ -59,7 +59,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     // ADD ENTITIES
     int result = acs_trie_add(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, result);
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key.c_str(), result);
 
     // ADD CLASSNAMES
     g_Tries.classnames[entity_index] = key;
@@ -71,7 +71,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
         result = acs_trie_add(&g_Tries.wp_entities, key, entity_index);
 
-        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, result);
+        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key.c_str(), result);
     }
 }
 
@@ -90,7 +90,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // CHECK ENTITY CREATION CLASS
     if (key != g_Tries.classnames[entity_index]) {
 
-        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s was changed from %s << WARNING !!!\n", entity_index, key, g_Tries.classnames[entity_index]);
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s was changed from %s << WARNING !!!\n", entity_index, key.c_str(), g_Tries.classnames[entity_index]);
 
         key = g_Tries.classnames[entity_index];
     }
@@ -98,7 +98,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // REMOVE ENTITIES
     int result = acs_trie_remove(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, new_count = %d\n", entity_index, key, result);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, new_count = %d\n", entity_index, key.c_str(), result);
 
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index))
@@ -115,7 +115,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
         result = acs_trie_remove(&g_Tries.wp_entities, key, entity_index);
 
-        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = %s, new_count = %d\n", key, result);
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = %s, new_count = %d\n", key.c_str(), result);
     }
 }
 
