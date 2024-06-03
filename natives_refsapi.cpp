@@ -1,15 +1,13 @@
 #include "precompiled.h"
 
-// native rf_get_players_num(nums[RFS_TEAMS], bool:teams_only);
+// native rf_get_players_num(nums[], nums_size, bool:teams_only);
 cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
 
-    enum args_e { arg_count, arg_nums_arr, arg_teams_only};
+    enum args_e { arg_count, arg_nums_arr, arg_nums_arr_size, arg_teams_only};
 
-    int* dest = getAmxAddr(amx, params[arg_nums_arr]);
+    if (params[arg_nums_arr_size] > 0)
     
-    if (dest != nullptr)
-    
-        Q_memcpy(dest, &g_PlayersNum, sizeof(g_PlayersNum));
+        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, min(params[arg_nums_arr_size], (int)sizeof(g_PlayersNum)));
     
     int total = g_PlayersNum[TEAM_TERRORIST] + g_PlayersNum[TEAM_CT];
 
@@ -23,15 +21,13 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     CHECK_ISPLAYER(arg_index);
 
-    int* dest = getAmxAddr(amx, params[arg_ent_arr]);
-
-    if (dest == nullptr) return;
+    if (params[arg_ent_arr_size] < 1) return;
 
     std::vector<int> v = g_Tries.player_entities[params[arg_index]];
 
     int max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
 
-    Q_memcpy(dest, v.data(), max_size);
+    Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v.data(), max_size);
 
     return max_size;
 }
@@ -102,7 +98,9 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             if (++result >= params[arg_ent_arr_size]) break;
         }
+        
     } else {
+
         // CHECK WEAPON
         if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX)) {
 
