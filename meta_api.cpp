@@ -45,7 +45,7 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	if (!OnMetaAttach())
 		return false;
 
-	g_engfuncs.pfnServerPrint("\n################\n# Hello World! #\n################\n\n");
+	UTIL_ServerPrint("\n################\n# Hello World! #\n################\n\n");
 	
 	GET_HOOK_TABLES(PLID, &g_pengfuncsTable, nullptr, nullptr);
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));

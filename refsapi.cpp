@@ -34,14 +34,14 @@ void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
 void* R_PvEntPrivateData(edict_t *pEdict) {
 
-    UTIL_ServerPrint("[DEBUG] ZZZZZZZZZZZZZZZZZZZZ: R_PvEntPrivateData");
+    //UTIL_ServerPrint("[DEBUG] ZZZZZZZZZZZZZZZZZZZZ: R_PvEntPrivateData");
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
 void* R_PvEntPrivateData_Post(edict_t *pEdict) {
 
-    UTIL_ServerPrint("[DEBUG] XXXXXXXXXXXXXXXXXXXX: R_PvEntPrivateData_Post");
+    //UTIL_ServerPrint("[DEBUG] XXXXXXXXXXXXXXXXXXXX: R_PvEntPrivateData_Post");
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
@@ -50,7 +50,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     if (FStringNull(pEdict->v.classname)) return;
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+    //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     char key[256];
     
@@ -73,7 +73,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
         g_Tries.entities[key] = v;
     }
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, count = %d\n", key, v.size());
+    //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, count = %d\n", key, v.size());
 }
 
 void Free_EntPrivateData(edict_t *pEdict) {
@@ -84,7 +84,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
     int owner_index = ENTINDEX(pEdict->v.owner);
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
+    //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     char key[256];
     
@@ -103,7 +103,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
             v.erase(it_value);
 
-            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, v.size());
+            //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, v.size());
 
             if (v.size() > 0)
 
@@ -128,7 +128,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
             g_Tries.player_entities[owner_index] = v;
 
-            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
+            //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
         }
     }
 }
@@ -154,7 +154,7 @@ CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerIt
 
             g_Tries.player_entities[owner_index] = v;
 
-            UTIL_ServerPrint("[DEBUG] CreateWeaponBox_RG: remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
+            //UTIL_ServerPrint("[DEBUG] CreateWeaponBox_RG: remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
         }
     }
 
@@ -165,9 +165,9 @@ qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerI
 
     auto origin = chain->callNext(pPlayer, pItem);
 
-    if (origin)
+    //if (origin)
 
-        UTIL_ServerPrint("[DEBUG] CanHavePlayerItem_RG(): id = %d, entity = %d\n", pPlayer->entindex(), pItem->entindex());
+    //    UTIL_ServerPrint("[DEBUG] CanHavePlayerItem_RG(): id = %d, entity = %d\n", pPlayer->entindex(), pItem->entindex());
 
     return origin;
 }
@@ -176,7 +176,7 @@ CBaseEntity* CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem 
 
     auto origin = chain->callNext(pPlayer, classname);
 
-    UTIL_ServerPrint("[DEBUG] GiveNamedItem_RG(): id = %d, item = %d, classname = %s\n", pPlayer->entindex(), origin->entindex(), classname);
+    //UTIL_ServerPrint("[DEBUG] GiveNamedItem_RG(): id = %d, item = %d, classname = %s\n", pPlayer->entindex(), origin->entindex(), classname);
 
     return origin;
 }
@@ -209,13 +209,13 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
                 g_Tries.player_entities[owner_index] = v;
 
-                UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
+                //UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
             }
         }
         // FIX OWNER
         pItem->pev->owner = pPlayer->edict();
 
-        UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner_index);
+        //UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = %s, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner_index);
     }
 
     return result;
@@ -297,7 +297,7 @@ edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *ne
 
 void R_ClientDisconnect(edict_t *pEntity) {
 
-    SERVER_PRINT("[DEBUG] R_ClientDisconnect() ===>\n");
+    UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
 
     Client_Disconnected(ENTINDEX(pEntity), false, 0);
 
@@ -308,7 +308,7 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 	
     char buffer[1024];
 
-    SERVER_PRINT("[DEBUG] SV_DropClient_RH() ===>\n");
+    UTIL_ServerPrint("[DEBUG] SV_DropClient_RH() ===>\n");
 
 	Q_strcpy_s(buffer, (char*)format);
 
