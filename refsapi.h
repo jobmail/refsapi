@@ -110,6 +110,7 @@ void Free_EntPrivateData(edict_t *pEdict);
 int acs_trie_add(std::map<std::string, std::vector<int>>* trie, std::string key, int value);
 int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string key, int value);
 void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::string key_from, std::string key_to, int value);
+int acs_vector_add(std::vector<int> *v, int value);
 int acs_vector_remove(std::vector<int> *v, int value);
 
 extern int gmsgTeamInfo;
