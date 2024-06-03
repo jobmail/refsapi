@@ -102,35 +102,16 @@ void Free_EntPrivateData(edict_t *pEdict) {
         key = g_Tries.classnames[entity_index];
     }
 
-    acs_trie_remove(&g_Tries.entities, key, entity_index);
+    int count = acs_trie_remove(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, v.size());
-    
-    /*
-    if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
-
-        v = g_Tries.entities[key];
-
-        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
-
-            v.erase(it_value);
-
-            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, v.size());
-
-            if (v.size() > 0)
-
-                g_Tries.entities[key] = v;                    
-
-            else
-
-                g_Tries.entities.erase(key);
-        }
-    }
-    */
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, count);
 
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index)) {
 
+        acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
+        
+        /*
         std::vector<int> v = g_Tries.player_entities[owner_index];
 
         std::vector<int>::iterator it_value;
@@ -143,6 +124,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
             UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
         }
+        */
     }
 
     g_Tries.classnames.erase(entity_index);
