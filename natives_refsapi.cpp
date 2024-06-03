@@ -1,22 +1,19 @@
 #include "precompiled.h"
 
-// native rf_get_players_num(num_unassigned, num_tt, num_ct, num_spectrator, num_dead_tt, num_dead_ct);
+// native rf_get_players_num(nums[RFS_TEAMS], bool:teams_only);
 cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
 
-    int total = 0;
+    enum args_e { arg_count, arg_nums_arr, arg_teams_only};
 
-    for (int i = 0; i < sizeof(g_PlayersNum); i++) {
-
-        if (i < 4)
-
-            total += g_PlayersNum[i];
-
-        if (i < PARAMS_COUNT)
-        
-            *getAmxAddr(amx, params[i + 1]) = g_PlayersNum[i];
-    }
+    int* dest = getAmxAddr(amx, params[arg_nums_arr]);
     
-    return total;
+    if (dest != nullptr)
+    
+        Q_memcpy(dest, &g_PlayersNum, sizeof(g_PlayersNum));
+    
+    int total = g_PlayersNum[TEAM_TERRORIST] + g_PlayersNum[TEAM_CT];
+
+    return params[arg_teams_only] ? total : total + g_PlayersNum[TEAM_UNASSIGNED] + g_PlayersNum[TEAM_SPECTRATOR];
 }
 
 // native rf_get_user_weapons(const id, ent[], ent_size);
@@ -26,19 +23,17 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     CHECK_ISPLAYER(arg_index);
 
-    int id = params[arg_index];
+    int* dest = getAmxAddr(amx, params[arg_ent_arr]);
 
-    int i = 0;
+    if (dest == nullptr) return;
 
-    std::vector<int> v = g_Tries.player_entities[id];
+    std::vector<int> v = g_Tries.player_entities[params[arg_index]];
 
     int max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
 
-    for (; i < max_size; i++)
+    Q_memcpy(dest, v.data(), max_size);
 
-        *(getAmxAddr(amx, params[arg_ent_arr]) + i) = v[i];
-
-    return i;
+    return max_size;
 }
 
 // native rf_get_weaponname(const ent, name[], name_len);
