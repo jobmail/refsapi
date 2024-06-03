@@ -67,9 +67,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     // ADD WP_ENTITIES
     if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
-        g_Tries.wp_entities.push_back(entity_index);
-
-        result = g_Tries.wp_entities.size();
+        result = acs_vector_add(&g_Tries.wp_entities, entity_index);
 
         UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
     }
@@ -165,14 +163,15 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
         int owner_index = ENTINDEX(pItem->pev->owner);
 
-        g_Tries.player_entities[id].push_back(entity_index);
+        acs_vector_add(&g_Tries.player_entities[id], entity_index);
 
         if ((is_valid_index(owner_index) || (owner_index > 0 && is_valid_index(owner_index = ENTINDEX(pItem->pev->owner->v.owner)))) && id != owner_index) {
 
-            int result = acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
+            acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
 
-            UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, result);
+            UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
         }
+        
         // FIX OWNER
         pItem->pev->owner = pPlayer->edict();
 
@@ -537,6 +536,13 @@ void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::strin
     g_Tries.classnames[value] = key_to;
 
     acs_trie_add(trie, key_to, value);
+}
+
+int acs_vector_add(std::vector<int> *v, int value) {
+
+    v->push_back(value);
+
+    return v->size();
 }
 
 int acs_vector_remove(std::vector<int> *v, int value) {
