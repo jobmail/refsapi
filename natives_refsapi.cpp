@@ -119,6 +119,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
 
+            /*
             for (const int& it : v) {
 
                 pEdict = INDEXENT(it);
@@ -143,6 +144,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
                     if (++result >= max_size) break;
                 }
             }
+            */
         }
     }
 
