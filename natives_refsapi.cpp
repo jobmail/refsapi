@@ -98,7 +98,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname)) {
 
-                UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): STEP_1");
+                g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_1");
 
                 acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
 
@@ -124,7 +124,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
                 // CHECK CREATION CLASSNAME
                 if (key == STRING(pEdict->v.classname)) {
 
-                    UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = <%s> was changed from <%d>", v[i], STRING(pEdict->v.classname), g_Tries.classnames[v[i]]);
+                    g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = <%s> was changed from <%d>", v[i], STRING(pEdict->v.classname), g_Tries.classnames[v[i]]);
 
                     *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
 
@@ -133,7 +133,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
                     // TRANSFER CLASSNAME
                     if (key != g_Tries.classnames[v[i]]) {
 
-                        UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): STEP_2");
+                        g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_2");
                         
                         acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[v[i]], key, v[i]);
                     }
