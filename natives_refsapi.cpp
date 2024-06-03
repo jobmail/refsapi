@@ -89,7 +89,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
         v = g_Tries.entities[key];
 
-        max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
+        max_size = min((int)v.size(), params[arg_ent_arr_size]);
 
         for (int i; i < max_size; i++) {
 
@@ -117,7 +117,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             v = g_Tries.wp_entities;
 
-            max_size = min((int)v.size(), *getAmxAddr(amx, params[arg_ent_arr_size]));
+            max_size = min((int)v.size(), params[arg_ent_arr_size]);
 
             /*
             for (const int& it : v) {
