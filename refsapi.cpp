@@ -128,6 +128,9 @@ CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerIt
 
         acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
 
+    // FIX OWNER
+    origin->edict()->v.owner = pPlayer->edict();
+
     return origin;
 }
 
