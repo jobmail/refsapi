@@ -132,6 +132,34 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
     }
 }
 
+CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo) {
+    
+    auto origin = chain->callNext(pItem, pPlayer, model, v_origin, v_angels, v_velocity, life_time, pack_ammo);
+
+    int owner_index = pPlayer->entindex();
+
+    int entity_index = pItem->entindex();
+
+    // REMOVE PLAYER_ENTITIES
+    if (is_valid_index(owner_index)) {
+
+        std::vector<int> v = g_Tries.player_entities[owner_index];
+
+        std::vector<int>::iterator it_value;
+
+        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
+
+            v.erase(it_value);
+
+            g_Tries.player_entities[owner_index] = v;
+
+            UTIL_ServerPrint("[DEBUG] CreateWeaponBox_RG: remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
+        }
+    }
+
+    return origin;
+}
+
 qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem) {
 
     auto origin = chain->callNext(pPlayer, pItem);
