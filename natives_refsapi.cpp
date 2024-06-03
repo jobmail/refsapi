@@ -49,7 +49,7 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
         return TRUE;
     }
-
+    
     return FALSE;
 }
 
