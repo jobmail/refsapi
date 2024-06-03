@@ -95,6 +95,12 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
+            // CHECK CREATION CLASSNAME
+            if (key != STRING(pEdict->v.classname)) {
+
+                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
+            }
+
             *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
 
             result++;
@@ -118,11 +124,17 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
                     // CHECK CREATION CLASSNAME
                     if (key == STRING(pEdict->v.classname)) {
 
-                        UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = %s was changed from %d", v[i], STRING(pEdict->v.classname), g_Tries.classnames[v[i]]);
+                        UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = <%s> was changed from <%d>", v[i], STRING(pEdict->v.classname), g_Tries.classnames[v[i]]);
 
                         *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
 
                         result++;
+
+                        // TRANSFER CLASSNAME
+                        if (key != g_Tries.classnames[v[i]]) {
+                            
+                            acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[v[i]], key, v[i]);
+                        }
                     }
                 }
             }
