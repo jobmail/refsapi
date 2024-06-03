@@ -74,7 +74,6 @@ void R_ClientPutInServer_Post(edict_t *pEntity);
 void R_ClientDisconnect(edict_t *pEntity);
 int R_Spawn(edict_t *pEntity);
 edict_t* R_CreateNamedEntity(string_t className);
-void R_Touch(edict_t *pentTouched, edict_t *pentOther);
 
 
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb);
