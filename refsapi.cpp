@@ -69,7 +69,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
         result = acs_vector_add(&g_Tries.wp_entities, entity_index);
 
-        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): WEAPONS, new_count = %d\n", result);
+        //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): WEAPONS, new_count = %d\n", result);
     }
 }
 
