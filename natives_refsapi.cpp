@@ -29,8 +29,6 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     size_t max_size = min(v.size(), (size_t)*getAmxAddr(amx, params[arg_ent_arr_size]));
 
-    UTIL_ServerPrint("[DEBUG] MAX_SIZE: v.size = %d, arr_size = %d", v.size(), params[arg_ent_arr_size]);
-
     if (max_size > 0)
     
         Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v.data(), max_size << 2);
@@ -92,8 +90,6 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname)) {
-
-                //g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_1");
 
                 acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
 
