@@ -8,6 +8,7 @@
 
 #define MAX_REG_MSGS                256 + 16
 #define MAX_PLAYERS                 32
+#define WP_CLASS_PREFIX             "weapon_"
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
 #define is_valid_index              __is_valid_edict_index
 
