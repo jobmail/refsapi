@@ -119,24 +119,9 @@ CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerIt
     int entity_index = pItem->entindex();
 
     // REMOVE PLAYER_ENTITIES
-    if (is_valid_index(owner_index)) {
+    if (is_valid_index(owner_index))
 
         acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
-        /*
-        std::vector<int> v = g_Tries.player_entities[owner_index];
-
-        std::vector<int>::iterator it_value;
-
-        if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
-
-            v.erase(it_value);
-
-            g_Tries.player_entities[owner_index] = v;
-
-            UTIL_ServerPrint("[DEBUG] CreateWeaponBox_RG: remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
-        }
-        */
-    }
 
     return origin;
 }
@@ -144,10 +129,6 @@ CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerIt
 qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem) {
 
     auto origin = chain->callNext(pPlayer, pItem);
-
-    //if (origin)
-
-    //    UTIL_ServerPrint("[DEBUG] CanHavePlayerItem_RG(): id = %d, entity = %d\n", pPlayer->entindex(), pItem->entindex());
 
     return origin;
 }
@@ -180,7 +161,11 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
         g_Tries.player_entities[id].push_back(entity_index);
 
         if ((is_valid_index(owner_index) || (owner_index > 0 && is_valid_index(owner_index = ENTINDEX(pItem->pev->owner->v.owner)))) && id != owner_index) {
-            
+
+            int result = acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
+
+            UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, result);
+            /*
             v = g_Tries.player_entities[owner_index];
 
             if ((it_value = std::find(v.begin(), v.end(), entity_index)) != v.end()) {
@@ -191,6 +176,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
                 UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
             }
+            */
         }
         // FIX OWNER
         pItem->pev->owner = pPlayer->edict();
