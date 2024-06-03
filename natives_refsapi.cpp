@@ -5,9 +5,11 @@ cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
 
     enum args_e { arg_count, arg_nums_arr, arg_nums_arr_size, arg_teams_only};
 
-    if (params[arg_nums_arr_size] > 0)
+    int max_size = *getAmxAddr(amx, params[arg_nums_arr_size]);
+
+    if (max_size > 0)
     
-        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, min(params[arg_nums_arr_size], C_COUNT(g_PlayersNum)));
+        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, min(max_size, C_COUNT(g_PlayersNum)));
     
     int total = g_PlayersNum[TEAM_TERRORIST] + g_PlayersNum[TEAM_CT];
 
