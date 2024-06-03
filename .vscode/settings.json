@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "atomic": "cpp",
+        "charconv": "cpp",
+        "cstring": "cpp",
+        "format": "cpp",
+        "functional": "cpp",
+        "system_error": "cpp",
+        "xlocale": "cpp",
+        "xlocbuf": "cpp",
+        "xlocinfo": "cpp",
+        "xlocmon": "cpp",
+        "xmemory": "cpp",
+        "xstring": "cpp"
+    }
+}
