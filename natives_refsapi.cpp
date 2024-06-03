@@ -99,6 +99,8 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
             if (key != STRING(pEdict->v.classname)) {
 
                 acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
+
+                continue;
             }
 
             *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
