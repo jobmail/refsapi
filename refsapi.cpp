@@ -494,10 +494,6 @@ int acs_trie_add(std::map<std::string, std::vector<int>>* trie, std::string key,
     if (trie->find(key) != trie->end())
 
         v = (*trie)[key];
-
-    else
-
-        v.clear();
     
     if (v.size() < v.max_size()) {
 
@@ -531,10 +527,7 @@ int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string k
 
                trie->erase(key);
         }
-
-    } else
-
-        v.clear();
+    }
 
     return v.size();
 }
