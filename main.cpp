@@ -69,6 +69,8 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	g_ReGameHookchains->CBasePlayer_AddPlayerItem()->registerHook(CBasePlayer_AddPlayerItem_RG);
 	g_ReGameHookchains->CBasePlayer_GiveNamedItem()->registerHook(CBasePlayer_GiveNamedItem_RG);
 
+	g_ReGameHookchains->CSGameRules_CanHavePlayerItem()->registerHook(CSGameRules_CanHavePlayerItem_RG);
+
 	SET_META_RESULT(MRES_IGNORED);
 }
 
@@ -93,6 +95,9 @@ void ServerDeactivate_Post()
 	g_ReGameHookchains->CSGameRules_CheckMapConditions()->unregisterHook(CSGameRules_CheckMapConditions_RG);
 	g_ReGameHookchains->CBasePlayer_AddPlayerItem()->unregisterHook(CBasePlayer_AddPlayerItem_RG);
 	g_ReGameHookchains->CBasePlayer_GiveNamedItem()->unregisterHook(CBasePlayer_GiveNamedItem_RG);
+
+	g_ReGameHookchains->CSGameRules_CanHavePlayerItem()->registerHook(CSGameRules_CanHavePlayerItem_RG);
+	
 
 	SET_META_RESULT(MRES_IGNORED);
 }
