@@ -42,7 +42,8 @@ struct sTries {
 
     std::map<std::string, int> names;
     std::map<std::string, int> authids;
-    std::map<std::string, std::vector<int>> entities;
+    std::map<std::string, std::vector<int>> entities;       // all entities
+    std::map<std::string, std::vector<int>> wp_entities;    // has classname weapon_*
     std::map<int, std::string> classnames;
     std::vector<int> player_entities[MAX_PLAYERS + 1];
     //std::map<std::string, std::vector<int>> ips;
@@ -110,3 +111,24 @@ extern funEventCall modMsgs[MAX_REG_MSGS];
 extern void (*function)(void*);
 extern void (*endfunction)(void*);
 
+int acs_trie_add(std::map<std::string, std::vector<int>>* trie, std::string key, int value) {
+
+    std::vector<int> v;
+
+    if (trie->find(key) != trie->end())
+
+        v = (*trie)[key];
+
+    else
+
+        v.clear();
+    
+    if (v.size() < v.max_size()) {
+
+        v.push_back(value);
+
+        (*trie)[key] = v;
+    }
+
+    return v.size();
+}

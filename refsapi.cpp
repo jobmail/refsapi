@@ -54,10 +54,14 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     int entity_index = ENTINDEX(pEdict);
 
-    char key[256];
-    
-    Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
+    std::string key = STRING(pEdict->v.classname);
 
+    /*
+    char key[256];
+    Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
+    */
+
+    /*
     std::vector<int> v;
 
     if (g_Tries.entities.find(key) != g_Tries.entities.end())
@@ -74,10 +78,24 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
         g_Tries.entities[key] = v;
     }
+    */
+
+    int start_pos = acs_trie_add(&g_Tries.entities, key, entity_index);
+
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, start_pos);
 
     g_Tries.classnames[entity_index] = key;
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, v.size());
+    start_pos = key.find("_");
+
+    if (start_pos != std::string::npos && key.length() > (start_pos + 1)) {
+
+        key = key.substr(start_pos + 1);
+
+        start_pos = acs_trie_add(&g_Tries.wp_entities, key, entity_index);
+
+        UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, start_pos);
+    }
 }
 
 void Free_EntPrivateData(edict_t *pEdict) {
