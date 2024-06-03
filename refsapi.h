@@ -159,3 +159,14 @@ int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string k
 
     return v.size();
 }
+
+int acs_vector_remove(std::vector<int> *v, int value) {
+
+    std::vector<int>::iterator it_value;
+
+    if ((it_value = std::find(v->begin(), v->end(), value)) != v->end())
+
+        v->erase(it_value);
+
+    return v->size();
+}
