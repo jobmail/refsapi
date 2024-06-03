@@ -98,7 +98,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname)) {
 
-                g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_1");
+                //g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_1");
 
                 acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
 
@@ -116,27 +116,27 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
             v = g_Tries.wp_entities;
 
 
-            for (const int& i : v) {
+            for (const int& it : v) {
 
-                pEdict = INDEXENT(v[i]);
+                pEdict = INDEXENT(it);
 
                 if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
                 // CHECK CREATION CLASSNAME
                 if (key == STRING(pEdict->v.classname)) {
 
-                    g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = <%s> was changed from <%d>", v[i], STRING(pEdict->v.classname), g_Tries.classnames[v[i]]);
+                    //g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): found entity = %d, classname = <%s> was changed from <%d>", it, STRING(pEdict->v.classname), g_Tries.classnames[it]);
 
-                    *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
+                    *(getAmxAddr(amx, params[arg_ent_arr]) + result) = it;
 
                     result++;
 
                     // TRANSFER CLASSNAME
-                    if (key != g_Tries.classnames[v[i]]) {
+                    if (key != g_Tries.classnames[it]) {
 
-                        g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_2");
+                        //g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_2");
                         
-                        acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[v[i]], key, v[i]);
+                        acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[it], key, it);
                     }
                 }
             }
