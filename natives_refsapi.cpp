@@ -62,7 +62,7 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
     return FALSE;
 }
 
-// native rf_get_ent_by_class(const classname[], const id, ent[], ent_size);
+// native rf_get_ent_by_class(const classname[], const owner, ent[], ent_size);
 cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     enum args_e { arg_count, arg_classname, arg_owner, arg_ent_arr, arg_ent_arr_size};
@@ -96,6 +96,8 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             result++;
         }
+    } else {
+        
     }
 
     return result;
