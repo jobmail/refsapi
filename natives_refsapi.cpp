@@ -54,7 +54,7 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
     if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr)) {
 
-        UTIL_ServerPrint("[DEBUG] found: ent = %d, classname = %s, onground = %d\n", params[arg_entity], STRING(pEdict->v.classname), (pEdict->v.flags & FL_ONGROUND));
+        UTIL_ServerPrint("[DEBUG] found: ent = %d, classname = %s\n", params[arg_entity], STRING(pEdict->v.classname));
 
         g_amxxapi.SetAmxString(amx, params[arg_name], STRING(pEdict->v.classname), params[arg_name_len]);
 
