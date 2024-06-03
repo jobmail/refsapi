@@ -91,7 +91,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
         max_size = min((int)v.size(), params[arg_ent_arr_size]);
 
-        for (int i; i < max_size; i++) {
+        for (int i = 0; i < max_size; i++) {
 
             pEdict = INDEXENT(v[i]);
 
