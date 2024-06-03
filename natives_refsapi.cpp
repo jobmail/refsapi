@@ -83,15 +83,11 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     bool is_valid = is_valid_index(owner_index);
 
-    int max_size;
-
     if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
         v = g_Tries.entities[key];
 
-        max_size = min((int)v.size(), params[arg_ent_arr_size]);
-
-        for (int i = 0; i < max_size; i++) {
+        for (int i = 0; i < v.size(); i++) {
 
             pEdict = INDEXENT(v[i]);
 
@@ -109,15 +105,13 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
 
-            result++;
+            if (++result >= params[arg_ent_arr_size]) break;
         }
     } else {
         // CHECK WEAPON
         if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX)) {
 
             v = g_Tries.wp_entities;
-
-            max_size = min((int)v.size(), params[arg_ent_arr_size]);
 
             for (const int& it : v) {
 
@@ -140,7 +134,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
                         acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[it], key, it);
                     }
 
-                    if (++result >= max_size) break;
+                    if (++result >= params[arg_ent_arr_size]) break;
                 }
             }
         }
