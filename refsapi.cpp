@@ -52,6 +52,8 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
+    int entity_index = ENTINDEX(pEdict);
+
     char key[256];
     
     Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
@@ -68,10 +70,12 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     
     if (v.size() < v.max_size()) {
 
-        v.push_back(ENTINDEX(pEdict));
+        v.push_back(entity_index);
 
         g_Tries.entities[key] = v;
     }
+
+    g_Tries.classnames[entity_index] = key;
 
     UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, new_count = %d\n", key, v.size());
 }
@@ -94,6 +98,13 @@ void Free_EntPrivateData(edict_t *pEdict) {
     std::vector<int> v;
 
     std::vector<int>::iterator it_value;
+
+    if (key != g_Tries.classnames[entity_index]) {
+
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = %s was changed from %s\n", key, g_Tries.classnames[entity_index]);
+
+        Q_strnlcpy(key, g_Tries.classnames[entity_index].c_str(), sizeof(key));
+    }
 
     if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
@@ -131,6 +142,8 @@ void Free_EntPrivateData(edict_t *pEdict) {
             UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d, from owner = %d, items_count = %d\n", entity_index, owner_index, v.size());
         }
     }
+
+    g_Tries.classnames.erase(entity_index);
 }
 
 CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo) {
