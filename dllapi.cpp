@@ -7,7 +7,7 @@ DLL_FUNCTIONS g_FunctionTable =
 	&DispatchSpawn,			// pfnSpawn
 	NULL,					// pfnThink
 	NULL,					// pfnUse
-	NULL,					// pfnTouch
+	&R_Touch,					// pfnTouch
 	NULL,					// pfnBlocked
 	&KeyValue,				// pfnKeyValue
 	NULL,					// pfnSave
