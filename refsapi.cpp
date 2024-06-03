@@ -536,6 +536,15 @@ int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string k
     return v.size();
 }
 
+void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::string key_from, std::string key_to, int value) {
+
+    acs_trie_remove(trie, key_from, value);
+    
+    g_Tries.classnames[value] = key_to;
+
+    acs_trie_add(trie, key_to, value);
+}
+
 int acs_vector_remove(std::vector<int> *v, int value) {
 
     std::vector<int>::iterator it_value;
