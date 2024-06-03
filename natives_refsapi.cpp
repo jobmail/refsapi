@@ -115,7 +115,6 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             v = g_Tries.wp_entities;
 
-
             for (const int& it : v) {
 
                 pEdict = INDEXENT(it);
