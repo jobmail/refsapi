@@ -98,16 +98,29 @@ void Free_EntPrivateData(edict_t *pEdict) {
     }
 
     // REMOVE ENTITIES
-    int count = acs_trie_remove(&g_Tries.entities, key, entity_index);
+    int result = acs_trie_remove(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", entity_index, key, count);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, new_count = %d\n", entity_index, key, result);
 
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index))
 
         acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
 
+    // REMOVE CLASSNAME
     g_Tries.classnames.erase(entity_index);
+
+    // REMOVE WP_ENTITIES
+    result = key.find("_");
+
+    if (result != std::string::npos && key.length() > (result + 1)) {
+
+        key = key.substr(result + 1);
+
+        result = acs_trie_remove(&g_Tries.wp_entities, key, entity_index);
+
+        UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): classname = %s, new_count = %d\n", key, result);
+    }
 }
 
 CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo) {
