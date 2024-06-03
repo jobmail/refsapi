@@ -106,68 +106,12 @@ void Client_Disconnected(int id, bool crash, char *format);
 void Alloc_EntPrivateData(edict_t *pEdict);
 void Free_EntPrivateData(edict_t *pEdict);
 
+int acs_trie_add(std::map<std::string, std::vector<int>>* trie, std::string key, int value);
+int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string key, int value);
+int acs_vector_remove(std::vector<int> *v, int value);
+
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
 extern funEventCall modMsgs[MAX_REG_MSGS];
 extern void (*function)(void*);
 extern void (*endfunction)(void*);
-
-int acs_trie_add(std::map<std::string, std::vector<int>>* trie, std::string key, int value) {
-
-    std::vector<int> v;
-
-    if (trie->find(key) != trie->end())
-
-        v = (*trie)[key];
-
-    else
-
-        v.clear();
-    
-    if (v.size() < v.max_size()) {
-
-        v.push_back(value);
-
-        (*trie)[key] = v;
-    }
-
-    return v.size();
-}
-
-int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string key, int value) {
-
-    std::vector<int> v;
-
-    std::vector<int>::iterator it_value;
-
-    if (trie->find(key) != trie->end()) {
-
-        v = (*trie)[key];
-
-        if ((it_value = std::find(v.begin(), v.end(), value)) != v.end()) {
-
-            v.erase(it_value);
-
-            if (v.size() > 0)
-
-                (*trie)[key] = v;                    
-
-            else
-
-               trie->erase(key);
-        }
-    }
-
-    return v.size();
-}
-
-int acs_vector_remove(std::vector<int> *v, int value) {
-
-    std::vector<int>::iterator it_value;
-
-    if ((it_value = std::find(v->begin(), v->end(), value)) != v->end())
-
-        v->erase(it_value);
-
-    return v->size();
-}
