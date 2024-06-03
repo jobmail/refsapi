@@ -531,14 +531,15 @@ int acs_trie_remove(std::map<std::string, std::vector<int>>* trie, std::string k
 
                trie->erase(key);
         }
-    }
+
+    } else
+
+        v.clear();
 
     return v.size();
 }
 
 void acs_trie_transfer(std::map<std::string, std::vector<int>>* trie, std::string key_from, std::string key_to, int value) {
-
-    edict_t *pEntity = INDEXENT(value);
 
     acs_trie_remove(trie, key_from, value);
     
