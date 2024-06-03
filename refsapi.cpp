@@ -198,7 +198,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
         g_Tries.player_entities[id].push_back(entity_index);
 
-        if (id != owner_index && (is_valid_index(owner_index) || (owner_index > 0 && is_valid_index(owner_index = ENTINDEX(pItem->pev->owner->v.owner))))) {
+        if ((is_valid_index(owner_index) || (owner_index > 0 && is_valid_index(owner_index = ENTINDEX(pItem->pev->owner->v.owner)))) && id != owner_index) {
             
             v = g_Tries.player_entities[owner_index];
 
