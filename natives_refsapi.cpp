@@ -102,7 +102,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
                 //g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_1");
 
-                //acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
+                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
 
                 continue;
             }
@@ -119,7 +119,6 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
             max_size = min((int)v.size(), params[arg_ent_arr_size]);
 
-            /*
             for (const int& it : v) {
 
                 pEdict = INDEXENT(it);
@@ -138,13 +137,12 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
                         //g_amxxapi.PrintSrvConsole("[DEBUG] rf_get_ent_by_class(): STEP_2");
                         
-                        //acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[it], key, it);
+                        acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[it], key, it);
                     }
 
                     if (++result >= max_size) break;
                 }
             }
-            */
         }
     }
 
