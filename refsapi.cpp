@@ -65,9 +65,9 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     g_Tries.classnames[entity_index] = key;
 
     // ADD WP_ENTITIES
-    if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX)) {
+    if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
-        key = key.substr(sizeof(WP_CLASS_PREFIX));
+        key = key.substr(WP_CLASS_PREFIX_LEN);
 
         result = acs_trie_add(&g_Tries.wp_entities, key, entity_index);
 
@@ -109,9 +109,9 @@ void Free_EntPrivateData(edict_t *pEdict) {
     g_Tries.classnames.erase(entity_index);
 
     // REMOVE WP_ENTITIES
-    if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX)) {
+    if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
-        key = key.substr(sizeof(WP_CLASS_PREFIX));
+        key = key.substr(WP_CLASS_PREFIX_LEN);
 
         result = acs_trie_remove(&g_Tries.wp_entities, key, entity_index);
 
