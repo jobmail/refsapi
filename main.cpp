@@ -164,7 +164,7 @@ void OnFreeEntPrivateData(edict_t *pEdict)
 {
 	CBaseEntity *pEntity = getPrivate<CBaseEntity>(pEdict);
 	if (pEntity) {
-		Free_EntPrivateData(pEdict, "OnFreeEntPrivateData");	//RefsAPI
+		Free_EntPrivateData(pEdict);	//RefsAPI
 		EntityCallbackDispatcher().DeleteExistingCallbacks(pEntity);
 	}
 

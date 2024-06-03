@@ -27,33 +27,7 @@ edict_t* R_CreateNamedEntity(string_t className) {
 
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb) {
 
-    UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
-
-    if (!FStringNull(pEdict->v.classname)) {
-
-        char key[256];
-        
-        Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
-
-        std::vector<int> v;
-
-        if (g_Tries.entities.find(key) != g_Tries.entities.end())
-
-            v = g_Tries.entities[key];
-
-        else
-
-            v.clear();
-        
-        if (v.size() < v.max_size()) {
-
-            v.push_back(ENTINDEX(pEdict));
-
-            g_Tries.entities[key] = v;
-        }
-
-        UTIL_ServerPrint("[DEBUG] R_PvAllocEntPrivateData(): classname = %s, count = %d\n", key, v.size());
-    }
+    Alloc_EntPrivateData(pEdict);
     
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
@@ -72,7 +46,37 @@ void* R_PvEntPrivateData_Post(edict_t *pEdict) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
-void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
+void Alloc_EntPrivateData(edict_t *pEdict) {
+
+    if (FStringNull(pEdict->v.classname)) return;
+
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = %s, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+
+    char key[256];
+    
+    Q_strnlcpy(key, (char*)STRING(pEdict->v.classname), sizeof(key));
+
+    std::vector<int> v;
+
+    if (g_Tries.entities.find(key) != g_Tries.entities.end())
+
+        v = g_Tries.entities[key];
+
+    else
+
+        v.clear();
+    
+    if (v.size() < v.max_size()) {
+
+        v.push_back(ENTINDEX(pEdict));
+
+        g_Tries.entities[key] = v;
+    }
+
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = %s, count = %d\n", key, v.size());
+}
+
+void Free_EntPrivateData(edict_t *pEdict) {
 
     if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || FStringNull(pEdict->v.classname)) return;
 
@@ -80,7 +84,7 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
 
     int owner_index = ENTINDEX(pEdict->v.owner);
 
-    UTIL_ServerPrint("[DEBUG] %s: entity = %d, classname = %s, owner = %d\n", prefix, entity_index, STRING(pEdict->v.classname), owner_index);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = %s, owner = %d\n", prefix, entity_index, STRING(pEdict->v.classname), owner_index);
 
     char key[256];
     
@@ -99,7 +103,7 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
 
             v.erase(it_value);
 
-            UTIL_ServerPrint("[DEBUG] %s: remove entity = %d from classname = %s, left_count = %d\n", prefix, entity_index, key, v.size());
+            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = %s, left_count = %d\n", prefix, entity_index, key, v.size());
 
             if (v.size() > 0)
 
@@ -124,7 +128,7 @@ void Free_EntPrivateData(edict_t *pEdict, const char* prefix) {
 
             g_Tries.player_entities[owner_index] = v;
 
-            UTIL_ServerPrint("[DEBUG] %s: remove entity = %d, from owner = %d, items_count = %d\n", prefix, entity_index, owner_index, v.size());
+            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d, from owner = %d, items_count = %d\n", prefix, entity_index, owner_index, v.size());
         }
     }
 }
@@ -219,7 +223,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
 void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
 
-    Free_EntPrivateData(pEdict, "ED_Free_RH");
+    //Free_EntPrivateData(pEdict, "ED_Free_RH");
 
     chain->callNext(pEdict);
 }
@@ -235,7 +239,7 @@ int R_Spawn(edict_t *pEntity) {
 
     //int id = ENTINDEX(pEntity);
 
-    UTIL_ServerPrint("[DEBUG] Spawn(): id = %d, owner = %d\n", ENTINDEX(pEntity), ENTINDEX(pEntity->v.owner));
+    //UTIL_ServerPrint("[DEBUG] Spawn(): id = %d, owner = %d\n", ENTINDEX(pEntity), ENTINDEX(pEntity->v.owner));
 
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
@@ -267,10 +271,6 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
     g_PlayersNum[TEAM_DEAD_TT] =
     
         g_PlayersNum[TEAM_DEAD_CT] = 0;
-
-    //for (int i = 0; i <= gpGlobals->maxClients; i++)
-
-        //g_Tries.player_entities[i].clear();
 
     chain->callNext();
 }
