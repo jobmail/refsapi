@@ -100,7 +100,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
                 UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): STEP_1");
 
-                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
+                //acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
 
                 continue;
             }
@@ -139,7 +139,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
                             UTIL_ServerPrint("[DEBUG] rf_get_ent_by_class(): STEP_2");
                             
-                            acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[v[i]], key, v[i]);
+                            //acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[v[i]], key, v[i]);
                         }
                     }
                 }
