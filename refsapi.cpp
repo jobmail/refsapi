@@ -199,6 +199,13 @@ int R_Spawn(edict_t *pEntity) {
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
+void R_Touch(edict_t *pentTouched, edict_t *pentOther) {
+
+    UTIL_ServerPrint("[DEBUG] R_Touch(): id = %d add item = %d\n", ENTINDEX(pentTouched), ENTINDEX(pentOther));
+
+    RETURN_META(MRES_IGNORED);
+}
+
 qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]) {
 
     int id = ENTINDEX(pEntity);
