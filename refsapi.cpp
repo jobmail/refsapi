@@ -84,9 +84,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // CHECK CREATION CLASSNAME
     if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || FStringNull(pEdict->v.classname)) {
 
-        return;
-        
-        /*
+        // WAS REGISTERED?
         if (g_Tries.classnames.find(entity_index) != g_Tries.classnames.end()) {
 
             key = g_Tries.classnames[entity_index];
@@ -94,9 +92,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
             UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): found deleted entity = %d with creation_classname = <%s> << WARNING !!!\n", entity_index, key);
 
             // REMOVE FROM ENTITIES
-            if (!key.empty() && g_Tries.entities.find(key) != g_Tries.entities.end())
-
-                acs_vector_remove(&g_Tries.entities[key], entity_index);
+            acs_vector_remove(&g_Tries.entities[key], entity_index);
 
             // REMOVE PLAYER_ENTITIES
             if (is_valid_index(owner_index))
@@ -104,14 +100,15 @@ void Free_EntPrivateData(edict_t *pEdict) {
                 acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
             
             // REMOVE WP_ENITITIES
-            acs_vector_remove(&g_Tries.wp_entities, entity_index);
+            if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN)
+                
+                acs_vector_remove(&g_Tries.wp_entities, entity_index);
 
             // REMOVE CLASSNAME
             g_Tries.classnames.erase(entity_index);
 
             return;
         }
-        */
     }
 
     //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s>, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
