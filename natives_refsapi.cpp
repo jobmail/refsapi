@@ -80,21 +80,29 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
         v = g_Tries.entities[key];
 
-        for (int i = 0; i < v.size(); i++) {
+        for (auto& v_it : v) {
 
-            pEdict = INDEXENT(v[i]);
+            pEdict = INDEXENT(v_it);
 
-            if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
+            // CHECK VALID ENTITY
+            if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || (pEdict->v.flags & FL_KILLME)) {
 
-            // CHECK CREATION CLASSNAME
-            if (key != STRING(pEdict->v.classname)) {
-
-                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v[i]);
+                v.erase(v.begin() + v_it);
 
                 continue;
             }
 
-            *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v[i];
+            if (is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
+
+            // CHECK CREATION CLASSNAME
+            if (key != STRING(pEdict->v.classname)) {
+
+                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v_it);
+
+                continue;
+            }
+
+            *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v_it;
 
             if (++result >= params[arg_ent_arr_size]) break;
         }
