@@ -13,6 +13,7 @@
 #define _COUNT(x)                  (size_t)(sizeof(x)/sizeof(cell))
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
 #define is_valid_index              __is_valid_edict_index
+#define is_valid_entity             (!(!pEdict || pEdict == nullptr || pEdict->pvPrivateData == nullptr || pEdict->free || (pEdict->v.flags & FL_KILLME)))
 
 inline bool __is_valid_edict_index(size_t index) {
 
