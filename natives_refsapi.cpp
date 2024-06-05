@@ -80,22 +80,22 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
         v = g_Tries.entities[key];
 
-        for (auto& v_it : v) {
+        for (auto& it : v) {
 
-            pEdict = INDEXENT(v_it);
+            pEdict = INDEXENT(it);
 
-            // CHECK VALID ENTITY
-            if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index || (pEdict->v.flags & FL_KILLME)) continue;
+            // CHECK VALID ENTITY & CHECK OWNER
+            if (!is_valid_entity || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname)) {
 
-                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), v_it);
+                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), it);
 
                 continue;
             }
 
-            *(getAmxAddr(amx, params[arg_ent_arr]) + result) = v_it;
+            *(getAmxAddr(amx, params[arg_ent_arr]) + result) = it;
 
             if (++result >= params[arg_ent_arr_size]) break;
         }
@@ -111,7 +111,8 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
                 pEdict = INDEXENT(it);
 
-                if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
+                // CHECK VALID ENTITY & CHECK OWNER
+                if (!is_valid_entity || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
                 // CHECK CREATION CLASSNAME
                 if (key == STRING(pEdict->v.classname)) {
