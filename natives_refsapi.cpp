@@ -85,14 +85,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
             pEdict = INDEXENT(v_it);
 
             // CHECK VALID ENTITY
-            if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || (pEdict->v.flags & FL_KILLME)) {
-
-                v.erase(v.begin() + v_it);
-
-                continue;
-            }
-
-            if (is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
+            if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname)) {
