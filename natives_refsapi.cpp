@@ -33,8 +33,6 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
     
         Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v.data(), max_size << 2);
 
-    g_pGameRules->
-
     return max_size;
 }
 
