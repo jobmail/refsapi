@@ -250,11 +250,15 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
     //UTIL_ServerPrint("[DEBUG] ClientPutInServer_Post() ===>\n");
 
+    /*
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(ENTINDEX(pEntity));
 
     if (pPlayer != nullptr && !pPlayer->IsBot())
 
         Client_PutInServer(pEntity, STRING(pPlayer->pev->netname));
+    */
+
+    Client_PutInServer(pEntity, STRING(pEntity->v.netname));
 
     RETURN_META(MRES_IGNORED);
 }
