@@ -104,7 +104,7 @@ void R_WriteEntity_Post(int iValue);
 void R_MessageEnd_Post(void);
 
 void Client_TeamInfo(void*);
-void Client_PutInServer(edict_t *pEntity, const char *netname);
+void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot);
 void Client_Disconnected(int id, bool crash, char *format);
 void Alloc_EntPrivateData(edict_t *pEdict);
 void Free_EntPrivateData(edict_t *pEdict);
