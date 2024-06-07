@@ -258,7 +258,7 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
         Client_PutInServer(pEntity, STRING(pPlayer->pev->netname));
     */
 
-    Client_PutInServer(pEntity, STRING(pEntity->v.netname));
+    Client_PutInServer(pEntity, STRING(pEntity->v.netname), false);
 
     RETURN_META(MRES_IGNORED);
 }
@@ -287,7 +287,7 @@ edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *ne
 
     //UTIL_ServerPrint("[DEBUG] CreateFakeClient(): id = %d, name = %s\n", ENTINDEX(pEntity), netname);
 
-    Client_PutInServer(pEntity, netname);
+    Client_PutInServer(pEntity, netname, true);
 
     return pEntity;
 }
@@ -314,11 +314,13 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
     chain->callNext(cl, crash, format);
 }
 
-void Client_PutInServer(edict_t *pEntity, const char *netname) {
+void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot) {
 
     int id = ENTINDEX(pEntity);
 
     if (is_valid_index(id)) {
+
+        g_Clients[id].is_bot = is_bot;
 
         g_Clients[id].is_connected = true;
 
