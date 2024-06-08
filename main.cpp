@@ -57,7 +57,9 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 		msg.id = GET_USER_MSG_ID(PLID, msg.pszName, NULL);
 	}
 
+	memset(g_Clients, 0, sizeof(g_Clients));
 	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
+
 	g_Tries.authids.clear();
 	g_Tries.classnames.clear();
 	g_Tries.entities.clear();
