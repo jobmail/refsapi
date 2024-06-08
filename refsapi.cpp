@@ -254,7 +254,7 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
     if (pPlayer != nullptr && !pPlayer->IsBot())
 
-        Client_PutInServer(pEntity, STRING(pPlayer->pev->netname));
+        Client_PutInServer(pEntity, STRING(pEntity->v.netname), false);
 
     //Client_PutInServer(pEntity, STRING(pEntity->v.netname), false);
 
