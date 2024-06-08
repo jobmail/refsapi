@@ -250,15 +250,13 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
     //UTIL_ServerPrint("[DEBUG] ClientPutInServer_Post() ===>\n");
 
-    /*
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(ENTINDEX(pEntity));
 
     if (pPlayer != nullptr && !pPlayer->IsBot())
 
         Client_PutInServer(pEntity, STRING(pPlayer->pev->netname));
-    */
 
-    Client_PutInServer(pEntity, STRING(pEntity->v.netname), false);
+    //Client_PutInServer(pEntity, STRING(pEntity->v.netname), false);
 
     RETURN_META(MRES_IGNORED);
 }
@@ -328,9 +326,9 @@ void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot
 
         g_PlayersNum[TEAM_UNASSIGNED]++;
 
-        //UTIL_ServerPrint("[DEBUG] PutInServer_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, netname, GETPLAYERAUTHID(pEntity), g_Clients[id].team, g_Clients[id].is_connected);
+        UTIL_ServerPrint("[DEBUG] PutInServer_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, netname, GETPLAYERAUTHID(pEntity), g_Clients[id].team, g_Clients[id].is_connected);
 
-        //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+        UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
     }
 }
 
@@ -338,7 +336,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
     if (is_valid_index(id)) {
         
-        //UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d\n", id, g_Clients[id].is_connected);
+        UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d\n", id, g_Clients[id].is_connected);
 
         if (g_Clients[id].is_connected) {
 
@@ -355,7 +353,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
                 g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
             }
 
-            //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
         }
     }
 }
