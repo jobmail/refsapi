@@ -409,7 +409,7 @@ void Client_TeamInfo(void* mValue) {
 
             } else if (new_team != TEAM_UNASSIGNED && g_Clients[id].team != new_team) {
 
-                //UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
+                UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
                 g_PlayersNum[g_Clients[id].team]--;
 
@@ -417,7 +417,7 @@ void Client_TeamInfo(void* mValue) {
 
                 g_Clients[id].team = new_team;
 
-                //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+                UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
             }
 
             break;
