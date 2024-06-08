@@ -274,7 +274,7 @@ void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *p
 
     if (g_Clients[pPlayer->entindex()].is_connected && pPlayer->m_iTeam >= 1 && pPlayer->m_iTeam <=2)
 
-        g_PlayersNum[TEAM_DEAD_TT + pPlayer->m_iTeam - 1]++;
+        ++g_PlayersNum[TEAM_DEAD_TT + pPlayer->m_iTeam - 1];
 
     chain->callNext(pPlayer, pevAttacker, iGib);
 }
@@ -324,7 +324,7 @@ void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot
 
         g_Clients[id].team = TEAM_UNASSIGNED;
 
-        g_PlayersNum[TEAM_UNASSIGNED]++;
+        ++g_PlayersNum[TEAM_UNASSIGNED];
 
         UTIL_ServerPrint("[DEBUG] PutInServer_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, netname, GETPLAYERAUTHID(pEntity), g_Clients[id].team, g_Clients[id].is_connected);
 
@@ -344,13 +344,13 @@ void Client_Disconnected(int id, bool crash, char *format) {
                 
                 g_Clients[id].is_bot = false;
 
-            g_PlayersNum[g_Clients[id].team]--;
+            --g_PlayersNum[g_Clients[id].team];
 
             CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
             if (pPlayer != nullptr && pPlayer->edict()->v.deadflag != DEAD_NO && g_Clients[id].team >= TEAM_TERRORIST && g_Clients[id].team <= TEAM_CT) {
 
-                g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
+                --g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1];
             }
 
             UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
@@ -407,9 +407,9 @@ void Client_TeamInfo(void* mValue) {
 
                 //UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
-                g_PlayersNum[g_Clients[id].team]--;
+                --g_PlayersNum[g_Clients[id].team];
 
-                g_PlayersNum[new_team]++;
+                ++g_PlayersNum[new_team];
 
                 g_Clients[id].team = new_team;
 
