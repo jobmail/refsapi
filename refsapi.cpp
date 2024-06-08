@@ -248,7 +248,7 @@ qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszA
 
 void R_ClientPutInServer_Post(edict_t *pEntity) {
 
-    //UTIL_ServerPrint("[DEBUG] ClientPutInServer_Post() ===>\n");
+    UTIL_ServerPrint("[DEBUG] ClientPutInServer_Post() ===>\n");
 
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(ENTINDEX(pEntity));
 
