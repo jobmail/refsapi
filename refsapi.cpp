@@ -292,9 +292,9 @@ edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *ne
 
 void R_ClientDisconnect(edict_t *pEntity) {
 
-    //UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
+    UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
 
-    Client_Disconnected(ENTINDEX(pEntity), false, 0);
+    //Client_Disconnected(ENTINDEX(pEntity), false, 0);
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -303,7 +303,7 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 	
     char buffer[1024];
 
-    //UTIL_ServerPrint("[DEBUG] SV_DropClient_RH() ===>\n");
+    UTIL_ServerPrint("[DEBUG] SV_DropClient_RH() ===>\n");
 
 	Q_strcpy_s(buffer, (char*)format);
 
