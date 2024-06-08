@@ -59,15 +59,17 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 
 	memset(g_Clients, 0, sizeof(g_Clients));
 	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
+	//memset(g_Tries.player_entities, 0, sizeof(g_Tries.player_entities));
 
 	g_Tries.authids.clear();
 	g_Tries.classnames.clear();
 	g_Tries.entities.clear();
 	g_Tries.names.clear();
 	g_Tries.wp_entities.clear();
+
 	for (int i_i = 0; i_i < MAX_PLAYERS + 1; i_i++)
 		g_Tries.player_entities[i_i].clear();
-
+	
 	g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
 	//g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
 	//g_RehldsHookchains->ED_Free()->registerHook(ED_Free_RH);
