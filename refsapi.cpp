@@ -294,7 +294,7 @@ void R_ClientDisconnect(edict_t *pEntity) {
 
     UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
 
-    //Client_Disconnected(ENTINDEX(pEntity), false, 0);
+    Client_Disconnected(ENTINDEX(pEntity), false, 0);
 
 	RETURN_META(MRES_IGNORED);
 }
