@@ -344,7 +344,9 @@ void Client_Disconnected(int id, bool crash, char *format) {
                 
                 g_Clients[id].is_bot = false;
 
-            g_PlayersNum[g_Clients[id].team]--;
+            if (--g_PlayersNum[g_Clients[id].team] < 0)
+
+                 UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, team = %d, count = %d << WARNING !!!", id, g_Clients[id].team, g_PlayersNum[g_Clients[id].team]);
 
             CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
