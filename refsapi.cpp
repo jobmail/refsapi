@@ -292,7 +292,7 @@ edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *ne
 
 void R_ClientDisconnect(edict_t *pEntity) {
 
-    UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>, id = %d\n", ENTINDEX(pEntity));
+    UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
 
     Client_Disconnected(ENTINDEX(pEntity), false, 0);
 
