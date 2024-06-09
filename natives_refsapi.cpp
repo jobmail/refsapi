@@ -45,7 +45,7 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params) {
 
     edict_t* pEdict = INDEXENT(params[arg_entity]);
 
-    if (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr)) {
+    if (is_valid_entity(pEdict)) {
 
         g_amxxapi.SetAmxString(amx, params[arg_name], STRING(pEdict->v.classname), params[arg_name_len]);
 
@@ -83,7 +83,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
             pEdict = INDEXENT(it);
 
             // CHECK VALID ENTITY & CHECK OWNER
-            if (!is_valid_entity || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
+            if (!is_valid_entity(pEdict) || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname)) {
@@ -110,7 +110,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
                 pEdict = INDEXENT(it);
 
                 // CHECK VALID ENTITY & CHECK OWNER
-                if (!is_valid_entity || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
+                if (!is_valid_entity(pEdict) || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
 
                 // CHECK CREATION CLASSNAME
                 if (key == STRING(pEdict->v.classname)) {
@@ -140,6 +140,17 @@ cell AMX_NATIVE_CALL rf_roundfloat(AMX *amx, cell *params) {
     return acs_roundfloat(*getAmxAddr(amx, params[arg_value]), params[arg_precision]);
 }
 
+// native rf_roundfloat(const Float:value, const precision);
+cell AMX_NATIVE_CALL rf_get_user_buyzone(AMX *amx, cell *params) {
+
+    enum args_e { arg_count, arg_index};
+
+    CHECK_ISPLAYER(arg_index);
+
+    return (qboolean)acs_get_user_buyzone(INDEXENT(params[arg_index])); 
+}
+
+
 AMX_NATIVE_INFO Misc_Natives[] = {
     
     { "rf_get_players_num", rf_get_players_num },
@@ -147,6 +158,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     { "rf_get_weaponname", rf_get_weaponname },
     { "rf_get_ent_by_class", rf_get_ent_by_class },
     { "rf_roundfloat", rf_roundfloat },
+    { "rf_get_user_buyzone", rf_get_user_buyzone },
     { nullptr, nullptr }
 };
 
