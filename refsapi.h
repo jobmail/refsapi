@@ -114,6 +114,7 @@ int acs_trie_remove(std::map<std::string, std::vector<cell>>* trie, std::string 
 void acs_trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::string key_from, std::string key_to, int value);
 int acs_vector_add(std::vector<cell> *v, int value);
 int acs_vector_remove(std::vector<cell> *v, int value);
+float acs_roundfloat(float value, int precision);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
