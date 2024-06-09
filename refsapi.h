@@ -72,7 +72,7 @@ inline bool __is_valid_edict_index(const size_t index) {
 
 inline bool __is_valid_edict(const edict_t *pEdict) {
 
-    return !(pEdict == NULL || pEdict == nullptr || pEdict->pvPrivateData == nullptr || pEdict->free || (pEdict->v.flags & FL_KILLME));
+    return !(pEdict == NULL || pEdict == nullptr || pEdict->pvPrivateData == nullptr || pEdict->free);
 }
 
 inline bool __is_valid_team(const int team) {
