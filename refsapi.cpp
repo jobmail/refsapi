@@ -613,9 +613,9 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
     bool result = false;
 
-    if (is_valid_entity(pEdict) && is_valid_team(pEdict->v.team) && pEdict->v.deadflag == DEAD_NO) {
+    UTIL_ServerPrint("[DEBUG] get_user_buyzone(): id = %d, team = %d, classname = %s\n", ENTINDEX(pEdict), pEdict->v.team, STRING(pEdict->v.classname));
 
-        UTIL_ServerPrint("[DEBUG] get_user_buyzone(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
+    if (is_valid_entity(pEdict) && is_valid_team(pEdict->v.team) && pEdict->v.deadflag == DEAD_NO) {
 
         if (r_bMapHasBuyZone) {
 
