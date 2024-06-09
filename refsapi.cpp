@@ -125,9 +125,9 @@ void Free_EntPrivateData(edict_t *pEdict) {
     }
 
     // REMOVE ENTITIES
-    acs_trie_remove(&g_Tries.entities, key, entity_index);
+    int result = acs_trie_remove(&g_Tries.entities, key, entity_index);
 
-    //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
+    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
 
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index))
