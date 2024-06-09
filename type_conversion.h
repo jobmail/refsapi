@@ -64,7 +64,7 @@ inline T* getPrivate(const edict_t *pEdict)
 
 inline entvars_t* PEV(const int index)
 {
-	return likely(index >= 0) ? &g_pEdicts[index].v : (void*)nullptr;
+	return likely(index >= 0) ? &g_pEdicts[index].v : nullptr;
 }
 
 template<typename T>
