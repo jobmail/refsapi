@@ -76,18 +76,6 @@ void ServerDeactivate_Post()
 {
 	SERVER_PRINT("[DEBUG] SERVER_DEACTIVATED\n");
 
-	memset(g_Clients, 0, sizeof(g_Clients));
-	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
-
-	// CLEAR TRIES
-	g_Tries.authids.clear();
-	g_Tries.classnames.clear();
-	g_Tries.entities.clear();
-	g_Tries.names.clear();
-	g_Tries.wp_entities.clear();
-	for (int i_i = 0; i_i < MAX_PLAYERS + 1; i_i++)
-		g_Tries.player_entities[i_i].clear();
-
 	g_pEdicts = nullptr;
 	api_cfg.ServerDeactivate();
 	g_hookManager.Clear();
@@ -108,6 +96,17 @@ void ServerDeactivate_Post()
 	//g_ReGameHookchains->CSGameRules_CanHavePlayerItem()->registerHook(CSGameRules_CanHavePlayerItem_RG);
 	g_ReGameHookchains->CreateWeaponBox()->unregisterHook(CreateWeaponBox_RG);
 	
+
+	// CLEAR TRIES
+	memset(g_Clients, 0, sizeof(g_Clients));
+	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
+	g_Tries.authids.clear();
+	g_Tries.classnames.clear();
+	g_Tries.entities.clear();
+	g_Tries.names.clear();
+	g_Tries.wp_entities.clear();
+	for (int i_i = 0; i_i < MAX_PLAYERS + 1; i_i++)
+		g_Tries.player_entities[i_i].clear();
 
 	SET_META_RESULT(MRES_IGNORED);
 }

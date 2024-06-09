@@ -425,6 +425,7 @@ void Client_TeamInfo(void* mValue) {
                 //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
             }
 
+            // FIX TEAM
             INDEXENT(id)->v.team = new_team;
 
             break;
@@ -615,7 +616,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
     bool result = false;
 
-    UTIL_ServerPrint("[DEBUG] get_user_buyzone(): id = %d, team = %d, classname = %s\n", ENTINDEX(pEdict), pEdict->v.team, STRING(pEdict->v.classname));
+    //UTIL_ServerPrint("[DEBUG] get_user_buyzone(): id = %d, team = %d, classname = %s\n", ENTINDEX(pEdict), pEdict->v.team, STRING(pEdict->v.classname));
 
     if (is_valid_entity(pEdict) && is_valid_team(pEdict->v.team) && pEdict->v.deadflag == DEAD_NO) {
 
