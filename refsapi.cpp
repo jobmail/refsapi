@@ -57,7 +57,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     std::string key = STRING(pEdict->v.classname);
 
     // ADD ENTITIES
-    int result = acs_trie_add(&g_Tries.entities, key, entity_index);
+    acs_trie_add(&g_Tries.entities, key, entity_index);
 
     //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
 
@@ -67,7 +67,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     // ADD WP_ENTITIES
     if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
-        result = acs_vector_add(&g_Tries.wp_entities, entity_index);
+        acs_vector_add(&g_Tries.wp_entities, entity_index);
 
         //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): WEAPONS, new_count = %d\n", result);
     }
@@ -89,7 +89,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
 
             key = g_Tries.classnames[entity_index];
 
-            UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): found deleted entity = %d with creation_classname = <%s> << WARNING !!!\n", entity_index, key);
+            //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): found deleted entity = %d with creation_classname = <%s> << WARNING !!!\n", entity_index, key);
 
             // REMOVE FROM ENTITIES
             acs_vector_remove(&g_Tries.entities[key], entity_index);
@@ -124,7 +124,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     }
 
     // REMOVE ENTITIES
-    int result = acs_trie_remove(&g_Tries.entities, key, entity_index);
+    acs_trie_remove(&g_Tries.entities, key, entity_index);
 
     //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
 
@@ -139,7 +139,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // REMOVE WP_ENTITIES
     if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
-        result = acs_vector_remove(&g_Tries.wp_entities, entity_index);
+        acs_vector_remove(&g_Tries.wp_entities, entity_index);
 
         //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): WEAPONS, new_count = %d\n", result);
     }
@@ -241,14 +241,14 @@ qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszA
 
     int id = ENTINDEX(pEntity);
 
-    UTIL_ServerPrint("[DEBUG] R_ClientConnect(): id = %d, name = %s, host = %s\n", id, pszName, pszAddress);
+    //UTIL_ServerPrint("[DEBUG] R_ClientConnect(): id = %d, name = %s, host = %s\n", id, pszName, pszAddress);
 
 	RETURN_META_VALUE(MRES_IGNORED, true);
 }
 
 void R_ClientPutInServer_Post(edict_t *pEntity) {
 
-    UTIL_ServerPrint("[DEBUG] ClientPutInServer_Post() ===>\n");
+    //UTIL_ServerPrint("[DEBUG] ClientPutInServer_Post() ===>\n");
 
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(ENTINDEX(pEntity));
 
@@ -292,7 +292,7 @@ edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *ne
 
 void R_ClientDisconnect(edict_t *pEntity) {
 
-    UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
+    //UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
 
     Client_Disconnected(ENTINDEX(pEntity), false, 0);
 
@@ -303,7 +303,7 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 	
     char buffer[1024];
 
-    UTIL_ServerPrint("[DEBUG] SV_DropClient_RH() ===>\n");
+    //UTIL_ServerPrint("[DEBUG] SV_DropClient_RH() ===>\n");
 
 	Q_strcpy_s(buffer, (char*)format);
 
@@ -326,9 +326,9 @@ void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot
 
         g_PlayersNum[TEAM_UNASSIGNED]++;
 
-        UTIL_ServerPrint("[DEBUG] PutInServer_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, netname, GETPLAYERAUTHID(pEntity), g_Clients[id].team, g_Clients[id].is_connected);
+        //UTIL_ServerPrint("[DEBUG] PutInServer_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, netname, GETPLAYERAUTHID(pEntity), g_Clients[id].team, g_Clients[id].is_connected);
 
-        UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+        //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
     }
 }
 
@@ -336,7 +336,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
     if (is_valid_index(id)) {
         
-        UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d\n", id, g_Clients[id].is_connected);
+        //UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d\n", id, g_Clients[id].is_connected);
 
         if (g_Clients[id].is_connected) {
 
@@ -346,18 +346,18 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
             if (--g_PlayersNum[g_Clients[id].team] < 0)
 
-                 UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, team = %d, count = %d << WARNING !!!", id, g_Clients[id].team, g_PlayersNum[g_Clients[id].team]);
+                //UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, team = %d, count = %d << WARNING !!!", id, g_Clients[id].team, g_PlayersNum[g_Clients[id].team]);
 
             CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-            UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s\n", id, STRING(pPlayer->edict()->v.netname));
+            //UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s\n", id, STRING(pPlayer->edict()->v.netname));
 
             if (pPlayer != nullptr && pPlayer->edict()->v.deadflag != DEAD_NO && g_Clients[id].team >= TEAM_TERRORIST && g_Clients[id].team <= TEAM_CT) {
 
                 g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]++;
             }
 
-            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+            //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
         }
     }
 }
@@ -409,7 +409,7 @@ void Client_TeamInfo(void* mValue) {
 
             } else if (new_team != TEAM_UNASSIGNED && g_Clients[id].team != new_team) {
 
-                UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
+                //UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
                 g_PlayersNum[g_Clients[id].team]--;
 
@@ -417,7 +417,7 @@ void Client_TeamInfo(void* mValue) {
 
                 g_Clients[id].team = new_team;
 
-                UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+                //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
             }
 
             break;
