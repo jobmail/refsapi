@@ -612,16 +612,6 @@ float acs_roundfloat(float value, int precision) {
     return floor(value * power + 0.5) / power;
 }
 
-bool acs_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2) {
-
-    return !(pEdict_1->v.absmin.x > pEdict_2->v.absmax.x ||
-            pEdict_1->v.absmin.y > pEdict_2->v.absmax.y ||
-            pEdict_1->v.absmin.z > pEdict_2->v.absmax.z ||
-            pEdict_1->v.absmax.x < pEdict_2->v.absmin.x ||
-            pEdict_1->v.absmax.y < pEdict_2->v.absmin.y ||
-            pEdict_1->v.absmax.z < pEdict_2->v.absmin.z);
-}
-
 bool acs_get_user_buyzone(const edict_t *pEdict) {
 
     bool result = false;
@@ -634,7 +624,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
                 edict_t *pBuyZone = INDEXENT(buyzone);
 
-                if (is_valid_entity(pBuyZone) && pEdict->v.team == pBuyZone->v.team && acs_entity_intersects(pEdict, pBuyZone)) {
+                if (is_valid_entity(pBuyZone) && pEdict->v.team == pBuyZone->v.team && is_entity_intersects(pEdict, pBuyZone)) {
 
                     result = true;
 

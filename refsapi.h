@@ -80,6 +80,16 @@ inline bool __is_valid_team(const int team) {
     return team >= TEAM_TERRORIST && team <= TEAM_CT;
 }
 
+inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2) {
+
+    return !(pEdict_1->v.absmin.x > pEdict_2->v.absmax.x ||
+            pEdict_1->v.absmin.y > pEdict_2->v.absmax.y ||
+            pEdict_1->v.absmin.z > pEdict_2->v.absmax.z ||
+            pEdict_1->v.absmax.x < pEdict_2->v.absmin.x ||
+            pEdict_1->v.absmax.y < pEdict_2->v.absmin.y ||
+            pEdict_1->v.absmax.z < pEdict_2->v.absmin.z);
+}
+
 edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
 edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
@@ -128,7 +138,6 @@ void acs_trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::stri
 int acs_vector_add(std::vector<cell> *v, int value);
 int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
-bool acs_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2);
 bool acs_get_user_buyzone(const edict_t *pEdict);
 
 extern int gmsgTeamInfo;
