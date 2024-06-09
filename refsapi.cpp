@@ -618,6 +618,8 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
     if (is_valid_entity(pEdict) && is_valid_team(pEdict->v.team) && pEdict->v.deadflag == DEAD_NO) {
 
+        UTIL_ServerPrint("[DEBUG] get_user_buyzone(): id = %d, classname = %s\n", ENTINDEX(pEdict), STRING(pEdict->v.classname));
+
         if (r_bMapHasBuyZone) {
 
             for (auto& buyzone : g_Tries.entities["func_buyzone"]) {
