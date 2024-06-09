@@ -626,6 +626,8 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
         if (r_bMapHasBuyZone) {
 
+            UTIL_ServerPrint("[DEBUG] get_user_buyzone(): zone_count = %d\n", g_Tries.entities["func_buyzone"].size());
+
             for (auto& buyzone : g_Tries.entities["func_buyzone"]) {
 
                 edict_t* pBuyZone = INDEXENT(buyzone);
