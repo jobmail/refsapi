@@ -266,7 +266,7 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
     
         g_PlayersNum[TEAM_DEAD_CT] = 0;
     
-    r_bMapHasBuyZone = g_Tries.entities.find("func_buyzone") != g_Tries.entities.end();
+    r_bMapHasBuyZone = (g_Tries.entities.find("func_buyzone") != g_Tries.entities.end());
 
     UTIL_ServerPrint("[DEBUG] r_bMapHasBuyZone = %d\n", r_bMapHasBuyZone);
 
