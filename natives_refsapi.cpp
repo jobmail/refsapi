@@ -68,8 +68,6 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     std::vector<cell> v;
 
-    std::vector<cell>::iterator it_value;
-
     char classname[256];
 
     std::string key = getAmxString(amx, params[arg_classname], classname);
