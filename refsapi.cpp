@@ -58,9 +58,9 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     std::string key = STRING(pEdict->v.classname);
 
     // ADD ENTITIES
-    acs_trie_add(&g_Tries.entities, key, entity_index);
+    int result = acs_trie_add(&g_Tries.entities, key, entity_index);
 
-    //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
+    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
 
     // ADD CLASSNAMES
     g_Tries.classnames[entity_index] = key;
