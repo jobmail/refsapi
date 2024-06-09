@@ -53,18 +53,18 @@ inline edict_t* edictByIndexAmx(const int index)
 template<typename T>
 inline T* getPrivate(const int index)
 {
-	return likely(index >= 0) ? g_pEdicts[index].pvPrivateData : nullptr;
+	return likely(index >= 0) ? g_pEdicts[index].pvPrivateData : (void*)nullptr;
 }
 
 template<typename T>
 inline T* getPrivate(const edict_t *pEdict)
 {
-	return likely(pEdict != nullptr) ? pEdict->pvPrivateData : nullptr;
+	return likely(pEdict != nullptr) ? pEdict->pvPrivateData : (void*)nullptr;
 }
 
 inline entvars_t* PEV(const int index)
 {
-	return likely(index >= 0) ? &g_pEdicts[index].v : nullptr;
+	return likely(index >= 0) ? &g_pEdicts[index].v : (void*)nullptr;
 }
 
 template<typename T>
