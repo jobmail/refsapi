@@ -148,6 +148,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     { "rf_get_user_weapons", rf_get_user_weapons },
     { "rf_get_weaponname", rf_get_weaponname },
     { "rf_get_ent_by_class", rf_get_ent_by_class },
+    { "rf_roundfloat", rf_roundfloat },
     { nullptr, nullptr }
 };
 
