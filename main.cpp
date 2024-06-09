@@ -97,6 +97,7 @@ void ServerDeactivate_Post()
 	g_ReGameHookchains->CreateWeaponBox()->unregisterHook(CreateWeaponBox_RG);
 	
 	// CLEAR TRIES
+	r_bMapHasBuyZone = false;
 	memset(g_Clients, 0, sizeof(g_Clients));
 	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
 	g_Tries.authids.clear();
