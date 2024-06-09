@@ -426,7 +426,11 @@ void Client_TeamInfo(void* mValue) {
             }
 
             // FIX TEAM
-            INDEXENT(id)->v.team = new_team;
+            edict_t* pEdict = INDEXENT(id);
+            
+            if (is_valid_entity(pEdict))
+            
+                pEdict->v.team = new_team;
 
             break;
     }
