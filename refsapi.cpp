@@ -4,6 +4,7 @@ int gmsgTeamInfo;
 int mState;
 int g_PlayersNum[6];
 
+bool r_bMapHasBuyZone;
 sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
 
