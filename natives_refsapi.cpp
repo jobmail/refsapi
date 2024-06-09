@@ -66,8 +66,6 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     edict_t* pEdict;
 
-    std::vector<cell> v;
-
     char classname[256];
 
     std::string key = getAmxString(amx, params[arg_classname], classname);
@@ -76,11 +74,9 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
 
     if (g_Tries.entities.find(key) != g_Tries.entities.end()) {
 
-        v = g_Tries.entities[key];
+        for (auto& entity : g_Tries.entities[key]) {
 
-        for (auto& it : v) {
-
-            pEdict = INDEXENT(it);
+            pEdict = INDEXENT(entity);
 
             // CHECK VALID ENTITY & CHECK OWNER
             if (!is_valid_entity(pEdict) || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
@@ -88,12 +84,12 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname)) {
 
-                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), it);
+                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), entity);
 
                 continue;
             }
 
-            *(getAmxAddr(amx, params[arg_ent_arr]) + result) = it;
+            *(getAmxAddr(amx, params[arg_ent_arr]) + result) = entity;
 
             if (++result >= params[arg_ent_arr_size]) break;
         }
@@ -103,11 +99,9 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
         // CHECK WEAPON
         if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX)) {
 
-            v = g_Tries.wp_entities;
+            for (const int& entity : g_Tries.wp_entities) {
 
-            for (const int& it : v) {
-
-                pEdict = INDEXENT(it);
+                pEdict = INDEXENT(entity);
 
                 // CHECK VALID ENTITY & CHECK OWNER
                 if (!is_valid_entity(pEdict) || is_valid && ENTINDEX(pEdict->v.owner) != owner_index) continue;
@@ -115,12 +109,12 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
                 // CHECK CREATION CLASSNAME
                 if (key == STRING(pEdict->v.classname)) {
 
-                    *(getAmxAddr(amx, params[arg_ent_arr]) + result) = it;
+                    *(getAmxAddr(amx, params[arg_ent_arr]) + result) = entity;
 
                     // TRANSFER CLASSNAME
-                    if (key != g_Tries.classnames[it]) {
+                    if (key != g_Tries.classnames[entity]) {
                         
-                        acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[it], key, it);
+                        acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[entity], key, entity);
                     }
 
                     if (++result >= params[arg_ent_arr_size]) break;
