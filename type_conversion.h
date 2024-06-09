@@ -25,76 +25,52 @@ inline size_t indexOfEdict(const entvars_t* pev)
 // safe to nullptr
 inline size_t indexOfEdictAmx(const entvars_t* pev)
 {
-	size_t index = AMX_NULLENT;
-	if (likely(pev != nullptr))
-		index = indexOfEdict(pev);
-	return index;
+	return likely(pev != nullptr) ? indexOfEdict(pev) : AMX_NULLENT;
 }
 
 inline size_t indexOfEdictAmx(const edict_t *pEdict)
 {
-	size_t index = AMX_NULLENT;
-	if (likely(pEdict != nullptr))
-		index = indexOfEdict(pEdict);
-	return index;
+	return likely(pEdict != nullptr) ? indexOfEdict(pEdict) : AMX_NULLENT;
 }
 
 // fast
 inline edict_t* edictByIndex(const int index)
 {
-	return g_pEdicts + index;
+	return likely(g_pEdicts == nullptr) ? nullptr : g_pEdicts + index;
 }
 
 inline IGameClient* clientByIndex(const int index)
 {
-	IGameClient* cl = nullptr;
-	if (likely(index > 0))
-		cl = g_RehldsSvs->GetClient(index - 1);
-	return cl;
+	return likely(index > 0) ? g_RehldsSvs->GetClient(index - 1) : nullptr;
 }
 
 // safe to index -1
 inline edict_t* edictByIndexAmx(const int index)
 {
-	auto ed = g_pEdicts + index;
-	if (unlikely(index < 0)) // == AMX_NULLENT
-		ed = nullptr;
-	return ed;
+	return likely(index >= 0) ? g_pEdicts + index : nullptr;
 }
 
 template<typename T>
 inline T* getPrivate(const int index)
 {
-	T* pdata = nullptr;
-	if (likely(index >= 0)) // != AMX_NULLENT
-		pdata = (T *)g_pEdicts[index].pvPrivateData;
-	return pdata;
+	return likely(index >= 0) ? g_pEdicts[index].pvPrivateData : nullptr;
 }
 
 template<typename T>
 inline T* getPrivate(const edict_t *pEdict)
 {
-	T* pdata = nullptr;
-	if (likely(pEdict != nullptr))
-		pdata = (T *)pEdict->pvPrivateData;
-	return pdata;
+	return likely(pEdict != nullptr) ? pEdict->pvPrivateData : nullptr;
 }
 
 inline entvars_t* PEV(const int index)
 {
-	entvars_t* pvars = nullptr;
-	if (likely(index >= 0)) // != AMX_NULLENT
-		pvars = &g_pEdicts[index].v;
-	return pvars;
+	return likely(index >= 0) ? &g_pEdicts[index].v : nullptr;
 }
 
 template<typename T>
 inline size_t indexOfPDataAmx(const T* pdata)
 {
-	size_t index = AMX_NULLENT;
-	if (likely(pdata != nullptr))
-		index = indexOfEdict(pdata->pev);
-	return index;
+	return likely(pdata != nullptr) ? indexOfEdict(pdata->pev) : AMX_NULLENT;
 }
 
 inline cell getAmxVector(Vector& vec)
