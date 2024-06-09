@@ -646,7 +646,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
                 edict_t* pSpawn = INDEXENT(spawn);
 
-                UTIL_ServerPrint("[DEBUG] get_user_buyzone(): spawn = %d, classname = %s, free = %d\n", spawn, STRING(pSpawn->v.classname), pSpawn->free);
+                UTIL_ServerPrint("[DEBUG] get_user_buyzone(): spawn = %d, classname = %s, kill = %d\n", spawn, STRING(pSpawn->v.classname), (pSpawn->v.flags & FL_KILLME));
 
                 if (is_valid_entity(pSpawn) && (pSpawn->v.origin - pEdict->v.origin).Length() < 200.0) {
 
