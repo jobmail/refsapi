@@ -134,6 +134,14 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params) {
     return result;
 }
 
+// native rf_roundfloat(const Float:value, const precision);
+cell AMX_NATIVE_CALL rf_roundfloat(AMX *amx, cell *params) {
+
+    enum args_e { arg_count, arg_value, arg_precision};
+
+    return acs_roundfloat(*getAmxAddr(amx, params[arg_value]), params[arg_precision]);
+}
+
 AMX_NATIVE_INFO Misc_Natives[] = {
     
     { "rf_get_players_num", rf_get_players_num },

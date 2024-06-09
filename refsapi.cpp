@@ -597,7 +597,7 @@ int acs_vector_remove(std::vector<cell> *v, int value) {
     return v->size();
 }
 
-float rf_roundfloat(float value, int precision) {
+float acs_roundfloat(float value, int precision) {
     double power = pow(10.0, -precision);
     return floor(value * power + 0.5) / power;
 }
