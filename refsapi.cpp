@@ -270,7 +270,10 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
 
     r_bMapHasBuyZone = g_Tries.entities.find(key) != g_Tries.entities.end();
 
-    UTIL_ServerPrint("[DEBUG] r_bMapHasBuyZone = %d, count = %d, total = %d\n", r_bMapHasBuyZone, g_Tries.entities[key].size(), g_Tries.entities.size());
+    for (auto &key : g_Tries.entities) {
+
+        UTIL_ServerPrint("[DEBUG] r_bMapHasBuyZone = %d, key = %s\n", r_bMapHasBuyZone, key.first);
+    }
 
     chain->callNext();
 }
