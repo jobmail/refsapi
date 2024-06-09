@@ -266,11 +266,11 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
     
         g_PlayersNum[TEAM_DEAD_CT] = 0;
     
-    std::string key = "func_buyzone\0";
+    std::string key = "func_buyzone";
 
     r_bMapHasBuyZone = g_Tries.entities.find(key) != g_Tries.entities.end();
 
-    UTIL_ServerPrint("[DEBUG] r_bMapHasBuyZone = %d, count = %d\n", r_bMapHasBuyZone, g_Tries.entities[key].size());
+    UTIL_ServerPrint("[DEBUG] r_bMapHasBuyZone = %d, count = %d, total = %d\n", r_bMapHasBuyZone, g_Tries.entities[key].size(), g_Tries.entities.size());
 
     chain->callNext();
 }
