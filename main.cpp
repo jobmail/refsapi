@@ -96,7 +96,6 @@ void ServerDeactivate_Post()
 	//g_ReGameHookchains->CSGameRules_CanHavePlayerItem()->registerHook(CSGameRules_CanHavePlayerItem_RG);
 	g_ReGameHookchains->CreateWeaponBox()->unregisterHook(CreateWeaponBox_RG);
 	
-
 	// CLEAR TRIES
 	memset(g_Clients, 0, sizeof(g_Clients));
 	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
