@@ -425,11 +425,7 @@ void Client_TeamInfo(void* mValue) {
                 //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
             }
 
-            edict_t* pEdict = INDEXENT(id);
-
-            if (is_valid_entity(pEdict))
-
-                pEdict->v.team = new_team;
+            INDEXENT(id)->v.team = new_team;
 
             break;
     }
