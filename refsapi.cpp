@@ -630,6 +630,8 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
                 edict_t* pBuyZone = INDEXENT(buyzone);
 
+                UTIL_ServerPrint("[DEBUG] get_user_buyzone(): entity = %d, team = %d\n", buyzone, pBuyZone->v.team);
+
                 if (is_valid_entity(pBuyZone) && pEdict->v.team == pBuyZone->v.team && is_entity_intersects(pEdict, pBuyZone)) {
 
                     result = true;
