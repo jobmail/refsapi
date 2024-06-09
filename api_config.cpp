@@ -27,6 +27,7 @@ void CAPI_Config::Init() {
 		g_engfuncs.pfnServerPrint("[REFSAPI] ReGAME API successfully initialized.\n");
 
 		g_ReGameHookchains->InstallGameRules()->registerHook(&InstallGameRules);
+
 	}
 
 	cvar_t* pCvar = CVAR_GET_POINTER(REFSAPI_CVAR);

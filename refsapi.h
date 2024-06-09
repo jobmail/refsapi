@@ -13,12 +13,8 @@
 #define _COUNT(x)                  (size_t)(sizeof(x)/sizeof(cell))
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
 #define is_valid_index              __is_valid_edict_index
-#define is_valid_entity             (!(pEdict == nullptr || pEdict->pvPrivateData == nullptr || pEdict->free || (pEdict->v.flags & FL_KILLME)))
-
-inline bool __is_valid_edict_index(size_t index) {
-
-    return index > 0 && index <= gpGlobals->maxClients;
-}
+#define is_valid_entity             __is_valid_edict
+#define is_valid_team               __is_valid_team
 
 typedef void (*funEventCall)(void*);
 
@@ -62,10 +58,27 @@ struct sClients {
 
 };
 
+extern bool r_bMapHasBuyZone;
+
 extern sClients g_Clients[MAX_PLAYERS + 1];
 extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
+
+inline bool __is_valid_edict_index(const size_t index) {
+
+    return index > 0 && index <= gpGlobals->maxClients;
+}
+
+inline bool __is_valid_edict(const edict_t *pEdict) {
+
+    return !(pEdict == nullptr || pEdict->pvPrivateData == nullptr || pEdict->free || (pEdict->v.flags & FL_KILLME));
+}
+
+inline bool __is_valid_team(const int team) {
+
+    return team >= TEAM_TERRORIST && team <= TEAM_CT;
+}
 
 edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
@@ -115,6 +128,8 @@ void acs_trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::stri
 int acs_vector_add(std::vector<cell> *v, int value);
 int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
+bool acs_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2);
+bool acs_get_user_buyzone(const edict_t *pEdict);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
