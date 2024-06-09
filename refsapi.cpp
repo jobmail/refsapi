@@ -620,9 +620,9 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
         if (r_bMapHasBuyZone) {
 
-            for (auto &buyzone : g_Tries.entities["func_buyzone"]) {
+            for (auto& buyzone : g_Tries.entities["func_buyzone"]) {
 
-                edict_t *pBuyZone = INDEXENT(buyzone);
+                edict_t* pBuyZone = INDEXENT(buyzone);
 
                 if (is_valid_entity(pBuyZone) && pEdict->v.team == pBuyZone->v.team && is_entity_intersects(pEdict, pBuyZone)) {
 
@@ -631,12 +631,12 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
                     break;
                 }
             }
-
+            
         } else {
 
-            for (auto &spawn : g_Tries.entities[pEdict->v.team == TEAM_TERRORIST ? "info_player_deathmatch" : "info_player_start"]) {
+            for (auto& spawn : g_Tries.entities[pEdict->v.team == TEAM_TERRORIST ? "info_player_deathmatch" : "info_player_start"]) {
 
-                edict_t *pSpawn = INDEXENT(spawn);
+                edict_t* pSpawn = INDEXENT(spawn);
 
                 if (is_valid_entity(pSpawn) && (pSpawn->v.origin - pEdict->v.origin).Length() < 200.0) {
 
