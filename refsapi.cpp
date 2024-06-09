@@ -51,7 +51,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     if (FStringNull(pEdict->v.classname)) return;
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+    //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     int entity_index = ENTINDEX(pEdict);
 
@@ -60,7 +60,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     // ADD ENTITIES
     int result = acs_trie_add(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
+    //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
 
     // ADD CLASSNAMES
     g_Tries.classnames[entity_index] = key;
@@ -127,7 +127,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     // REMOVE ENTITIES
     int result = acs_trie_remove(&g_Tries.entities, key, entity_index);
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
+    //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
 
     // REMOVE PLAYER_ENTITIES
     if (is_valid_index(owner_index))
