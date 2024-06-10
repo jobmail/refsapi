@@ -620,13 +620,13 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
         if (r_bMapHasBuyZone) {
 
-            UTIL_ServerPrint("[DEBUG] get_user_buyzone(): zone_count = %d\n", g_Tries.entities["func_buyzone"].size());
+            //UTIL_ServerPrint("[DEBUG] get_user_buyzone(): zone_count = %d\n", g_Tries.entities["func_buyzone"].size());
 
             for (auto& buyzone : g_Tries.entities["func_buyzone"]) {
 
                 edict_t* pBuyZone = INDEXENT(buyzone);
 
-                UTIL_ServerPrint("[DEBUG] get_user_buyzone(): entity = %d, team = %d\n", buyzone, pBuyZone->v.team);
+                //UTIL_ServerPrint("[DEBUG] get_user_buyzone(): entity = %d, team = %d\n", buyzone, pBuyZone->v.team);
 
                 if (is_valid_entity(pBuyZone) && pEdict->v.team == pBuyZone->v.team && is_entity_intersects(pEdict, pBuyZone)) {
 
@@ -642,7 +642,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
                 edict_t* pSpawn = INDEXENT(spawn);
 
-                UTIL_ServerPrint("[DEBUG] get_user_buyzone(): spawn = %d, classname = %s, kill = %d\n", spawn, STRING(pSpawn->v.classname), (pSpawn->v.flags & FL_KILLME));
+                //UTIL_ServerPrint("[DEBUG] get_user_buyzone(): spawn = %d, classname = %s, kill = %d\n", spawn, STRING(pSpawn->v.classname), (pSpawn->v.flags & FL_KILLME));
 
                 if (is_valid_entity(pSpawn) && (pSpawn->v.origin - pEdict->v.origin).Length() < 200.0f) {
 
