@@ -150,6 +150,7 @@ void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPl
 
     int id = pPlayer->entindex();
 
+    // FIX TEAMS DEAD COUNT
     if (is_valid_index(id) && is_valid_team(g_Clients[id].team) && pPlayer->edict()->v.deadflag != DEAD_NO && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
 
         g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
@@ -308,7 +309,7 @@ void R_ClientDisconnect(edict_t *pEntity) {
 
     //UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
 
-    Client_Disconnected(ENTINDEX(pEntity), false, 0);
+    Client_Disconnected(pEntity, false, 0);
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -321,7 +322,7 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 
 	Q_strcpy_s(buffer, (char*)format);
 
-    Client_Disconnected(ENTINDEX(cl->GetEdict()), crash, buffer);
+    Client_Disconnected(cl->GetEdict(), crash, buffer);
 
     chain->callNext(cl, crash, format);
 }
@@ -346,7 +347,9 @@ void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot
     }
 }
 
-void Client_Disconnected(int id, bool crash, char *format) {
+void Client_Disconnected(edict_t *pEdict, bool crash, char *format) {
+
+    int id = ENTINDEX(pEdict);
 
     if (is_valid_index(id)) {
         
@@ -364,18 +367,14 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
             //CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
 
-            edict_t* pEdict = INDEXENT(id);
-
             //UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s\n", id, STRING(pPlayer->edict()->v.netname));
 
-            if (is_valid_entity(pEdict)) {
+            g_PlayersNum[g_Clients[id].team]--;
+            
+            // FIX TEAMS DEAD COUNT
+            if (is_valid_entity(pEdict) && pEdict->v.deadflag != DEAD_NO && is_valid_team(g_Clients[id].team) && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
 
-                g_PlayersNum[g_Clients[id].team]--;
-
-                if (pEdict->v.deadflag != DEAD_NO && is_valid_team(g_Clients[id].team))
-
-                    g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
-            }
+                g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
 
             //UTIL_ServerPrint("[DEBUG] DISCONNECT: num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d, num_dead_tt = %d, num_dead_ct = %d\n",
             //    g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR], g_PlayersNum[TEAM_DEAD_TT], g_PlayersNum[TEAM_DEAD_CT]
