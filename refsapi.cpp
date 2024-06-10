@@ -146,6 +146,17 @@ void Free_EntPrivateData(edict_t *pEdict) {
     }
 }
 
+void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer) {
+
+    int id = pPlayer->entindex();
+
+    if (is_valid_index(id) && is_valid_team(g_Clients[id].team) && pPlayer->edict()->v.deadflag != DEAD_NO && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
+
+        g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
+
+    chain->callNext(pPlayer);
+}
+
 CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo) {
     
     auto origin = chain->callNext(pItem, pPlayer, model, v_origin, v_angels, v_velocity, life_time, pack_ammo);
@@ -361,7 +372,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
                 g_PlayersNum[g_Clients[id].team]--;
 
-                if (pEdict->v.deadflag != DEAD_NO && g_Clients[id].team >= TEAM_TERRORIST && g_Clients[id].team <= TEAM_CT)
+                if (pEdict->v.deadflag != DEAD_NO && is_valid_team(g_Clients[id].team))
 
                     g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
             }
@@ -420,7 +431,21 @@ void Client_TeamInfo(void* mValue) {
 
             } else if (new_team != TEAM_UNASSIGNED && g_Clients[id].team != new_team) {
 
-                //UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
+                edict_t* pEdict = INDEXENT(id);
+
+                // FIX TEAMS DEAD COUNT
+                if (is_valid_entity(pEdict) && pEdict->v.deadflag != DEAD_NO) {
+
+                    if (is_valid_team(g_Clients[id].team) && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
+
+                        g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
+
+                    if (is_valid_team(new_team) && g_PlayersNum[TEAM_DEAD_TT + new_team - 1] > 0)
+
+                        g_PlayersNum[TEAM_DEAD_TT + new_team - 1]++;
+                } 
+
+                UTIL_ServerPrint("[DEBUG] Team changed!!!\n");
 
                 g_PlayersNum[g_Clients[id].team]--;
 
@@ -428,7 +453,9 @@ void Client_TeamInfo(void* mValue) {
 
                 g_Clients[id].team = new_team;
 
-                //UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
+                UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d, num_dead_tt = %d, num_dead_ct = %d\n",
+                    g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR], g_PlayersNum[TEAM_DEAD_TT], g_PlayersNum[TEAM_DEAD_CT]
+                );
             }
 
             // FIX TEAM
