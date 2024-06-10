@@ -131,7 +131,9 @@ cell AMX_NATIVE_CALL rf_roundfloat(AMX *amx, cell *params) {
 
     enum args_e { arg_count, arg_value, arg_precision};
 
-    return acs_roundfloat(static_cast<float>(params[arg_value]), params[arg_precision]);
+    float result = acs_roundfloat(amx_ctof(params[arg_value]), params[arg_precision]);
+
+    return amx_ftoc(result);
 }
 
 // native rf_get_user_buyzone(const id);
