@@ -58,7 +58,6 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	}
 	
 	r_bMapHasBuyZone = g_Tries.entities.find("func_buyzone") != g_Tries.entities.end();
-    UTIL_ServerPrint("[DEBUG] r_bMapHasBuyZone = %d\n", r_bMapHasBuyZone);
 
 	g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
 	//g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
