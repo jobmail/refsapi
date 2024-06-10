@@ -271,7 +271,7 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
 
 void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib) {
 
-    if (g_Clients[pPlayer->entindex()].is_connected && pPlayer->m_iTeam >= TEAM_TERRORIST && pPlayer->m_iTeam <= TEAM_CT)
+    if (g_Clients[pPlayer->entindex()].is_connected && is_valid_team(pPlayer->m_iTeam))
 
         g_PlayersNum[TEAM_DEAD_TT + pPlayer->m_iTeam - 1]++;
     
