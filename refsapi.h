@@ -16,6 +16,9 @@
 #define is_valid_entity             __is_valid_edict
 #define is_valid_team               __is_valid_team
 
+#define amx_ftoc(f)                 ( * ((cell*)&f) )   /* float to cell */
+#define amx_ctof(c)                 ( * ((float*)&c) )  /* cell to float */
+
 typedef void (*funEventCall)(void*);
 
 typedef enum {
