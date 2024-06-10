@@ -644,7 +644,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
                 UTIL_ServerPrint("[DEBUG] get_user_buyzone(): spawn = %d, classname = %s, kill = %d\n", spawn, STRING(pSpawn->v.classname), (pSpawn->v.flags & FL_KILLME));
 
-                if (is_valid_entity(pSpawn) && (pSpawn->v.origin - pEdict->v.origin).Length() < 200.0) {
+                if (is_valid_entity(pSpawn) && (pSpawn->v.origin - pEdict->v.origin).Length() < 200.0f) {
 
                     result = true;
 
