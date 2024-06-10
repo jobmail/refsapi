@@ -51,7 +51,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
 
     if (FStringNull(pEdict->v.classname)) return;
 
-    UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
+    //UTIL_ServerPrint("[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
 
     int entity_index = ENTINDEX(pEdict);
 
@@ -112,7 +112,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
         }
     }
 
-    UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s>, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
+    //UTIL_ServerPrint("[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s>, owner = %d\n", entity_index, STRING(pEdict->v.classname), owner_index);
 
     key = STRING(pEdict->v.classname);
 
@@ -271,11 +271,11 @@ void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapCondition
 
 void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib) {
 
-    if (g_Clients[pPlayer->entindex()].is_connected && pPlayer->m_iTeam >= 1 && pPlayer->m_iTeam <=2)
+    if (g_Clients[pPlayer->entindex()].is_connected && pPlayer->m_iTeam >= TEAM_TERRORIST && pPlayer->m_iTeam <= TEAM_CT)
 
         g_PlayersNum[TEAM_DEAD_TT + pPlayer->m_iTeam - 1]++;
     
-    UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d, num_dead_tt = %d, num_dead_ct = %d\n",
+    UTIL_ServerPrint("[DEBUG] KILL: num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d, num_dead_tt = %d, num_dead_ct = %d\n",
         g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR], g_PlayersNum[TEAM_DEAD_TT], g_PlayersNum[TEAM_DEAD_CT]
     );
 
@@ -362,7 +362,7 @@ void Client_Disconnected(int id, bool crash, char *format) {
                 g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
             }
 
-            UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d, num_dead_tt = %d, num_dead_ct = %d\n",
+            UTIL_ServerPrint("[DEBUG] DISCONNECT: num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d, num_dead_tt = %d, num_dead_ct = %d\n",
                 g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR], g_PlayersNum[TEAM_DEAD_TT], g_PlayersNum[TEAM_DEAD_CT]
             );
         }
