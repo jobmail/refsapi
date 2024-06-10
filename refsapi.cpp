@@ -357,9 +357,13 @@ void Client_Disconnected(int id, bool crash, char *format) {
 
             //UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s\n", id, STRING(pPlayer->edict()->v.netname));
 
-            if (is_valid_entity(pEdict) && pEdict->v.deadflag != DEAD_NO && g_Clients[id].team >= TEAM_TERRORIST && g_Clients[id].team <= TEAM_CT) {
+            if (is_valid_entity(pEdict)) {
 
-                g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
+                g_PlayersNum[g_Clients[id].team]--;
+
+                if (pEdict->v.deadflag != DEAD_NO && g_Clients[id].team >= TEAM_TERRORIST && g_Clients[id].team <= TEAM_CT)
+
+                    g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
             }
 
             UTIL_ServerPrint("[DEBUG] DISCONNECT: num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d, num_dead_tt = %d, num_dead_ct = %d\n",
