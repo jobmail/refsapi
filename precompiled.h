@@ -10,6 +10,9 @@
 // C++
 #include <vector>				// std::vector
 #include <list>					// std::list
+#include <iostream>
+#include <filesystem>
+#include <fstream>
 
 // platform defs
 #include "platform.h"
@@ -42,7 +45,9 @@
 #include <ex_rehlds_api.h>
 
 // AmxModX API
-#include "amxxmodule.h"
+//#include "amxmodx.h"
+#include "CPlugin.h"
+#include <amxxmodule.h>
 
 #include "info.h"
 #include "com_client.h"
@@ -55,7 +60,8 @@
 #include "hook_callback.h"
 #include "entity_callback_dispatcher.h"
 
+// Refs API
 #include "refsapi.h"
 #include "natives_helper.h"
 #include "natives_refsapi.h"
-//#include "sdk_util.cpp"
+#include "sdk_util.h"

@@ -16,11 +16,46 @@
 #ifndef __AMXXMODULE_H__
 #define __AMXXMODULE_H__
 
+#include "hashing.h"
+#include "auto-string.h"
+#include <amtl/am-autoptr.h>
+#include <amtl/am-string.h>
+#include <amtl/am-vector.h>
+#include <amtl/am-inlinelist.h>
+
 // module interface version was 1
 // 2 - added logtag to struct (amxx1.1-rc1)
 // 3 - added new tagAMX structure (amxx1.5)
 // 4 - added new 'library' setting for direct loading
 #define AMXX_INTERFACE_VERSION 4
+
+#define UD_FINDPLUGIN	3
+#define UD_DEBUGGER		2
+#define UD_OPCODELIST	1
+#define	UD_HANDLER		0
+#define	UT_NATIVE		3
+#define UT_OPTIMIZER	2
+#define UT_BROWSEHOOK	1
+#define UT_BINLOGS		0
+
+#define MAX_REG_MSGS                256 + 16
+#define MAX_WEAPONS					32		// ???
+#define MAX_WEAPON_SLOTS			5	// hud item selection slots
+#define MAX_ITEM_TYPES				6	// hud item selection slots
+#define MAX_ITEMS					5	// hard coded item types
+#define	HIDEHUD_WEAPONS				( 1<<0 )
+#define	HIDEHUD_FLASHLIGHT			( 1<<1 )
+#define	HIDEHUD_ALL					( 1<<2 )
+#define HIDEHUD_HEALTH				( 1<<3 )
+#define	MAX_AMMO_TYPES				32		// ???
+#define MAX_AMMO_SLOTS  			32		// not really slots
+
+#define HUD_PRINTNOTIFY				1
+#define HUD_PRINTCONSOLE			2
+#define HUD_PRINTTALK				3
+#define HUD_PRINTCENTER				4
+
+#define WEAPON_SUIT					31
 
 // amxx module info
 struct amxx_module_info_s
@@ -157,6 +192,8 @@ typedef struct
 } AMX_NATIVE_INFO;
 
 #define AMX_USERNUM	4
+
+#define DECLARE_REQ(x)	{#x, offsetof(amxxapi_t, x)}
 
 /* The AMX structure is the internal structure for many functions. Not all
 * fields are valid at all times; many fields are cached in local variables.

@@ -1,5 +1,7 @@
 #include "precompiled.h"
 
+inline CPluginMngr::CPlugin* findPluginFast(AMX *amx) { return (CPluginMngr::CPlugin*)(amx->userdata[UD_FINDPLUGIN]); }
+
 // native rf_get_players_num(nums[], nums_size, bool:teams_only);
 cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
 
@@ -9,7 +11,7 @@ cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params) {
 
     if (max_size > 0) 
     
-        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, min(max_size, _COUNT(g_PlayersNum)) << 2);
+        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, std::min(max_size, _COUNT(g_PlayersNum)) << 2);
     
     int total = g_PlayersNum[TEAM_TERRORIST] + g_PlayersNum[TEAM_CT];
 
@@ -27,7 +29,7 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params) {
 
     std::vector<cell> v = g_Tries.player_entities[params[arg_index]];
 
-    size_t max_size = min(v.size(), (size_t)*getAmxAddr(amx, params[arg_ent_arr_size]));
+    size_t max_size = std::min(v.size(), (size_t)*getAmxAddr(amx, params[arg_ent_arr_size]));
 
     if (max_size > 0)
     
@@ -146,6 +148,84 @@ cell AMX_NATIVE_CALL rf_get_user_buyzone(AMX *amx, cell *params) {
     return (qboolean)acs_get_user_buyzone(INDEXENT(params[arg_index])); 
 }
 
+// native rf_config(const bool:auto_create = true, const name[] = "", const folder[] = "");
+cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
+
+    enum args_e { arg_count, arg_auto_create, arg_name, arg_folder};
+
+    bool result = FALSE;
+
+    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+
+    char buff[256];
+
+    getAmxString(amx, params[arg_name], buff);
+
+    std::string name = buff[0] == 0 ? plugin->getName() : buff;
+
+    name.replace(name.find(".amxx"), 1, 0);
+
+    getAmxString(amx, params[arg_folder], buff);
+
+    Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), buff[0] ? fmt("plugin-%s/%s", buff, name.c_str()) : name.c_str());
+
+    auto path = std::filesystem::path(buff);
+
+    bool is_exist;
+
+    if ((is_exist = std::filesystem::exists(path)) || std::filesystem::exists(path.remove_filename()) || std::filesystem::create_directories(path.remove_filename())) {
+
+        std::fstream file;
+        
+        if (is_exist || params[arg_auto_create]) {
+            
+            file.open(path);
+
+            if (file.is_open()) {
+                
+                // FILE EXIST
+                if (is_exist) {
+
+                    std::string line;
+
+                    size_t pos;
+
+                    while (std::getline(file, line)) {
+
+                        // COMMENTS
+                        if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0) continue;
+
+                        if ((pos = line.find("=")) != std::string::npos) {
+
+                            // SPLIT VAR
+                            std::string var_name = trim_c(line.substr(0, pos));
+
+                            std::string var_value = trim_c(line.substr(pos + 1, line.size() - pos));
+
+                            rm_quote_c(var_value);
+
+                            UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name, var_value);
+                        }
+                    }
+                // AUTO CREATE
+                } else {
+
+                    UTIL_ServerPrint("[DEBUG] rf_config(): CREATED !!!");
+                }
+
+                result = TRUE;
+
+                file.close();
+
+            }
+        }
+    }
+    if (!result)
+
+        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
+
+    return result;
+}
 
 AMX_NATIVE_INFO Misc_Natives[] = {
     

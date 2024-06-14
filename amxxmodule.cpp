@@ -29,8 +29,6 @@ static amxx_module_info_s g_ModuleInfo =
 // Storage for the requested functions
 amxxapi_t g_amxxapi;
 
-#define DECLARE_REQ(x)	{#x, offsetof(amxxapi_t, x)}
-
 static struct funcreq_t
 {
 	const char * name;
@@ -180,6 +178,8 @@ C_DLLEXPORT int AMXX_PluginsLoaded()
 {
 	//int iFwd = g_amxxapi.RegisterForward("__reapi_version_check", ET_IGNORE, FP_CELL, FP_CELL, FP_DONE);
 	//g_amxxapi.ExecuteForward(iFwd, REAPI_VERSION_MAJOR, REAPI_VERSION_MINOR);
+
+	//g_amxxapi.OverrideNatives();
 
 	return AMXX_OK;
 }

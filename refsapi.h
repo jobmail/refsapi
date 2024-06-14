@@ -6,11 +6,10 @@
 #include <map>
 #include <precompiled.h>
 
-#define MAX_REG_MSGS                256 + 16
 #define MAX_PLAYERS                 32
 #define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN         (sizeof(WP_CLASS_PREFIX) - 1)
-#define _COUNT(x)                  (size_t)(sizeof(x)/sizeof(cell))
+#define _COUNT(x)                   (size_t)(sizeof(x)/sizeof(cell))
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
 #define is_valid_index              __is_valid_edict_index
 #define is_valid_entity             __is_valid_edict
@@ -67,6 +66,74 @@ extern sClients g_Clients[MAX_PLAYERS + 1];
 extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
+
+inline void rm_quote(std::string &s) {
+
+    if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {
+    
+        s.erase(s.begin());
+
+        s.erase(s.end() - 1);
+    }
+}
+
+inline std::string rm_quote_c(std::string &s) {
+
+    if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {
+    
+        s.erase(s.begin());
+
+        s.erase(s.end() - 1);
+    }
+
+    return s;
+}
+
+inline void ltrim(std::string &s) {
+
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+    
+        return !std::isspace(ch);
+    
+    }));
+}
+
+inline void rtrim(std::string &s) {
+    
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+    
+        return !std::isspace(ch);
+    
+    }).base(), s.end());
+}
+
+inline void trim(std::string &s) {
+    
+    rtrim(s);
+    
+    ltrim(s);
+}
+
+inline std::string ltrim_c(std::string s) {
+    
+    ltrim(s);
+    
+    return s;
+}
+
+inline std::string rtrim_c(std::string s) {
+    
+    rtrim(s);
+    
+    return s;
+}
+
+inline std::string trim_c(std::string s) {
+    
+    trim(s);
+    
+    return s;
+}
 
 inline bool __is_valid_edict_index(const size_t index) {
 
@@ -143,6 +210,7 @@ int acs_vector_add(std::vector<cell> *v, int value);
 int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
+char* fmt(char *fmt, ...);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
