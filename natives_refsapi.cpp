@@ -165,7 +165,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     std::string name = buff[0] == 0 && plugin ? plugin->getName() : buff;
 
-    name.replace(name.find(".amxx"), 1, 0);
+    name.replace(name.find(".amxx"), 1, "");
 
     getAmxString(amx, params[arg_folder], buff);
 
