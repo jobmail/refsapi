@@ -161,14 +161,13 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     getAmxString(amx, params[arg_name], buff);
 
-    std::string name = buff[0] == 0 ? plugin->getName() : buff;
-
+    std::string name = buff[0] == 0 && plugin != nullptr ? plugin->getName() : buff;
 
     name.replace(name.find(".amxx"), 1, 0);
 
     getAmxString(amx, params[arg_folder], buff);
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): auto_create = %d, name = %s, folder = %s\n", params[arg_auto_create], name.c_str(), buff);
+    UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], name.c_str(), buff);
 
     Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), buff[0] ? fmt("plugin-%s/%s", buff, name.c_str()) : name.c_str());
 
