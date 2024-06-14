@@ -175,7 +175,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     auto path = std::filesystem::path(buff);
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s\n", buff);
+    UTIL_ServerPrint("[DEBUG] rf_config(): url = %s, path = %s, file = %s\n", buff, path.c_str(), path.filename().c_str());
 
     bool is_exist;
 
@@ -184,6 +184,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
         std::fstream file;
         
         if (is_exist || params[arg_auto_create]) {
+
+            UTIL_ServerPrint("[DEBUG] rf_config(): exist = %d\n", is_exist);
             
             file.open(path);
 
