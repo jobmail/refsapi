@@ -165,7 +165,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     std::string name = buff[0] == 0 && plugin ? plugin->getName() : buff;
 
-    name.replace(name.find(".amxx"), 1, "");
+    name.replace(name.find(".amxx"), sizeof(".amxx") - 1, "");
 
     getAmxString(amx, params[arg_folder], buff);
 
@@ -228,7 +228,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
     }
     if (!result)
 
-        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
+        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s> <%s>", __FUNCTION__, path.c_str(), path.filename() );
 
     return result;
 }
