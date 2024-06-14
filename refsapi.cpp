@@ -7,6 +7,7 @@ int g_PlayersNum[6];
 int a = sizeof(eRFS_TEAMS);
 
 bool r_bMapHasBuyZone;
+char g_fmt_buff[1024];
 sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
 
@@ -699,16 +700,14 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 }
 
 char* fmt(char *fmt, ...) {
-    
-    char buff[256];
 
     va_list arg_ptr;
 
     va_start(arg_ptr, fmt);
 
-    Q_vsnprintf(buff, sizeof(buff), fmt, arg_ptr);
+    Q_vsnprintf(g_fmt_buff, sizeof(g_fmt_buff), fmt, arg_ptr);
 
     va_end(arg_ptr);
 
-    return buff;
+    return g_fmt_buff;
 }

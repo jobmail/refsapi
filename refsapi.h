@@ -62,6 +62,7 @@ struct sClients {
 
 extern bool r_bMapHasBuyZone;
 
+extern char g_fmt_buff[1024];
 extern sClients g_Clients[MAX_PLAYERS + 1];
 extern sTries g_Tries;
 extern cell g_PlayersNum[6];
