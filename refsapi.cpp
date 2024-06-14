@@ -705,7 +705,7 @@ char* fmt(char *fmt, ...) {
 
     va_start(arg_ptr, fmt);
 
-    Q_vsnprintf(g_fmt_buff, sizeof(g_fmt_buff), fmt, arg_ptr);
+    Q_vsnprintf(g_fmt_buff, sizeof(g_fmt_buff) - 1, fmt, arg_ptr);
 
     va_end(arg_ptr);
 
