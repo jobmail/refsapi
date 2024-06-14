@@ -222,10 +222,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                 }
 
                 result = TRUE;
-
-                file.close();
-
             }
+            
+            file.close();
         }
     }
     if (!result)
