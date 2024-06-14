@@ -155,13 +155,15 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     bool result = FALSE;
 
+    UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
+
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
 
     char buff[256];
 
     getAmxString(amx, params[arg_name], buff);
 
-    std::string name = buff[0] == 0 && plugin != nullptr ? plugin->getName() : buff;
+    std::string name = buff[0] == 0 && plugin ? plugin->getName() : buff;
 
     name.replace(name.find(".amxx"), 1, 0);
 
