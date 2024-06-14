@@ -173,7 +173,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), buff[0] ? fmt("plugin-%s/%s", buff, name.c_str()) : name.c_str());
 
-    auto path = std::filesystem::path(buff, );
+    std::filesystem::path path(buff);
 
     UTIL_ServerPrint("[DEBUG] rf_config(): url = %s, path = %s, file = %s\n", buff, path.c_str(), path.filename().c_str());
 
