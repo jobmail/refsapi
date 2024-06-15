@@ -9,7 +9,7 @@ OBJECTS = *.cpp include/cssdk/public/interface.cpp
 
 LINK = -ldl -m32 -s -Llib/linux32
 
-OPT_FLAGS = -O3 -msse3 -flto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
+OPT_FLAGS = -O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
 INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
         -I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude \
