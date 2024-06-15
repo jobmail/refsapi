@@ -189,7 +189,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     bool is_exist;
 
-    if ((is_exist = std::filesystem::exists(path)) || std::filesystem::exists(path.remove_filename()) || std::filesystem::create_directories(path.remove_filename())) {
+    if ((is_exist = std::filesystem::exists(path)) || std::filesystem::exists(path. remove_filename()) || std::filesystem::create_directories(path.remove_filename())) {
 
         std::fstream file;
         
