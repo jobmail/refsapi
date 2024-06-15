@@ -195,6 +195,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
             
             file.open(path);
 
+             UTIL_ServerPrint("[DEBUG] rf_config(): is_open = %d\n", file.is_open());
+
             if (file.is_open()) {
                 
                 // FILE EXIST
@@ -204,6 +206,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     size_t pos;
 
+                    /*
                     while (std::getline(file, line)) {
 
                         // COMMENTS
@@ -221,6 +224,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                             UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
                         }
                     }
+                    */
                 // AUTO CREATE
                 } else {
 
@@ -228,9 +232,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                 }
 
                 result = TRUE;
-            }
 
-            file.close();
+                file.close();
+            }
         }
     }
     if (!result)
