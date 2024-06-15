@@ -68,6 +68,13 @@ extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
 
+inline bool file_exists(const std::string &name) {
+ 
+    struct stat buff;
+    
+    return (stat(name.c_str(), &buff) == 0);
+}
+
 inline void rm_quote(std::string &s) {
 
     if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {

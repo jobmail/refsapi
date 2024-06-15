@@ -181,57 +181,53 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     return TRUE;
 
-    /*
     bool is_exist;
 
-    if ((is_exist = std::filesystem::exists(path)) || std::filesystem::exists(path. remove_filename()) || std::filesystem::create_directories(path.remove_filename())) {
+    if ((is_exist = file_exists(path)) || params[arg_auto_create]) {
 
         std::fstream file;
+    
+        UTIL_ServerPrint("[DEBUG] rf_config(): exist = %d\n", is_exist);
         
-        if (is_exist || params[arg_auto_create]) {
+        file.open(path);
 
-            UTIL_ServerPrint("[DEBUG] rf_config(): exist = %d\n", is_exist);
+        UTIL_ServerPrint("[DEBUG] rf_config(): is_open = %d\n", file.is_open());
+
+        if (file.is_open()) {
             
-            file.open(path);
+            // FILE EXIST
+            if (is_exist) {
 
-             UTIL_ServerPrint("[DEBUG] rf_config(): is_open = %d\n", file.is_open());
+                std::string line;
 
-            if (file.is_open()) {
-                
-                // FILE EXIST
-                if (is_exist) {
+                size_t pos;
 
-                    std::string line;
+                while (std::getline(file, line)) {
 
-                    size_t pos;
+                    // COMMENTS
+                    if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0) continue;
 
-                    while (std::getline(file, line)) {
+                    if ((pos = line.find("=")) != std::string::npos) {
 
-                        // COMMENTS
-                        if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0) continue;
+                        // SPLIT VAR
+                        std::string var_name = trim_c(line.substr(0, pos));
 
-                        if ((pos = line.find("=")) != std::string::npos) {
+                        std::string var_value = trim_c(line.substr(pos + 1, line.size() - pos));
 
-                            // SPLIT VAR
-                            std::string var_name = trim_c(line.substr(0, pos));
+                        rm_quote_c(var_value);
 
-                            std::string var_value = trim_c(line.substr(pos + 1, line.size() - pos));
-
-                            rm_quote_c(var_value);
-
-                            UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
-                        }
+                        UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
                     }
-                // AUTO CREATE
-                } else {
-
-                    UTIL_ServerPrint("[DEBUG] rf_config(): CREATED !!!");
                 }
+            // AUTO CREATE
+            } else {
 
-                result = TRUE;
-
-                file.close();
+                UTIL_ServerPrint("[DEBUG] rf_config(): CREATED !!!");
             }
+
+            result = TRUE;
+
+            file.close();
         }
     }
     if (!result)
@@ -239,7 +235,6 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
         AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
 
     return result;
-    */
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
