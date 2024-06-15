@@ -181,7 +181,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     UTIL_ServerPrint("[DEBUG] rf_config(): path init\n");
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s, file = %s\n", path.c_str(), "zzz"/*path.filename().c_str()*/);
+    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s, file = %s\n", path, path.filename());
 
     bool is_exist;
 
@@ -239,7 +239,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
     }
     if (!result)
 
-        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s> <%s>", __FUNCTION__, path.c_str(), path.filename() );
+        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
 
     return result;
 }
