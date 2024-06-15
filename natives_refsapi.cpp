@@ -169,22 +169,19 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     name.replace(name.find(".amxx"), sizeof(".amxx") - 1, "");
 
-    std::string folder = getAmxString(amx, params[arg_folder], buff);
+    std::string path = getAmxString(amx, params[arg_folder], buff);
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], name.c_str(), folder.c_str());
+    UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], name.c_str(), path.c_str());
 
-    Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), folder.empty() ? name.c_str() : fmt("plugin-%s/%s", folder.c_str(), name.c_str()));
+    Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), path.empty() ? name.c_str() : fmt("plugin-%s/%s", path.c_str(), name.c_str()));
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): url = %s\n", buff);
+    path = buff;
 
-    auto path = std::filesystem::path(buff);
-
-    UTIL_ServerPrint("[DEBUG] rf_config(): path init = %s\n", path.c_str());
-
-    UTIL_ServerPrint("[DEBUG] rf_config(): file = %s\n", path.filename().c_str());
+    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s\n", name.c_str(), path.c_str());
 
     return TRUE;
 
+    /*
     bool is_exist;
 
     if ((is_exist = std::filesystem::exists(path)) || std::filesystem::exists(path. remove_filename()) || std::filesystem::create_directories(path.remove_filename())) {
@@ -208,7 +205,6 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     size_t pos;
 
-                    /*
                     while (std::getline(file, line)) {
 
                         // COMMENTS
@@ -226,7 +222,6 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                             UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
                         }
                     }
-                    */
                 // AUTO CREATE
                 } else {
 
@@ -244,6 +239,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
         AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
 
     return result;
+    */
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
