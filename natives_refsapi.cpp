@@ -177,17 +177,17 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     UTIL_ServerPrint("[DEBUG] rf_config(): url = %s\n", buff);
 
-    auto *path = new std::filesystem::path(buff);
+    auto path = std::filesystem::path(buff);
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): path init\n");
+    UTIL_ServerPrint("[DEBUG] rf_config(): path init = %s\n", path.c_str());
 
-    auto filename = path->filename();
+    auto filename = path.filename();
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s, file = %d\n", path->c_str(), filename);
+    UTIL_ServerPrint("[DEBUG] rf_config(): file = %s\n", filename.c_str());
 
     bool is_exist;
 
-    if ((is_exist = std::filesystem::exists(*path)) || std::filesystem::exists(path->remove_filename()) || std::filesystem::create_directories(path->remove_filename())) {
+    if ((is_exist = std::filesystem::exists(path)) || std::filesystem::exists(path.remove_filename()) || std::filesystem::create_directories(path.remove_filename())) {
 
         std::fstream file;
         
@@ -195,7 +195,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
             UTIL_ServerPrint("[DEBUG] rf_config(): exist = %d\n", is_exist);
             
-            file.open(*path, std::ios::in | std::ios::out);
+            file.open(path);
 
              UTIL_ServerPrint("[DEBUG] rf_config(): is_open = %d\n", file.is_open());
 
@@ -241,9 +241,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
     }
     if (!result)
 
-        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path->c_str());
-
-    delete path;
+        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
 
     return result;
 }
