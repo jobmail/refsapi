@@ -177,7 +177,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     UTIL_ServerPrint("[DEBUG] rf_config(): url = %s\n", buff);
 
-    auto path = std::filesystem::path(buff);
+    auto path = std::filesystem::path(buff).filename();
 
     UTIL_ServerPrint("[DEBUG] rf_config(): path init = %s\n", path.c_str());
 
