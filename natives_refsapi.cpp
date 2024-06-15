@@ -161,21 +161,23 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     char buff[256];
 
-    getAmxString(amx, params[arg_name], buff);
+    std::string name = getAmxString(amx, params[arg_name], buff);
 
-    std::string name = buff[0] == 0 && plugin ? plugin->getName() : buff;
+    if (name.empty())
+
+        name =  plugin->getName();
 
     name.replace(name.find(".amxx"), sizeof(".amxx") - 1, "");
 
-    getAmxString(amx, params[arg_folder], buff);
+    std::string folder = getAmxString(amx, params[arg_folder], buff);
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], name.c_str(), buff);
+    UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], name.c_str(), folder.c_str());
 
-    Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), buff[0] ? fmt("plugin-%s/%s", buff, name.c_str()) : name.c_str());
+    Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), folder.empty() ? name.c_str() : fmt("plugin-%s/%s", folder.c_str(), name.c_str()));
 
     std::filesystem::path path(buff);
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): url = %s, path = %s, file = %s\n", buff, path.c_str(), path.filename().c_str());
+    UTIL_ServerPrint("[DEBUG] rf_config(): url = %s, path = %s, file = %s\n", buff, path, path.filename());
 
     bool is_exist;
 
