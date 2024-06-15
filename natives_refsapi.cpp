@@ -183,7 +183,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     auto filename = path.filename();
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s, file = %s\n", path.c_str(), filename.c_str());
+    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s, file = %d\n", path.c_str(), filename);
 
     bool is_exist;
 
