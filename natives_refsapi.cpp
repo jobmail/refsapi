@@ -241,7 +241,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
     }
     if (!result)
 
-        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
+        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path->c_str());
 
     delete path;
 
