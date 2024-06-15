@@ -7,7 +7,9 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp
 
-LINK = -ldl -m32 -s -Llib/linux32
+LINK = -ldl -m32 -s -static
+
+#-Llib/linux32
 
 OPT_FLAGS = -O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
