@@ -181,9 +181,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     UTIL_ServerPrint("[DEBUG] rf_config(): path init = %s\n", path.c_str());
 
-    auto filename = path.stem();// extension();
-
-    UTIL_ServerPrint("[DEBUG] rf_config(): file = %s\n", filename.c_str());
+    UTIL_ServerPrint("[DEBUG] rf_config(): file = %s.%s\n", path.stem().c_str(), path.extension());
 
     return TRUE;
 
