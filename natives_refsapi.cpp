@@ -175,11 +175,13 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), folder.empty() ? name.c_str() : fmt("plugin-%s/%s", folder.c_str(), name.c_str()));
 
+    UTIL_ServerPrint("[DEBUG] rf_config(): url = %s\n", buff);
+
     std::filesystem::path path = buff;
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): path init");
+    UTIL_ServerPrint("[DEBUG] rf_config(): path init\n");
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): url = %s, path = %s, file = %s\n", buff, path.c_str(), path.filename().c_str());
+    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s, file = %s\n", path.c_str(), path.filename().c_str());
 
     bool is_exist;
 
