@@ -228,7 +228,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
             } else {
 
-                file << "TEST_CVAR = Тестовая строка\n";
+                file.write(L"TEST_CVAR = Тестовая строка\n", sizeof(L"TEST_CVAR = Тестовая строка\n"));
             }
 
             file.close();
