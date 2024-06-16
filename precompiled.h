@@ -17,6 +17,7 @@
 #include <fstream>
 #include <codecvt>
 #include <wchar.h>
+#include <wtypes.h>
 #include <cstdio>
 
 // platform defs
