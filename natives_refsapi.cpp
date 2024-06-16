@@ -191,7 +191,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
         std::wfstream file;
     
-        file.open(wstoc(path.c_str()), is_exist ? std::ios::in : std::ios::in | std::ios::out | std::ios::trunc);
+        file.open(wstoc(path.c_str()), is_exist ? std::ios::in | std::ios::binary : std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
     
         UTIL_ServerPrint("[DEBUG] rf_config(): is_exist = %d, is_open = %d\n", is_exist, file.is_open());
 
@@ -228,7 +228,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
             } else {
 
-                file.write(L"TEST_CVAR = Тестовая строка\n", sizeof(L"TEST_CVAR = Тестовая строка\n"));
+                file << L"TEST_CVAR = Тестовая строка\n";
             }
 
             file.close();
