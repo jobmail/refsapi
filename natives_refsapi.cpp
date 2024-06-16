@@ -217,9 +217,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                     if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L"=")) == std::string::npos) continue;
 
                     // SPLIT VAR
-                    std::wstring var_name = trim_c(line.substr(0, pos));
+                    std::wstring var_name = trim_c(line.substr(0, pos++));
 
-                    std::wstring var_value = trim_c(line.substr(pos + 1, line.size() - pos));
+                    std::wstring var_value = trim_c(line.substr(pos, line.size() - pos - 1));
 
                     //rm_quote(var_value);
 
