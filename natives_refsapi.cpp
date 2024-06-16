@@ -228,7 +228,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
             } else {
 
-                file << L"TEST_CVAR = Тестовая строка\n";
+                std::wstring tmp = converter.from_bytes(converter.to_bytes(L"TEST_CVAR = Тестовая строка\n"));
+
+                file << tmp;
             }
 
             file.close();
