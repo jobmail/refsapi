@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>			    // for strncpy(), etc
 #include <unistd.h>             
+#include <fcntl.h>
 
 // C++
 #include <vector>				// std::vector
