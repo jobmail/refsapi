@@ -715,7 +715,7 @@ char* fmt(char *fmt, ...) {
     return g_fmt_buff;
 }
 
-wchar_t * wfmt(wchar_t *fmt, ...) {
+wchar_t* wfmt(wchar_t *fmt, ...) {
 
     va_list arg_ptr;
 
@@ -726,4 +726,11 @@ wchar_t * wfmt(wchar_t *fmt, ...) {
     va_end(arg_ptr);
 
     return g_wfmt_buff;
+}
+
+char* wstoc(const wchar_t *s) {
+
+    wcstombs(g_fmt_buff, s, sizeof(g_fmt_buff));
+
+    return g_fmt_buff;
 }

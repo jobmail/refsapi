@@ -291,6 +291,7 @@ float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
 char* fmt(char *fmt, ...);
 wchar_t * wfmt(wchar_t *fmt, ...);
+char* wstoc(const wchar_t *s);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];

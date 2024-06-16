@@ -14,7 +14,8 @@
         "xstring": "cpp",
         "*.tcc": "cpp",
         "string": "cpp",
-        "istream": "cpp"
+        "istream": "cpp",
+        "fstream": "cpp"
     },
     "C_Cpp.default.compilerPath": "C:\\Dev\\Tools\\msys64\\ucrt64\\bin\\gcc.exe"
 }
