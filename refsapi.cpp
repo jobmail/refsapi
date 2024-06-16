@@ -701,7 +701,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
     }
     return result;
 }
-
+/*
 char* fmt(char *fmt, ...) {
 
     va_list arg_ptr;
@@ -727,3 +727,4 @@ wchar_t* wfmt(wchar_t *fmt, ...) {
 
     return g_wfmt_buff;
 }
+*/

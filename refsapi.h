@@ -69,20 +69,70 @@ extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
 
-inline char* wstoc(const wchar_t *s) {
+class wstoc {
+    char* buff;
+    public:
+        wstoc(const wchar_t *s) {
+            buff = new char[1024];
+            wcstombs(buff, s, sizeof(buff) - 1);
+        }
+        wstoc(std::wstring s) {
+            buff = new char[1024];
+            wcstombs(buff, s.c_str(), sizeof(buff) - 1);
+        }
+        wstoc(wfmt c) {
+            buff = new char[1024];
+            wcstombs(buff, c.c_str(), sizeof(buff) - 1);
+        }
+        ~wstoc() {
+            delete buff;
+        }
+        char* c_str() {
+            return buff;
+        }
+};
 
-    char buff[1024];
+class fmt {
+    char* buff;
+    public:
+        fmt(char *fmt, ...) {
+            buff = new char[1024];
+            va_list arg_ptr;
+            va_start(arg_ptr, fmt);
+            Q_vsnprintf(buff, sizeof(buff) - 1, fmt, arg_ptr);
+            va_end(arg_ptr);
+        }
+        ~fmt() {
+            delete buff;
+        }
+        char* c_str() {
+            return buff;
+        }
+};
 
-    wcstombs(buff, s, sizeof(buff));
-
-    return buff;
-}
+class wfmt {
+    wchar_t* buff;
+    public:
+        wfmt(wchar_t *fmt, ...) {
+            buff = new wchar_t[1024];
+            va_list arg_ptr;
+            va_start(arg_ptr, fmt);
+            std::vswprintf(buff, sizeof(buff) - 1, fmt, arg_ptr);
+            va_end(arg_ptr);
+        }
+        ~wfmt() {
+            delete buff;
+        }
+        wchar_t* c_str() {
+            return buff;
+        }
+};
 
 inline bool file_exists(const std::wstring &name) {
 
     struct stat buff;
     
-    return (stat(wstoc(name.c_str()), &buff) == 0);
+    return (stat(wstoc(name).c_str(), &buff) == 0);
 }
 
 inline void rm_quote(std::string &s) {
@@ -297,8 +347,8 @@ int acs_vector_add(std::vector<cell> *v, int value);
 int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
-char* fmt(char *fmt, ...);
-wchar_t * wfmt(wchar_t *fmt, ...);
+//char* fmt(char *fmt, ...);
+//wchar_t * wfmt(wchar_t *fmt, ...);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
