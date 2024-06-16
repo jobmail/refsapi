@@ -223,7 +223,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     if (rm_quote(var_value) == -1)
 
-                        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: param <%s> has value <%s> with single quote", __FUNCTION__, wstoc(var_name).c_str(), wstoc(var_value).c_str());
+                        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: the parameter <%s> has a value <%s> with a single quotation mark", __FUNCTION__, wstoc(var_name).c_str(), wstoc(var_value).c_str());
 
                     else                       
                         
