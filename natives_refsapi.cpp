@@ -173,7 +173,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], name.c_str(), path.c_str());
 
-    Q_snprintf(buff, sizeof(buff), "%s/plugins/%s.cfg", LOCALINFO("amxx_configsdir"), path.empty() ? name.c_str() : fmt("plugin-%s/%s", path.c_str(), name.c_str()));
+    Q_snprintf(buff, sizeof(buff), "%s/%s/plugins/%s.cfg", g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? name.c_str() : fmt("plugin-%s/%s", path.c_str(), name.c_str()));
 
     path = buff;
 
