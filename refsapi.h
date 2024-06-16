@@ -70,13 +70,14 @@ extern cell g_PlayersNum[6];
 extern int mState;
 
 class fmt {
+    const size_t size = 1024;
     char* buff;
     public:
         fmt(char *fmt, ...) {
-            buff = new char[1024];
+            buff = new char[size];
             va_list arg_ptr;
             va_start(arg_ptr, fmt);
-            Q_vsnprintf(buff, sizeof(buff), fmt, arg_ptr);
+            Q_vsnprintf(buff, size, fmt, arg_ptr);
             va_end(arg_ptr);
         }
         ~fmt() {
@@ -88,13 +89,14 @@ class fmt {
 };
 
 class wfmt {
+    const size_t size = 1024;
     wchar_t* buff;
     public:
         wfmt(wchar_t *fmt, ...) {
-            buff = new wchar_t[1024];
+            buff = new wchar_t[size];
             va_list arg_ptr;
             va_start(arg_ptr, fmt);
-            std::vswprintf(buff, sizeof(buff), fmt, arg_ptr);
+            std::vswprintf(buff, size, fmt, arg_ptr);
             va_end(arg_ptr);
         }
         ~wfmt() {
