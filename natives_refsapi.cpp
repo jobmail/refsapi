@@ -177,7 +177,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     path = buff;
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s\n", name.c_str(), path.c_str());
+    getcwd(buff, sizeof(buff));
+
+    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", name.c_str(), path.c_str(), buff);
 
     bool is_exist;
 
