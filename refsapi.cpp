@@ -727,10 +727,3 @@ wchar_t* wfmt(wchar_t *fmt, ...) {
 
     return g_wfmt_buff;
 }
-
-char* wstoc(const wchar_t *s) {
-
-    wcstombs(g_fmt_buff, s, sizeof(g_fmt_buff));
-
-    return g_fmt_buff;
-}

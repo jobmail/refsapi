@@ -69,11 +69,18 @@ extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
 
+inline char* wstoc(const wchar_t *s) {
+
+    wcstombs(g_fmt_buff, s, sizeof(g_fmt_buff));
+
+    return g_fmt_buff;
+}
+
 inline bool file_exists(const std::wstring &name) {
 
     struct stat buff;
     
-    return (stat((char*)name.c_str(), &buff) == 0);
+    return (stat(wstoc(name.c_str()), &buff) == 0);
 }
 
 inline void rm_quote(std::string &s) {
@@ -290,7 +297,6 @@ float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
 char* fmt(char *fmt, ...);
 wchar_t * wfmt(wchar_t *fmt, ...);
-char* wstoc(const wchar_t *s);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
