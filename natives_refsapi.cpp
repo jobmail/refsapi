@@ -191,7 +191,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
     
         file.open(path, std::ios::in | std::ios::out | std::ios::trunc);
     
-        UTIL_ServerPrint("[DEBUG] rf_config(): is_open = %d\n", file.is_open());
+        UTIL_ServerPrint("[DEBUG] rf_config(): is_exist = %d, is_open = %d\n", is_exist, file.is_open());
 
         if (file.is_open()) {
 
