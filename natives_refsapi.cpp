@@ -203,13 +203,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                 std::wstring line;
 
-                //std::wstring w_line;
-
-                //std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-
                 size_t pos;
 
-                while (std::getline(file, line, L'\n')) { // (std::getline(file, line)) {
+                while (std::getline(file, line, L'\n')) {
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", wstoc(line).c_str());
 

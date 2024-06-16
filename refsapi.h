@@ -6,6 +6,7 @@
 #include <precompiled.h>
 
 #define MAX_PLAYERS                 32
+#define _QQ                         "\"'`" 
 #define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN         (sizeof(WP_CLASS_PREFIX) - 1)
 #define _COUNT(x)                   (size_t)(sizeof(x)/sizeof(cell))
@@ -143,50 +144,85 @@ inline bool file_exists(const std::wstring &name) {
 
 inline int rm_quote(std::string &s) {
 
+    int result = 0;
+
     bool f[2];
 
-    if (((f[0] = s.front() == '"') && (f[1] = s.back() == '"')) || ((f[0] = s.front() == '\'') && (f[1] = s.back() == '\'')) || ((f[0] = s.front() == '`') && (f[1] = s.back() == '`'))) {
-    
-        s.erase(s.begin());
+    char qq[] = _QQ;
+
+    for (int i = 0; i < sizeof(qq) - 1; i++) {
+
+        f[0] = f[1] = 0;
+
+        if ((f[0] = s.front() == qq[i]) && (f[1] = s.back() == qq[i])) {
+
+            s.erase(s.begin());
         
-        s.erase(s.end() - 1);
+            s.erase(s.end() - 1);
 
-        return 1;
+            result = 1;
 
-    } else if (f[0] != f[1])
-    
-        return -1;
+            break;
 
-    return 0;
+        } else if (f[0] != f[1]) {
+
+            result = -1;
+
+            break;
+        }
+    }
+
+    return result;
 }
 
 inline int rm_quote(std::wstring &s) {
 
+    int result = 0;
+
     bool f[2];
 
-    if (((f[0] = s.front() == '"') && (f[1] = s.back() == '"')) || ((f[0] = s.front() == '\'') && (f[1] = s.back() == '\'')) || ((f[0] = s.front() == '`') && (f[1] = s.back() == '`'))) {
-    
-        s.erase(s.begin());
+    char qq[] = _QQ;
+
+    for (int i = 0; i < sizeof(qq) - 1; i++) {
+
+        f[0] = f[1] = 0;
+
+        if ((f[0] = s.front() == qq[i]) && (f[1] = s.back() == qq[i])) {
+
+            s.erase(s.begin());
         
-        s.erase(s.end() - 1);
+            s.erase(s.end() - 1);
 
-        return 1;
+            result = 1;
 
-    } else if (f[0] != f[1])
-    
-        return -1;
+            break;
 
-    return 0;
+        } else if (f[0] != f[1]) {
+
+            result = -1;
+
+            break;
+        }
+    }
+
+    return result;
 }
 
 
 inline std::string rm_quote_c(std::string &s) {
 
-    if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {
-    
-        s.erase(s.begin());
+    char qq[] = _QQ;
 
-        s.erase(s.end() - 1);
+    for (int i = 0; i < sizeof(qq) - 1; i++) {
+
+        if (s.front() == qq[i] && s.back() == qq[i]) {
+
+            s.erase(s.begin());
+        
+            s.erase(s.end() - 1);
+
+            break;
+        }
     }
 
     return s;
