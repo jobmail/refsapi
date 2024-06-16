@@ -76,7 +76,7 @@ class fmt {
             buff = new char[1024];
             va_list arg_ptr;
             va_start(arg_ptr, fmt);
-            Q_vsnprintf(buff, sizeof(buff) - 1, fmt, arg_ptr);
+            Q_vsnprintf(buff, sizeof(buff), fmt, arg_ptr);
             va_end(arg_ptr);
         }
         ~fmt() {
@@ -94,7 +94,7 @@ class wfmt {
             buff = new wchar_t[1024];
             va_list arg_ptr;
             va_start(arg_ptr, fmt);
-            std::vswprintf(buff, sizeof(buff) - 1, fmt, arg_ptr);
+            std::vswprintf(buff, sizeof(buff), fmt, arg_ptr);
             va_end(arg_ptr);
         }
         ~wfmt() {
@@ -110,15 +110,16 @@ class wstoc {
     public:
         wstoc(const wchar_t *s) {
             buff = new char[1024];
-            wcstombs(buff, s, sizeof(buff) - 1);
+            wcstombs(buff, s, sizeof(buff));
         }
         wstoc(const std::wstring &s) {
             buff = new char[1024];
-            wcstombs(buff, s.c_str(), sizeof(buff) - 1);
+            wcstombs(buff, s.c_str(), sizeof(buff));
+            UTIL_ServerPrint("[DEBUG] wstoc(): buff = %s\n", buff);
         }
         wstoc(wfmt c) {
             buff = new char[1024];
-            wcstombs(buff, c.c_str(), sizeof(buff) - 1);
+            wcstombs(buff, c.c_str(), sizeof(buff));
         }
         ~wstoc() {
             delete buff;
