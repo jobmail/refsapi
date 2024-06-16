@@ -112,7 +112,7 @@ class wstoc {
             buff = new char[1024];
             wcstombs(buff, s, sizeof(buff));
         }
-        wstoc(const std::wstring &s) {
+        wstoc(const std::wstring s) {
             buff = new char[1024];
             wcstombs(buff, s.c_str(), sizeof(buff));
             UTIL_ServerPrint("[DEBUG] wstoc(): buff = %s\n", buff);
