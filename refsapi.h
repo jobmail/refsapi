@@ -63,16 +63,18 @@ struct sClients {
 extern bool r_bMapHasBuyZone;
 
 extern char g_fmt_buff[1024];
+extern wchar_t g_wfmt_buff[1024];
+
 extern sClients g_Clients[MAX_PLAYERS + 1];
 extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
 
-inline bool file_exists(const std::string &name) {
- 
+inline bool file_exists(const std::wstring &name) {
+
     struct stat buff;
     
-    return (stat(name.c_str(), &buff) == 0);
+    return (stat((char*)name.c_str(), &buff) == 0);
 }
 
 inline void rm_quote(std::string &s) {
@@ -85,7 +87,30 @@ inline void rm_quote(std::string &s) {
     }
 }
 
+inline void rm_quote(std::wstring &s) {
+
+    if ((s.front() == '\"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {
+    
+        s.erase(s.begin());
+
+        s.erase(s.end() - 1);
+    }
+}
+
+
 inline std::string rm_quote_c(std::string &s) {
+
+    if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {
+    
+        s.erase(s.begin());
+
+        s.erase(s.end() - 1);
+    }
+
+    return s;
+}
+
+inline std::wstring rm_quote_c(std::wstring &s) {
 
     if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {
     
@@ -106,7 +131,25 @@ inline void ltrim(std::string &s) {
     }));
 }
 
+inline void ltrim(std::wstring &s) {
+
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+    
+        return !std::isspace(ch) && ch != '\t';
+    
+    }));
+}
+
 inline void rtrim(std::string &s) {
+    
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+    
+        return !std::isspace(ch) && ch != '\t';
+    
+    }).base(), s.end());
+}
+
+inline void rtrim(std::wstring &s) {
     
     s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
     
@@ -122,7 +165,21 @@ inline void trim(std::string &s) {
     ltrim(s);
 }
 
+inline void trim(std::wstring &s) {
+    
+    rtrim(s);
+    
+    ltrim(s);
+}
+
 inline std::string ltrim_c(std::string s) {
+    
+    ltrim(s);
+    
+    return s;
+}
+
+inline std::wstring ltrim_c(std::wstring s) {
     
     ltrim(s);
     
@@ -136,7 +193,21 @@ inline std::string rtrim_c(std::string s) {
     return s;
 }
 
+inline std::wstring rtrim_c(std::wstring s) {
+    
+    rtrim(s);
+    
+    return s;
+}
+
 inline std::string trim_c(std::string s) {
+    
+    trim(s);
+    
+    return s;
+}
+
+inline std::wstring trim_c(std::wstring s) {
     
     trim(s);
     
@@ -219,6 +290,7 @@ int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
 char* fmt(char *fmt, ...);
+wchar_t * wfmt(wchar_t *fmt, ...);
 
 extern int gmsgTeamInfo;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];

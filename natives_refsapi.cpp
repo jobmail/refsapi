@@ -155,21 +155,23 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     bool result = FALSE;
 
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+
     UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
 
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
 
     char buff[256];
 
-    std::string name = getAmxString(amx, params[arg_name], buff);
+    std::wstring name = converter.from_bytes(getAmxString(amx, params[arg_name], buff));
 
     if (name.empty())
 
-        name =  plugin->getName();
+        name = converter.from_bytes(plugin->getName());
 
-    name.replace(name.find(".amxx"), sizeof(".amxx") - 1, "");
+    name.replace(name.find(L".amxx"), sizeof(L".amxx") - 1, L"");
 
-    std::string path = getAmxString(amx, params[arg_folder], buff);
+    std::wstring path = converter.from_bytes(getAmxString(amx, params[arg_folder], buff));
 
     UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], name.c_str(), path.c_str());
 
@@ -177,9 +179,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     std::string root = buff;
 
-    Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? name.c_str() : fmt("plugin-%s/%s", path.c_str(), name.c_str()));
+    Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? name.c_str() : wfmt(L"plugin-%s/%s", path.c_str(), name.c_str()));
 
-    path = buff;
+    path = converter.from_bytes(buff);
 
     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", name.c_str(), path.c_str(), buff);
 
@@ -187,9 +189,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     if ((is_exist = file_exists(path)) || params[arg_auto_create]) {
 
-        std::fstream file;
+        std::wfstream file;
     
-        file.open(path, is_exist ? std::ios::in : std::ios::in | std::ios::out | std::ios::trunc);
+        file.open(path.c_str(), is_exist ? std::ios::in : std::ios::in | std::ios::out | std::ios::trunc);
     
         UTIL_ServerPrint("[DEBUG] rf_config(): is_exist = %d, is_open = %d\n", is_exist, file.is_open());
 
@@ -197,21 +199,25 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
             if (is_exist) {
 
-                std::string line;
+                std::wstring line;
+
+                //std::wstring w_line;
+
+                //std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 
                 size_t pos;
 
-                while (std::getline(file, line)) {
+                while (std::getline(file, line, L'\n')) { // (std::getline(file, line)) {
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", line.c_str());
 
                     // COMMENTS
-                    if (line.find(";") == 0 || line.find("#") == 0 || line.find("//") == 0 || (pos = line.find("=")) == std::string::npos) continue;
+                    if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L"=")) == std::string::npos) continue;
 
                     // SPLIT VAR
-                    std::string var_name = trim_c(line.substr(0, pos++));
+                    std::wstring var_name = trim_c(line.substr(0, pos++));
 
-                    std::string var_value = trim_c(line.substr(pos, line.size() - pos));
+                    std::wstring var_value = trim_c(line.substr(pos, line.size() - pos));
 
                     rm_quote(var_value);
 

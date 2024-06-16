@@ -7,7 +7,10 @@ int g_PlayersNum[6];
 int a = sizeof(eRFS_TEAMS);
 
 bool r_bMapHasBuyZone;
+
 char g_fmt_buff[1024];
+wchar_t g_wfmt_buff[1024];
+
 sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
 
@@ -710,4 +713,17 @@ char* fmt(char *fmt, ...) {
     va_end(arg_ptr);
 
     return g_fmt_buff;
+}
+
+wchar_t * wfmt(wchar_t *fmt, ...) {
+
+    va_list arg_ptr;
+
+    va_start(arg_ptr, fmt);
+
+    Q_vsnwprintf(g_wfmt_buff, sizeof(g_wfmt_buff) - 1, fmt, arg_ptr);
+
+    va_end(arg_ptr);
+
+    return g_wfmt_buff;
 }
