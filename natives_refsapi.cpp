@@ -213,7 +213,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     std::string var_value = trim_c(line.substr(pos, line.size() - pos));
 
-                    rm_quote_c(var_value);
+                    rm_quote(var_value);
+
+                    trim(var_value);
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
                 }
