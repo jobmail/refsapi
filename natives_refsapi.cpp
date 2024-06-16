@@ -183,46 +183,51 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", name.c_str(), path.c_str(), buff);
 
-    if (file_exists(path) || params[arg_auto_create]) {
+    bool is_exist;
+
+    if ((is_exist = file_exists(path)) || params[arg_auto_create]) {
 
         std::fstream file;
     
-        file.open(path);
+        file.open(path, std::ios::in | std::ios::out | std::ios::trunc);
     
         UTIL_ServerPrint("[DEBUG] rf_config(): is_open = %d\n", file.is_open());
 
         if (file.is_open()) {
-            
-            std::string line;
 
-            size_t pos;
+            if (is_exist) {
 
-            while (std::getline(file, line)) {
+                std::string line;
 
-                // COMMENTS
-                if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0) continue;
+                size_t pos;
 
-                if ((pos = line.find("=")) != std::string::npos) {
+                while (std::getline(file, line)) {
 
-                    // SPLIT VAR
-                    std::string var_name = trim_c(line.substr(0, pos));
+                    // COMMENTS
+                    if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0) continue;
 
-                    std::string var_value = trim_c(line.substr(pos + 1, line.size() - pos));
+                    if ((pos = line.find("=")) != std::string::npos) {
 
-                    rm_quote_c(var_value);
+                        // SPLIT VAR
+                        std::string var_name = trim_c(line.substr(0, pos));
 
-                    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
-                }    
+                        std::string var_value = trim_c(line.substr(pos + 1, line.size() - pos));
+
+                        rm_quote_c(var_value);
+
+                        UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
+                    }    
+                }
+
+            } else {
+
+                file << "TEST_CVAR = 10.5\n";
             }
-
-            result = TRUE;
         
-        } else {
+            result = TRUE;
 
-            file << "TEST\n";
+            file.close();
         }
-
-        file.close();
     }
     if (!result)
 
