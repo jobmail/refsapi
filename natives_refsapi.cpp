@@ -187,24 +187,24 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     if ((is_exist = file_exists(path)) || params[arg_auto_create]) {
 
-        //std::fstream file;
-        //file.open(path, std::ios::in | std::ios::out | std::ios::trunc);
-
-        FILE *file = fopen(path.c_str(), "w+");
+        std::fstream file;
     
-        UTIL_ServerPrint("[DEBUG] rf_config(): is_exist = %d, is_open = %d\n", is_exist, file != NULL);
+        file.open(path, is_exist ? std::ios::in : std::ios::in | std::ios::out | std::ios::trunc);
+    
+        UTIL_ServerPrint("[DEBUG] rf_config(): is_exist = %d, is_open = %d\n", is_exist, file.is_open());
 
-        if (file) {
+        if (file.is_open()) {
 
             if (is_exist) {
 
-                char line[1024];
+                std::string line;
 
-                while (fgets(line, sizeof(line), file)) {
+                size_t pos;
 
-                    UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", line);
+                while (std::getline(file, line)) {
 
-                    /*
+                    UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", line.c_str());
+
                     // COMMENTS
                     if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0 || (pos = line.find("=")) == std::string::npos) continue;
 
@@ -216,16 +216,14 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                     rm_quote_c(var_value);
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
-                    */
                 }
 
             } else {
 
-                //file << "TEST_CVAR = 10.5\n";
+                file << "TEST_CVAR = 10.5\n";
             }
 
-            //file.close();
-            fclose(file);
+            file.close();
         
         } else 
 
