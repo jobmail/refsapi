@@ -10,7 +10,7 @@ OBJECTS = *.cpp include/cssdk/public/interface.cpp
 LINK = -ldl -m32 -s
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -flto=auto -pipe -fno-strict-aliasing -Wno-uninitialized -std=gnu++17
+OPT_FLAGS = -O3 -msse3 -flto=auto -pipe -fno-strict-aliasing -Wno-uninitialized -std=gnu++14
 
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
