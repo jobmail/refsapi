@@ -203,35 +203,32 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                 while (std::getline(file, line)) {
 
+                    UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", line.c_str());
+
                     // COMMENTS
-                    if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0) continue;
+                    if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0 || (pos = line.find("=")) == std::string::npos) continue;
 
-                    if ((pos = line.find("=")) != std::string::npos) {
+                    // SPLIT VAR
+                    std::string var_name = trim_c(line.substr(0, pos++));
 
-                        // SPLIT VAR
-                        std::string var_name = trim_c(line.substr(0, pos));
+                    std::string var_value = trim_c(line.substr(pos, line.size() - pos));
 
-                        std::string var_value = trim_c(line.substr(pos + 1, line.size() - pos));
+                    rm_quote_c(var_value);
 
-                        rm_quote_c(var_value);
-
-                        UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
-                    }    
+                    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", var_name.c_str(), var_value.c_str());
                 }
 
             } else {
 
                 file << "TEST_CVAR = 10.5\n";
             }
-        
-            result = TRUE;
 
             file.close();
-        }
-    }
-    if (!result)
+        
+        } else 
 
-        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
+            AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, path.c_str());
+    }
 
     return result;
 }
