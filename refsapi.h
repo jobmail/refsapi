@@ -71,9 +71,11 @@ extern int mState;
 
 inline char* wstoc(const wchar_t *s) {
 
-    wcstombs(g_fmt_buff, s, sizeof(g_fmt_buff));
+    char buff[1024];
 
-    return g_fmt_buff;
+    wcstombs(buff, s, sizeof(buff));
+
+    return buff;
 }
 
 inline bool file_exists(const std::wstring &name) {
