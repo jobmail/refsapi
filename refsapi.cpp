@@ -721,7 +721,7 @@ wchar_t* wfmt(wchar_t *fmt, ...) {
 
     va_start(arg_ptr, fmt);
 
-    _vsnwprintf(g_wfmt_buff, sizeof(g_wfmt_buff) - 1, fmt, arg_ptr);
+    Q_vsnwprintf(g_wfmt_buff, sizeof(g_wfmt_buff) - 1, fmt, arg_ptr);
 
     va_end(arg_ptr);
 
