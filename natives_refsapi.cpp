@@ -175,6 +175,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], wstoc(name).c_str(), wstoc(path).c_str());
 
+    return FALSE;
+
     getcwd(buff, sizeof(buff));
 
     std::string root = buff;
