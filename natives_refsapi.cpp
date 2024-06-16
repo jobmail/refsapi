@@ -221,9 +221,13 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     std::wstring var_value = trim_c(line.substr(pos, line.size() - pos));
 
-                    rm_quote(var_value);
+                    if (rm_quote(var_value) == -1)
 
-                    trim(var_value);
+                        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: param <%s> has value <%s> with single quote", __FUNCTION__, wstoc(var_name).c_str(), wstoc(var_value).c_str());
+
+                    else                       
+                        
+                        trim(var_value);
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", wstoc(var_name).c_str(), wstoc(var_value).c_str());
                 }
