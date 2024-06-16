@@ -84,6 +84,7 @@ class fmt {
             delete buff;
         }
         char* c_str() {
+            buff[size - 1] = 0;
             return buff;
         }
 };
@@ -103,6 +104,7 @@ class wfmt {
             delete buff;
         }
         wchar_t* c_str() {
+            buff[size - 1] = 0;
             return buff;
         }
 };
@@ -127,6 +129,7 @@ class wstoc {
             delete buff;
         }
         char* c_str() {
+            buff[size - 1] = 0;
             return buff;
         }
 };
