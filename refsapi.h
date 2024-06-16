@@ -1,7 +1,6 @@
 #pragma once
 // gets rid of annoying "deprecated conversion from string constant blah blah" warning
 #pragma GCC diagnostic ignored "-Wwrite-strings"
-#define __USE_MINGW_ANSI_STDIO 1
 
 #include <map>
 #include <precompiled.h>
