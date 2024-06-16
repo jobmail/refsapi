@@ -27,6 +27,7 @@
 */
 
 #pragma once
+#include <wchar.h>
 
 #ifdef _WIN32
 const char CORRECT_PATH_SEPARATOR = '\\';
