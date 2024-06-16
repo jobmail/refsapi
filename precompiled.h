@@ -15,6 +15,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <codecvt>
 
 // platform defs
 #include "platform.h"
