@@ -8,6 +8,7 @@
 #include <string.h>			    // for strncpy(), etc
 #include <unistd.h>             
 #include <fcntl.h>
+#include <wchar.h>
 
 // C++
 #include <vector>				// std::vector
@@ -16,7 +17,6 @@
 #include <filesystem>
 #include <fstream>
 #include <codecvt>
-#include <wchar.h>
 #include <cstdio>
 
 // platform defs
