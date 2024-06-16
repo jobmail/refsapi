@@ -197,6 +197,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
         if (file.is_open()) {
 
+            file.imbue(std::locale("ru_RU.UTF-8"));
+
             if (is_exist) {
 
                 std::wstring line;
@@ -215,20 +217,18 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                     if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L"=")) == std::string::npos) continue;
 
                     // SPLIT VAR
-                    std::wstring var_name = trim_c(line.substr(0, pos++));
+                    std::wstring var_name = trim_c(line.substr(0, pos));
 
-                    std::wstring var_value = trim_c(line.substr(pos, line.size() - pos));
+                    std::wstring var_value = trim_c(line.substr(pos + 1, line.size() - pos));
 
-                    rm_quote(var_value);
+                    //rm_quote(var_value);
 
-                    trim(var_value);
+                    //trim(var_value);
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", wstoc(var_name.c_str()), wstoc(var_value.c_str()));
                 }
 
             } else {
-
-                file.imbue(std::locale("ru_RU.UTF-8"));
 
                 file << L"TEST_CVAR = Тестовая строка\n";
             }
