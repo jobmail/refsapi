@@ -187,12 +187,10 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     if ((is_exist = file_exists(path)) || params[arg_auto_create]) {
 
-        std::fstream file;
-    
         UTIL_ServerPrint("[DEBUG] rf_config(): exist = %d\n", is_exist);
-        
-        file.open(path);
 
+        std::fstream file(path);
+    
         UTIL_ServerPrint("[DEBUG] rf_config(): is_open = %d\n", file.is_open());
 
         if (file.is_open()) {
