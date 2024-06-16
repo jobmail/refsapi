@@ -173,11 +173,11 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], name.c_str(), path.c_str());
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): mod = %s\n", g_amxxapi.GetModname());
-
     Q_snprintf(buff, sizeof(buff), "%s/%s/plugins/%s.cfg", g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? name.c_str() : fmt("plugin-%s/%s", path.c_str(), name.c_str()));
 
     path = buff;
+
+    getcwd(buff, sizeof(buff));
 
     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", name.c_str(), path.c_str(), buff);
 
@@ -189,7 +189,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
     
         UTIL_ServerPrint("[DEBUG] rf_config(): exist = %d\n", is_exist);
         
-        file.open(path.c_str());
+        file.open(path);
 
         UTIL_ServerPrint("[DEBUG] rf_config(): is_open = %d\n", file.is_open());
 
