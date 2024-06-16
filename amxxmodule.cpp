@@ -42,7 +42,7 @@ static struct funcreq_t
 	DECLARE_REQ(GetAmxAddr),
 	//DECLARE_REQ(GetAmxVectorNull),			// AMXX 1.8.3-dev
 	//DECLARE_REQ(PrintSrvConsole),
-	//DECLARE_REQ(GetModname),
+	DECLARE_REQ(GetModname),
 	DECLARE_REQ(GetAmxScriptName),
 	//DECLARE_REQ(GetAmxScript),
 	DECLARE_REQ(FindAmxScriptByAmx),
