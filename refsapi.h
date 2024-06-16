@@ -141,24 +141,42 @@ inline bool file_exists(const std::wstring &name) {
     return (stat(wstoc(name).c_str(), &buff) == 0);
 }
 
-inline void rm_quote(std::string &s) {
+inline int rm_quote(std::string &s) {
 
-    if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {
+    bool f[2];
+
+    if (((f[0] = s.front() == '"') && (f[1] = s.back() == '"')) || ((f[0] = s.front() == '\'') && (f[1] = s.back() == '\'')) || ((f[0] = s.front() == '`') && (f[1] = s.back() == '`'))) {
     
         s.erase(s.begin());
-
+        
         s.erase(s.end() - 1);
-    }
+
+        return 1;
+
+    } else if (f[0] != f[1])
+    
+        return -1;
+
+    return 0;
 }
 
-inline void rm_quote(std::wstring &s) {
+inline int rm_quote(std::wstring &s) {
 
-    if ((s.front() == '\"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\'') || (s.front() == '`' && (s.back() == '`' || s.back() == '\''))) {
+    bool f[2];
+
+    if (((f[0] = s.front() == '"') && (f[1] = s.back() == '"')) || ((f[0] = s.front() == '\'') && (f[1] = s.back() == '\'')) || ((f[0] = s.front() == '`') && (f[1] = s.back() == '`'))) {
     
         s.erase(s.begin());
-
+        
         s.erase(s.end() - 1);
-    }
+
+        return 1;
+
+    } else if (f[0] != f[1])
+    
+        return -1;
+
+    return 0;
 }
 
 
