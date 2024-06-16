@@ -175,7 +175,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     getcwd(buff, sizeof(buff));
 
-    Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", buff, g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? name.c_str() : fmt("plugin-%s/%s", path.c_str(), name.c_str()));
+    std::string root = buff;
+
+    Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? name.c_str() : fmt("plugin-%s/%s", path.c_str(), name.c_str()));
 
     path = buff;
 
