@@ -11,7 +11,10 @@
         "xlocinfo": "cpp",
         "xlocmon": "cpp",
         "xmemory": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "*.tcc": "cpp",
+        "string": "cpp",
+        "istream": "cpp"
     },
     "C_Cpp.default.compilerPath": "C:\\Dev\\Tools\\msys64\\ucrt64\\bin\\gcc.exe"
 }
