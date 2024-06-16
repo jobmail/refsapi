@@ -206,7 +206,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                     UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", line.c_str());
 
                     // COMMENTS
-                    if (line.find(";") == 0 || line.find("#") == 0 || !line.find("//") == 0 || (pos = line.find("=")) == std::string::npos) continue;
+                    if (line.find(";") == 0 || line.find("#") == 0 || line.find("//") == 0 || (pos = line.find("=")) == std::string::npos) continue;
 
                     // SPLIT VAR
                     std::string var_name = trim_c(line.substr(0, pos++));
