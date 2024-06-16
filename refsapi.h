@@ -69,29 +69,6 @@ extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
 
-class wstoc {
-    char* buff;
-    public:
-        wstoc(const wchar_t *s) {
-            buff = new char[1024];
-            wcstombs(buff, s, sizeof(buff) - 1);
-        }
-        wstoc(std::wstring s) {
-            buff = new char[1024];
-            wcstombs(buff, s.c_str(), sizeof(buff) - 1);
-        }
-        wstoc(wfmt c) {
-            buff = new char[1024];
-            wcstombs(buff, c.c_str(), sizeof(buff) - 1);
-        }
-        ~wstoc() {
-            delete buff;
-        }
-        char* c_str() {
-            return buff;
-        }
-};
-
 class fmt {
     char* buff;
     public:
@@ -124,6 +101,29 @@ class wfmt {
             delete buff;
         }
         wchar_t* c_str() {
+            return buff;
+        }
+};
+
+class wstoc {
+    char* buff;
+    public:
+        wstoc(const wchar_t *s) {
+            buff = new char[1024];
+            wcstombs(buff, s, sizeof(buff) - 1);
+        }
+        wstoc(std::wstring s) {
+            buff = new char[1024];
+            wcstombs(buff, s.c_str(), sizeof(buff) - 1);
+        }
+        wstoc(wfmt c) {
+            buff = new char[1024];
+            wcstombs(buff, c.c_str(), sizeof(buff) - 1);
+        }
+        ~wstoc() {
+            delete buff;
+        }
+        char* c_str() {
             return buff;
         }
 };
