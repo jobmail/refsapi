@@ -106,20 +106,21 @@ class wfmt {
 };
 
 class wstoc {
+    const size_t size = 1024;
     char* buff;
     public:
         wstoc(const wchar_t *s) {
-            buff = new char[1024];
-            wcstombs(buff, s, sizeof(buff));
+            buff = new char[size];
+            wcstombs(buff, s, size);
         }
         wstoc(const std::wstring s) {
-            buff = new char[1024];
-            wcstombs(buff, s.c_str(), sizeof(buff));
+            buff = new char[size];
+            wcstombs(buff, s.c_str(), size);
             UTIL_ServerPrint("[DEBUG] wstoc(): buff = %s\n", buff);
         }
         wstoc(wfmt c) {
-            buff = new char[1024];
-            wcstombs(buff, c.c_str(), sizeof(buff));
+            buff = new char[size];
+            wcstombs(buff, c.c_str(), size);
         }
         ~wstoc() {
             delete buff;
