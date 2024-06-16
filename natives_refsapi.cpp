@@ -219,7 +219,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                     // SPLIT VAR
                     std::wstring var_name = trim_c(line.substr(0, pos++));
 
-                    std::wstring var_value = trim_c(line.substr(pos, line.size() - pos - 1));
+                    std::wstring var_value = trim_c(line.substr(pos, line.size() - pos));
 
                     //rm_quote(var_value);
 
