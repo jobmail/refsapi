@@ -6,7 +6,9 @@
 #include <precompiled.h>
 
 #define MAX_PLAYERS                 32
-#define _QQ                         "\"'`" 
+#define _QQ                         "\"'`"
+#define DECIMAL_POINT               '.'
+#define _LOCALE                     std::locale("ru_RU.UTF-8")
 #define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN         (sizeof(WP_CLASS_PREFIX) - 1)
 #define _COUNT(x)                   (size_t)(sizeof(x)/sizeof(cell))
@@ -53,11 +55,9 @@ struct sTries {
 };
 
 struct sClients {
-
     bool is_connected;
     bool is_bot;
     eRFS_TEAMS team;
-
 };
 
 extern bool r_bMapHasBuyZone;
@@ -407,11 +407,104 @@ int acs_vector_add(std::vector<cell> *v, int value);
 int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
+bool is_number(std::string &s);
+float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f);
 //char* fmt(char *fmt, ...);
 //wchar_t * wfmt(wchar_t *fmt, ...);
 
 extern int gmsgTeamInfo;
+extern std::wstring_convert<std::codecvt_utf8<wchar_t>> g_converter;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
 extern funEventCall modMsgs[MAX_REG_MSGS];
 extern void (*function)(void*);
 extern void (*endfunction)(void*);
+
+typedef struct m_cvar_s {
+    cvar_t *cvar;
+    std::wstring value;
+    std::wstring desc;
+    bool has_min;
+    bool has_max;
+    float min_val;
+    float max_val;
+} m_cvar_t;
+
+typedef std::map<std::wstring, m_cvar_s> cvar_list_t;
+typedef std::map<int, cvar_list_t> plugin_cvar_t;
+typedef std::pair<cvar_list_t::iterator, bool> cvar_list_result_t;
+
+typedef struct cvar_mngr_s {
+    plugin_cvar_t plugin;
+} cvar_mngr_t;
+
+class cvar_mngr {
+    cvar_mngr_t cvars;
+    private:
+        void cvar_direct_set(cvar_t *cvar, char *value) {
+            if (cvar != nullptr)
+                g_engfuncs.pfnCvar_DirectSet(cvar, value);
+        }
+        cvar_t* create_cvar(std::wstring name, std::wstring value, int flags = 0) {
+            char* name_c = wstoc(name).c_str();
+            char* value_c = wstoc(value).c_str();
+            cvar_t* p_cvar = CVAR_GET_POINTER(name_c);
+            if (p_cvar == nullptr) {
+                cvar_t cvar;
+                cvar.name = name_c;
+                cvar.flags = flags;
+                cvar.string = value_c;
+                cvar.value = 0.0f;
+                cvar.next = nullptr;
+                CVAR_REGISTER(&cvar);
+                p_cvar = CVAR_GET_POINTER(name_c);
+            }
+            return p_cvar;
+        }
+    public:
+        cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
+            std::string s = g_converter.to_bytes(value);
+            plugin_cvar_t::iterator plugin_it;
+            cvar_list_t::iterator cvar_it;
+            cvar_list_t p_cvar_list;
+            if (name.empty() || value.empty()) return {cvar_it, false};
+            // FIX NAME
+            name = std::tolower(name, _LOCALE);
+            // IS NUMBER?
+            if (is_number(s)) {
+                value = g_converter.from_bytes(std::to_string(stof(s, has_min, min_val, has_max, max_val)));
+            }
+            // PLUGIN EXIST?
+            if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
+                p_cvar_list = plugin_it->second;
+                // CVAR EXIST?
+                if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
+                    return {cvar_it, true};
+            }
+            // CREATE CVAR
+            m_cvar_t m_cvar;
+            if ((m_cvar.cvar = create_cvar(name, value, flags)) != nullptr) {
+                m_cvar.value = value;
+                m_cvar.desc = desc;
+                m_cvar.has_min = has_min;
+                m_cvar.min_val = min_val;                
+                m_cvar.has_max = has_max;                
+                m_cvar.max_val = max_val;
+                auto result = p_cvar_list.insert({name, m_cvar});
+                // SAVE cvar_list
+                if (result.second) {
+                    // PLUGIN EXIST?
+                    if (plugin_it != cvars.plugin.end())
+                        plugin_it->second = p_cvar_list;
+                    // CREATE PLUGINS CVAR
+                    else
+                        cvars.plugin[plugin->getId()] = p_cvar_list;
+                    return result;
+                }
+            }
+            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstoc(name).c_str(), wstoc(value).c_str());
+            return {cvar_it, false};
+        }
+        void clear() {
+            cvars.plugin.clear();
+        }
+};

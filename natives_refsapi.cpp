@@ -155,23 +155,21 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     bool result = FALSE;
 
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-
     UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
 
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
 
     char buff[256];
 
-    std::wstring name = converter.from_bytes(getAmxString(amx, params[arg_name], buff));
+    std::wstring name = g_converter.from_bytes(getAmxString(amx, params[arg_name], buff));
 
     if (name.empty())
 
-        name = converter.from_bytes(plugin->getName());
+        name = g_converter.from_bytes(plugin->getName());
 
     name.replace(name.find(L".amxx"), sizeof(L".amxx") - 1, L"");
 
-    std::wstring path = converter.from_bytes(getAmxString(amx, params[arg_folder], buff));
+    std::wstring path = g_converter.from_bytes(getAmxString(amx, params[arg_folder], buff));
 
     UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], wstoc(name).c_str(), wstoc(path).c_str());
 
@@ -181,7 +179,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? wstoc(name).c_str() : wstoc( wfmt( L"plugin-%s/%s", path.c_str(), name.c_str() ) ).c_str());
 
-    path = converter.from_bytes(buff);
+    path = g_converter.from_bytes(buff);
 
     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", wstoc(name.c_str()), wstoc(path.c_str()), buff);
 
@@ -197,7 +195,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
         if (file.is_open()) {
 
-            file.imbue(std::locale("ru_RU.UTF-8"));
+            file.imbue(_LOCALE);
 
             if (is_exist) {
 
@@ -219,13 +217,13 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     if (rm_quote(var_value) == -1)
 
-                        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: the parameter <%s> has a value <%s> with a single quotation mark", __FUNCTION__, wstoc(var_name).c_str(), wstoc(var_value).c_str());
+                        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: the parameter <%s> has a value <%s> with a wrong quotation mark", __FUNCTION__, wstoc(var_name).c_str(), wstoc(var_value).c_str());
 
                     else                       
                         
                         trim(var_value);
 
-                    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, value = <%s>\n", wstoc(var_name).c_str(), wstoc(var_value).c_str());
+                    UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstoc(var_name).c_str(), wstoc(var_value).c_str());
                 }
 
             } else {
