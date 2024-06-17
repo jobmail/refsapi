@@ -190,14 +190,14 @@ class wstoc {
         }
 };
 
-std::wstring str_to_ws(const std::string &s) {
+inline std::wstring stows(const std::string &s) {
     try {
         return g_converter.from_bytes(s);
-        //UTIL_ServerPrint("[DEBUG] str_to_ws(): done\n");
+        //UTIL_ServerPrint("[DEBUG] stows(): done\n");
     } catch(std::range_error &e) {
         std::wstring result;
         size_t length = s.length();
-        UTIL_ServerPrint("[DEBUG] str_to_ws(): catch !!! length = %d\n", length);
+        UTIL_ServerPrint("[DEBUG] stows(): catch !!! length = %d\n", length);
         result.reserve(length);
         for(size_t i = 0; i < length; i++)
             result.push_back(s[i] & 0xFF);
@@ -528,8 +528,8 @@ class cvar_mngr {
                 return {cvar_it, false};
             // IS NUMBER?
             if (is_number(s)) {
-                value = str_to_ws(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
-                //std::wstring test = str_to_ws(num).get();
+                value = stows(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
+                //std::wstring test = stows(num).get();
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstoc(value).c_str());
             }
             // PLUGIN EXIST?
