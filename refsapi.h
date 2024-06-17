@@ -500,7 +500,7 @@ class cvar_mngr {
                 cvar_t cvar;
                 cvar.name = p_name->c_str();
                 cvar.flags = flags;
-                //cvar.string = p_value->c_str();
+                cvar.string = "";//p_value->c_str();
                 //cvar.value = 0.0f;
                 //cvar.next = nullptr;
                 UTIL_ServerPrint("[DEBUG] create_cvar(): before create\n");
