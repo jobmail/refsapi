@@ -430,11 +430,15 @@ inline std::string rtrim_zero(std::string &s) {
     
     }).base();
     
+    UTIL_ServerPrint("[DEBUG] rtrim_zero(): begin = %d, start = %d\n", s.begin(), start);
+
     if (start != s.begin() && *(start - 1) == '.')
     
         start--;
     
     s.erase(start, s.end());
+
+    UTIL_ServerPrint("[DEBUG] rtrim_zero(): start_new = %d, s = <%s>\n", start, s.c_str());
 
     return s;
 }
