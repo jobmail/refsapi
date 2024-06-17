@@ -504,7 +504,7 @@ class cvar_mngr {
                 cvar.next = nullptr;
                 UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
                 CVAR_REGISTER(&cvar);
-                p_cvar = CVAR_GET_POINTER(c.cvar.name);
+                p_cvar = CVAR_GET_POINTER(c.name.data());
                 UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, cvar.name, cvar.string);
             }
             return p_cvar;
