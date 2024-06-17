@@ -161,15 +161,15 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     char buff[256];
 
-    std::wstring name = stws(getAmxString(amx, params[arg_name], buff));
+    std::wstring name = ws_conv(getAmxString(amx, params[arg_name], buff));
 
     if (name.empty())
 
-        name = stws(plugin->getName());
+        name = ws_conv(plugin->getName());
 
     name.replace(name.find(L".amxx"), sizeof(L".amxx") - 1, L"");
 
-    std::wstring path = stws(getAmxString(amx, params[arg_folder], buff));
+    std::wstring path = ws_conv(getAmxString(amx, params[arg_folder], buff));
 
     UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], wstoc(name).c_str(), wstoc(path).c_str());
 
@@ -179,7 +179,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? wstoc(name).c_str() : wstoc( wfmt( L"plugin-%s/%s", path.c_str(), name.c_str() ) ).c_str());
 
-    path = stws(buff);
+    path = ws_conv(buff);
 
     UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", wstoc(name.c_str()), wstoc(path.c_str()), buff);
 
