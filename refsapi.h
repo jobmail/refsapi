@@ -126,9 +126,6 @@ int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
 bool is_number(std::string &s);
-//float rstof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f);
-//char* fmt(char *fmt, ...);
-//wchar_t * wfmt(wchar_t *fmt, ...);
 
 class fmt {
     const size_t size = 1024;
@@ -158,14 +155,13 @@ class wfmt {
             buff = new wchar_t[size];
             va_list arg_ptr;
             va_start(arg_ptr, fmt);
-            std::vswprintf(buff, size, fmt, arg_ptr);
+            std::vswprintf(buff, size - 1, fmt, arg_ptr);
             va_end(arg_ptr);
         }
         ~wfmt() {
             delete buff;
         }
         wchar_t* c_str() {
-            buff[size - 1] = 0;
             return buff;
         }
 };
@@ -176,25 +172,39 @@ class wstoc {
     public:
         wstoc(const wchar_t *s) {
             buff = new char[size];
-            wcstombs(buff, s, size);
+            wcstombs(buff, s, size - 1);
         }
         wstoc(const std::wstring s) {
             buff = new char[size];
-            wcstombs(buff, s.c_str(), size);
+            wcstombs(buff, s.c_str(), size - 1);
         }
         wstoc(wfmt c) {
             buff = new char[size];
-            wcstombs(buff, c.c_str(), size);
+            wcstombs(buff, c.c_str(), size - 1);
         }
         ~wstoc() {
             delete buff;
         }
         char* c_str() {
-            buff[size - 1] = 0;
             return buff;
         }
 };
 
+std::wstring ws_conv(const std::string &s) {
+    try {
+        return g_converter.from_bytes(s);
+        //UTIL_ServerPrint("[DEBUG] ws_conv(): done\n");
+    } catch(std::range_error &e) {
+        std::wstring result;
+        size_t length = s.length();
+        UTIL_ServerPrint("[DEBUG] ws_conv(): catch !!! length = %d\n", length);
+        result.reserve(length);
+        for(size_t i = 0; i < length; i++)
+            result.push_back(s[i] & 0xFF);
+        return result;
+    }
+}
+/*
 class ws_conv {
     std::wstring* result = new std::wstring;
     public:
@@ -218,8 +228,7 @@ class ws_conv {
             delete result;
         }
 };
-
-
+*/
 
 inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
     float result = std::stof(s); //is_number(s) ? std::stof(s) : 0.0f;
@@ -497,8 +506,7 @@ class cvar_mngr {
             cvar_t* p_cvar = CVAR_GET_POINTER(c.name.data());
             if (p_cvar == nullptr) {
                 cvar_t cvar;
-                std::string tmp_name = c.name;
-                cvar.name = tmp_name.data(); //c.name.data();
+                cvar.name = c.name.data();
                 cvar.string = c.value.data();
                 cvar.value = 0.0f;
                 cvar.flags = c.flags;
@@ -507,9 +515,6 @@ class cvar_mngr {
                 CVAR_REGISTER(&cvar);
                 p_cvar = CVAR_GET_POINTER(c.name.data());
                 UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, p_cvar->name, p_cvar->string);
-                UTIL_ServerPrint("[DEBUG] create_cvar(): TEST_1 ==> &cvar.name = %d, &p_cvar.name = %d\n", &cvar.name, *p_cvar->name);
-                UTIL_ServerPrint("[DEBUG] create_cvar(): TEST_2 ==> &cvar.string = %d, &p_cvar.string = %d\n", &cvar.string, *p_cvar->string);
-                UTIL_ServerPrint("[DEBUG] create_cvar(): TEST_3 ==> &cvar.flags = %d, &p_cvar.flags = %d\n", &cvar.flags, &p_cvar->flags);
             }
             return p_cvar;
         }
@@ -523,7 +528,7 @@ class cvar_mngr {
                 return {cvar_it, false};
             // IS NUMBER?
             if (is_number(s)) {
-                value = ws_conv(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val)))).get();
+                value = ws_conv(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
                 //std::wstring test = ws_conv(num).get();
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstoc(value).c_str());
             }
