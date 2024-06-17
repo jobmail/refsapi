@@ -447,7 +447,7 @@ typedef struct m_cvar_s {
     float max_val;
 } m_cvar_t;
 
-typedef std::map<std::wstring, m_cvar_s> cvar_list_t;
+typedef std::map<std::wstring, m_cvar_t> cvar_list_t;
 typedef std::map<int, cvar_list_t> plugin_cvar_t;
 typedef std::pair<cvar_list_t::iterator, bool> cvar_list_result_t;
 
@@ -480,12 +480,12 @@ class cvar_mngr {
         }
     public:
         cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
-            std::string s = g_converter.to_bytes(value);
-            plugin_cvar_t::iterator plugin_it;
             cvar_list_t::iterator cvar_it;
-            cvar_list_t p_cvar_list;
             if (name.empty() || value.empty())
                 return {cvar_it, false};
+            cvar_list_t p_cvar_list;
+            plugin_cvar_t::iterator plugin_it;
+            std::string s = g_converter.to_bytes(value);
             // IS NUMBER?
             if (is_number(s)) {
                 value = stows(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
@@ -527,6 +527,20 @@ class cvar_mngr {
                 }
             } else
                 AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstoc(name).c_str(), wstoc(value).c_str());
+            return {cvar_it, false};
+        }
+        cvar_list_result_t get(CPluginMngr::CPlugin *plugin, std::wstring name) {
+            plugin_cvar_t::iterator plugin_it;
+            cvar_list_t::iterator cvar_it;
+            cvar_list_t p_cvar_list;
+            // PLUGIN EXIST?
+            if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
+                UTIL_ServerPrint("[DEBUG] cvar_mngr::get(): plugin_it = %d\n", plugin_it);
+                p_cvar_list = plugin_it->second;
+                // CVAR EXIST?
+                if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
+                    return {cvar_it, true};
+            }
             return {cvar_it, false};
         }
         void clear() {
