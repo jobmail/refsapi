@@ -511,7 +511,7 @@ class cvar_mngr {
             return p_cvar;
         }
     public:
-        cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
+        cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring &value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
             std::string s = g_converter.to_bytes(value);
             plugin_cvar_t::iterator plugin_it;
             cvar_list_t::iterator cvar_it;
@@ -524,7 +524,6 @@ class cvar_mngr {
                 std::string num = std::to_string(stof(s, has_min, min_val, has_max, max_val));
                 rtrim_zero(num);
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): num = %s\n", num.c_str());
-                value.clear();
                 value = ws_conv(num).get();
                 //std::wstring test = ws_conv(num).get();
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstoc(value).c_str());
