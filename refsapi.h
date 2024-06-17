@@ -467,10 +467,11 @@ inline std::string rtrim_zero_c(std::string s) {
 }
 
 typedef struct m_cvar_s {
-    cvar_t cvar;
+    cvar_t* cvar;
     std::string name;
     std::string value;
     std::wstring desc;
+    int flags;
     bool has_min;
     bool has_max;
     float min_val;
@@ -492,20 +493,21 @@ class cvar_mngr {
             if (cvar != nullptr)
                 g_engfuncs.pfnCvar_DirectSet(cvar, value);
         }
-        bool create_cvar(m_cvar_t &c) {
-            cvar_t* p_cvar = CVAR_GET_POINTER(c.cvar.name);
+        cvar_t* create_cvar(m_cvar_t &c) {
+            cvar_t* p_cvar = CVAR_GET_POINTER(c.name.data());
             if (p_cvar == nullptr) {
-                UTIL_ServerPrint("[DEBUG] create_cvar(): name = %s, value = %s\n", c.cvar.name, c.cvar.string);
-                CVAR_REGISTER(&c.cvar);
+                cvar_t cvar;
+                cvar.name = c.name.data();
+                cvar.string = c.value.data();
+                cvar.value = 0.0f;
+                cvar.flags = c.flags;
+                cvar.next = nullptr;
+                UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
+                CVAR_REGISTER(&cvar);
                 p_cvar = CVAR_GET_POINTER(c.cvar.name);
-                UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, c.cvar.name, c.cvar.string);
-                if (p_cvar == &c.cvar)
-                    UTIL_ServerPrint("[DEBUG] create_cvar(): succesfully created!");
-                else
-                    UTIL_ServerPrint("[DEBUG] create_cvar(): something went wrong p_cvar = %d, c.cvar = %d\n", p_cvar, &c.cvar);
-                return p_cvar != nullptr;
+                UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, cvar.name, cvar.string);
             }
-            return false;
+            return p_cvar;
         }
     public:
         cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
@@ -535,18 +537,21 @@ class cvar_mngr {
             m_cvar.name = wstoc(name).c_str();
             m_cvar.value = wstoc(value).c_str();
             m_cvar.desc = desc;
+            m_cvar.flags = flags;
             m_cvar.has_min = has_min;
             m_cvar.min_val = min_val;                
             m_cvar.has_max = has_max;                
             m_cvar.max_val = max_val;
             // FILL CVAR_T
+            /*
             m_cvar.cvar.name = m_cvar.name.data();
             m_cvar.cvar.string = m_cvar.value.data();
             m_cvar.cvar.value = 0.0f;
             m_cvar.cvar.flags = flags;
             m_cvar.cvar.next = nullptr;
+            */
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): before create_var()\n");
-            if (create_cvar(m_cvar)) {
+            if ((m_cvar.cvar = create_cvar(m_cvar)) != nullptr) {
                 auto result = p_cvar_list.insert({name, m_cvar});
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, m_cvar.name.c_str(), m_cvar.value.c_str(), wstoc(m_cvar.desc).c_str());
                 // SAVE CVAR LIST
