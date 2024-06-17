@@ -501,6 +501,7 @@ class cvar_mngr {
                 UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, c.cvar.name, c.cvar.value);
                 if (p_cvar == &c.cvar)
                     UTIL_ServerPrint("[DEBUG] create_cvar(): succesfully created!");
+                return p_cvar == &c.cvar;
             }
             return false;
         }
