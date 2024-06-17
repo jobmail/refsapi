@@ -497,7 +497,8 @@ class cvar_mngr {
             cvar_t* p_cvar = CVAR_GET_POINTER(c.name.data());
             if (p_cvar == nullptr) {
                 cvar_t cvar;
-                cvar.name = c.name.data();
+                std::string tmp_name = c.name;
+                cvar.name = tmp_name.data(); //c.name.data();
                 cvar.string = c.value.data();
                 cvar.value = 0.0f;
                 cvar.flags = c.flags;
@@ -542,14 +543,6 @@ class cvar_mngr {
             m_cvar.min_val = min_val;                
             m_cvar.has_max = has_max;                
             m_cvar.max_val = max_val;
-            // FILL CVAR_T
-            /*
-            m_cvar.cvar.name = m_cvar.name.data();
-            m_cvar.cvar.string = m_cvar.value.data();
-            m_cvar.cvar.value = 0.0f;
-            m_cvar.cvar.flags = flags;
-            m_cvar.cvar.next = nullptr;
-            */
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): before create_var()\n");
             if ((m_cvar.cvar = create_cvar(m_cvar)) != nullptr) {
                 auto result = p_cvar_list.insert({name, m_cvar});
