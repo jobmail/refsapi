@@ -448,21 +448,23 @@ class cvar_mngr {
                 g_engfuncs.pfnCvar_DirectSet(cvar, value);
         }
         cvar_t* create_cvar(std::wstring name, std::wstring value, int flags = 0) {
-            char* name_c = wstoc(name).c_str();
-            char* value_c = wstoc(value).c_str();
-            cvar_t* p_cvar = CVAR_GET_POINTER(name_c);
+            wstoc* p_name = new wstoc(name);
+            wstoc* p_value = new wstoc(value);
+            cvar_t* p_cvar = CVAR_GET_POINTER(p_name->c_str());
             if (p_cvar == nullptr) {
                 cvar_t cvar;
-                cvar.name = name_c;
+                cvar.name = p_name->c_str();
                 cvar.flags = flags;
-                cvar.string = value_c;
+                cvar.string = p_value->c_str();
                 //cvar.value = 0.0f;
                 //cvar.next = nullptr;
                 CVAR_REGISTER(&cvar);
-                p_cvar = CVAR_GET_POINTER(name_c);
-                UTIL_ServerPrint("[DEBUG] rf_config(): p_cvar = %d, name = <%s>, value = <%s>\n", p_cvar, name_c, value_c);
-                cvar_direct_set(p_cvar, value_c);
+                p_cvar = CVAR_GET_POINTER(p_name->c_str());
+                UTIL_ServerPrint("[DEBUG] rf_config(): p_cvar = %d, name = <%s>, value = <%s>\n", p_cvar, p_name->c_str(), p_value->c_str());
+                //cvar_direct_set(p_name->c_str(), p_value->c_str());
             }
+            delete p_name;
+            delete p_value;
             return p_cvar;
         }
     public:
