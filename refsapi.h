@@ -2,9 +2,6 @@
 // gets rid of annoying "deprecated conversion from string constant blah blah" warning
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
-#include <map>
-#include <precompiled.h>
-
 #define MAX_PLAYERS                 32
 #define _QQ                         "\"'`"
 #define DECIMAL_POINT               '.'
