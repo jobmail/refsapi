@@ -436,7 +436,9 @@ inline void rtrim_zero(std::string &s) {
     
         start--;
     
-    s.erase(start, s.end());
+    s.resize(start - s.begin());
+
+    //s.erase(start, s.end());
 
     UTIL_ServerPrint("[DEBUG] rtrim_zero(): start_new = %d, s = <%s>\n", start, s.c_str());
 }
