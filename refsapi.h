@@ -70,6 +70,69 @@ extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
 
+edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
+void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
+edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
+void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict);
+
+void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib);
+void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapConditions *chain);
+qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem);
+CBaseEntity* CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem *chain, CBasePlayer *pPlayer, const char *classname);
+qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem);
+CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo);
+void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer);
+
+qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128]);
+void R_ClientPutInServer(edict_t *pEntity);
+void R_ClientPutInServer_Post(edict_t *pEntity);
+void R_ClientDisconnect(edict_t *pEntity);
+int R_Spawn(edict_t *pEntity);
+edict_t* R_CreateNamedEntity(string_t className);
+
+
+void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb);
+void* R_PvEntPrivateData(edict_t *pEdict);
+void* R_PvEntPrivateData_Post(edict_t *pEdict);
+
+int	 R_RegUserMsg_Post(const char *pszName, int iSize);
+void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
+void R_WriteByte_Post(int iValue);
+void R_WriteChar_Post(int iValue);
+void R_WriteShort_Post(int iValue);
+void R_WriteLong_Post(int iValue);
+void R_WriteAngle_Post(float flValue);
+void R_WriteCoord_Post(float flValue);
+void R_WriteString_Post(const char *sz);
+void R_WriteEntity_Post(int iValue);
+void R_MessageEnd_Post(void);
+
+void Client_TeamInfo(void*);
+void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot);
+void Client_Disconnected(edict_t *pEdict, bool crash, char *format);
+void Alloc_EntPrivateData(edict_t *pEdict);
+void Free_EntPrivateData(edict_t *pEdict);
+
+int acs_trie_add(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
+int acs_trie_remove(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
+void acs_trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::string key_from, std::string key_to, int value);
+int acs_vector_add(std::vector<cell> *v, int value);
+int acs_vector_remove(std::vector<cell> *v, int value);
+float acs_roundfloat(float value, int precision);
+bool acs_get_user_buyzone(const edict_t *pEdict);
+bool is_number(std::string &s);
+//float rstof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f);
+//char* fmt(char *fmt, ...);
+//wchar_t * wfmt(wchar_t *fmt, ...);
+
+extern int gmsgTeamInfo;
+extern std::wstring_convert<std::codecvt_utf8<wchar_t>> g_converter;
+extern funEventCall modMsgsEnd[MAX_REG_MSGS];
+extern funEventCall modMsgs[MAX_REG_MSGS];
+extern void (*function)(void*);
+extern void (*endfunction)(void*);
+
+
 class fmt {
     const size_t size = 1024;
     char* buff;
@@ -363,68 +426,6 @@ inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_
             pEdict_1->v.absmax.y < pEdict_2->v.absmin.y ||
             pEdict_1->v.absmax.z < pEdict_2->v.absmin.z);
 }
-
-edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
-void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
-edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
-void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict);
-
-void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib);
-void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapConditions *chain);
-qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem);
-CBaseEntity* CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem *chain, CBasePlayer *pPlayer, const char *classname);
-qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem);
-CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo);
-void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer);
-
-qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128]);
-void R_ClientPutInServer(edict_t *pEntity);
-void R_ClientPutInServer_Post(edict_t *pEntity);
-void R_ClientDisconnect(edict_t *pEntity);
-int R_Spawn(edict_t *pEntity);
-edict_t* R_CreateNamedEntity(string_t className);
-
-
-void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb);
-void* R_PvEntPrivateData(edict_t *pEdict);
-void* R_PvEntPrivateData_Post(edict_t *pEdict);
-
-int	 R_RegUserMsg_Post(const char *pszName, int iSize);
-void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
-void R_WriteByte_Post(int iValue);
-void R_WriteChar_Post(int iValue);
-void R_WriteShort_Post(int iValue);
-void R_WriteLong_Post(int iValue);
-void R_WriteAngle_Post(float flValue);
-void R_WriteCoord_Post(float flValue);
-void R_WriteString_Post(const char *sz);
-void R_WriteEntity_Post(int iValue);
-void R_MessageEnd_Post(void);
-
-void Client_TeamInfo(void*);
-void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot);
-void Client_Disconnected(edict_t *pEdict, bool crash, char *format);
-void Alloc_EntPrivateData(edict_t *pEdict);
-void Free_EntPrivateData(edict_t *pEdict);
-
-int acs_trie_add(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
-int acs_trie_remove(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
-void acs_trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::string key_from, std::string key_to, int value);
-int acs_vector_add(std::vector<cell> *v, int value);
-int acs_vector_remove(std::vector<cell> *v, int value);
-float acs_roundfloat(float value, int precision);
-bool acs_get_user_buyzone(const edict_t *pEdict);
-bool is_number(std::string &s);
-//float rstof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f);
-//char* fmt(char *fmt, ...);
-//wchar_t * wfmt(wchar_t *fmt, ...);
-
-extern int gmsgTeamInfo;
-extern std::wstring_convert<std::codecvt_utf8<wchar_t>> g_converter;
-extern funEventCall modMsgsEnd[MAX_REG_MSGS];
-extern funEventCall modMsgs[MAX_REG_MSGS];
-extern void (*function)(void*);
-extern void (*endfunction)(void*);
 
 typedef struct m_cvar_s {
     cvar_t *cvar;
