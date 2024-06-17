@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp
 
-LINK = -ldl -m32 -s
+LINK = -ldl -m32 -s -Llib/linux32 -static-libgcc -static-libc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
 OPT_FLAGS = -O3 -msse3 -flto=auto -pipe -fno-strict-aliasing -Wno-uninitialized -std=gnu++14
