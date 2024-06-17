@@ -506,7 +506,8 @@ class cvar_mngr {
                 UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
                 CVAR_REGISTER(&cvar);
                 p_cvar = CVAR_GET_POINTER(c.name.data());
-                UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, cvar.name, cvar.string);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, p_cvar->name, p_cvar->string);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): &cvar.name = %d, &p_cvar.name = %d\n", &cvar.name, &p_cvar->name);
             }
             return p_cvar;
         }
