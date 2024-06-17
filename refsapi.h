@@ -422,7 +422,7 @@ inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_
             pEdict_1->v.absmax.z < pEdict_2->v.absmin.z);
 }
 
-inline std::string rtrim_zero(std::string &s) {
+inline void rtrim_zero(std::string &s) {
 
     auto start = std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
     
@@ -439,6 +439,11 @@ inline std::string rtrim_zero(std::string &s) {
     s.erase(start, s.end());
 
     UTIL_ServerPrint("[DEBUG] rtrim_zero(): start_new = %d, s = <%s>\n", start, s.c_str());
+}
+
+inline std::string rtrim_zero_c(std::string s) {
+
+    rtrim_zero(s);
 
     return s;
 }
@@ -500,7 +505,7 @@ class cvar_mngr {
             if (is_number(s)) {
                 std::string num = std::to_string(stof(s, has_min, min_val, has_max, max_val));
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): num = %s\n", num.c_str());
-                value = g_converter.from_bytes(rtrim_zero(num));
+                value = g_converter.from_bytes(rtrim_zero_c(num));
             }
             // PLUGIN EXIST?
             if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
