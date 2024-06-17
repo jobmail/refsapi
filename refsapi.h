@@ -460,6 +460,7 @@ class cvar_mngr {
                 //cvar.next = nullptr;
                 CVAR_REGISTER(&cvar);
                 p_cvar = CVAR_GET_POINTER(name_c);
+                UTIL_ServerPrint("[DEBUG] rf_config(): p_cvar = %d, name = <%s>, value = <%s>\n", p_cvar, name_c, value_c);
                 cvar_direct_set(p_cvar, value_c);
             }
             return p_cvar;
