@@ -554,7 +554,7 @@ class cvar_mngr {
             if ((*cvar_it).second.cvar == nullptr)
                 return;
             UTIL_ServerPrint("[DEBUG] cvar_mngr::set(): &cvar = %d\n", cvar_it->second.cvar);
-            cvar_direct_set((*cvar_it).second.cvar, "987.65400");//wstoc(value).c_str());
+            cvar_direct_set((*cvar_it).second.cvar, wstoc(value).c_str());
         }
         void clear() {
             cvars.plugin.clear();
