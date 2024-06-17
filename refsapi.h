@@ -173,35 +173,9 @@ inline std::string wstoc(const std::wstring &s) {
     return g_converter.to_bytes(s);
 }
 
-inline std::string wstoc(wfmt s) {
+inline std::string wstoc(wfmt &s) {
     return g_converter.to_bytes(s.c_str());
 }
-
-/*
-class wstoc {
-    const size_t size = 1024;
-    char* buff;
-    public:
-        wstoc(const wchar_t *s) {
-            buff = new char[size];
-            wcstombs(buff, s, size - 1);
-        }
-        wstoc(const std::wstring s) {
-            buff = new char[size];
-            wcstombs(buff, s.c_str(), size - 1);
-        }
-        wstoc(wfmt c) {
-            buff = new char[size];
-            wcstombs(buff, c.c_str(), size - 1);
-        }
-        ~wstoc() {
-            delete buff;
-        }
-        char* c_str() {
-            return buff;
-        }
-};
-*/
 
 inline std::wstring stows(const std::string &s) {
     try {
@@ -217,31 +191,6 @@ inline std::wstring stows(const std::string &s) {
         return result;
     }
 }
-/*
-class ws_conv {
-    std::wstring* result = new std::wstring;
-    public:
-        ws_conv(const std::string &s) {
-            try {
-                *result = g_converter.from_bytes(s);
-                UTIL_ServerPrint("[DEBUG] ws_conv(): done\n");
-            } catch(std::range_error &e) {
-                result->clear();
-                size_t length = s.length();
-                UTIL_ServerPrint("[DEBUG] ws_conv(): catch !!! length = %d\n", length);
-                result->reserve(length);
-                for(size_t i = 0; i < length; i++)
-                    result->push_back(s[i] & 0xFF);
-            }
-        }
-        std::wstring get() {
-            return *result;
-        }
-        ~ws_conv() {
-            delete result;
-        }
-};
-*/
 
 inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
     float result = std::stof(s); //is_number(s) ? std::stof(s) : 0.0f;
