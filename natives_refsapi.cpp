@@ -232,6 +232,10 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                     auto cvar_result = g_cvar_mngr.get(plugin, var_name);
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, value = <%s>\n", cvar_result.second, cvar_result.first->second.cvar->name, cvar_result.first->second.cvar->string);
+
+                    g_cvar_mngr.set(plugin, var_name, L"123.4567890");
+
+                    UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, value = <%s>\n", cvar_result.second, cvar_result.first->second.cvar->name, cvar_result.first->second.cvar->string);
                 }
 
             } else {

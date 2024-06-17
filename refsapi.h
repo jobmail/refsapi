@@ -458,7 +458,7 @@ typedef struct cvar_mngr_s {
 class cvar_mngr {
     cvar_mngr_t cvars;
     private:
-        void cvar_direct_set(cvar_t *cvar, char *value) {
+        void cvar_direct_set(cvar_t *cvar, const char *value) {
             if (cvar != nullptr)
                 g_engfuncs.pfnCvar_DirectSet(cvar, value);
         }
@@ -542,6 +542,13 @@ class cvar_mngr {
                     return {cvar_it, true};
             }
             return {cvar_it, false};
+        }
+        void set(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value) {
+            auto cvar_result = get(plugin, name);
+            if (!cvar_result.second)
+                return;
+            auto cvar = cvar_result.first->second.cvar;
+            cvar_direct_set(cvar, wstoc(value).c_str());
         }
         void clear() {
             cvars.plugin.clear();
