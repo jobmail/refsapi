@@ -195,6 +195,19 @@ class wstoc {
         }
 };
 
+inline std::wstring convert(const std::string& s) {
+    try {
+        return g_converter.from_bytes(s);
+    } catch(std::range_error &e) {
+        size_t length = s.length();
+        std::wstring result;
+        result.reserve(length);
+        for(size_t i = 0; i < length; i++)
+            result.push_back(s[i] & 0xFF);
+        return result;
+    }
+}
+
 inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
     float result = std::stof(s); //is_number(s) ? std::stof(s) : 0.0f;
     if (has_min && result < min_val) result = min_val;
@@ -495,7 +508,7 @@ class cvar_mngr {
             //name = std::tolower(name, _LOCALE);
             // IS NUMBER?
             if (is_number(s)) {
-                value = g_converter.from_bytes(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
+                value = convert(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
             }
             // PLUGIN EXIST?
             if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
