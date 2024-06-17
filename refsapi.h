@@ -135,6 +135,13 @@ class wstoc {
         }
 };
 
+inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
+    float result = is_number(s) ? std::stof(s) : 0.0f;
+    if (has_min && result < min_val) result = min_val;
+    if (has_min && result > max_val) result = max_val;
+    return result;
+}
+
 inline bool file_exists(const std::wstring &name) {
 
     struct stat buff;
@@ -408,7 +415,7 @@ int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
 bool is_number(std::string &s);
-float rstof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f);
+//float rstof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f);
 //char* fmt(char *fmt, ...);
 //wchar_t * wfmt(wchar_t *fmt, ...);
 
@@ -471,7 +478,7 @@ class cvar_mngr {
             //name = std::tolower(name, _LOCALE);
             // IS NUMBER?
             if (is_number(s)) {
-                value = g_converter.from_bytes(std::to_string(rstof(s, has_min, min_val, has_max, max_val)));
+                value = g_converter.from_bytes(std::to_string(stof(s, has_min, min_val, has_max, max_val)));
             }
             // PLUGIN EXIST?
             if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
