@@ -524,7 +524,7 @@ class cvar_mngr {
                 std::string num = std::to_string(stof(s, has_min, min_val, has_max, max_val));
                 rtrim_zero(num);
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): num = %s\n", num.c_str());
-                value = ws_conv(num).get();
+                value = std::wstring(ws_conv(num).get());
                 //std::wstring test = ws_conv(num).get();
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstoc(value).c_str());
             }
