@@ -19,7 +19,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
         -Iinclude/amxmodx -Iinclude/amxmodx/public -Iinclude/amxmodx/amtl -Iinclude/amxmodx/third_party/hashing -Icommon
 
 BIN_DIR = Release
-CFLAGS = $(OPT_FLAGS) -Wno-unused-result
+CFLAGS = $(OPT_FLAGS) -Wno-unused-result -Wabi
 
 CFLAGS += -fvisibility=hidden -fno-exceptions -shared -fabi-version=6
 
