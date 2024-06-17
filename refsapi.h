@@ -135,29 +135,17 @@ class fmt {
             buff = new char[size];
             va_list arg_ptr;
             va_start(arg_ptr, fmt);
-            Q_vsnprintf(buff, size, fmt, arg_ptr);
+            Q_vsnprintf(buff, size - 1, fmt, arg_ptr);
             va_end(arg_ptr);
         }
         ~fmt() {
             delete buff;
         }
         char* c_str() {
-            buff[size - 1] = 0;
             return buff;
         }
 };
 
-inline wchar_t* wfmt(wchar_t *fmt, ...) {
-    const size_t size = 1024;
-    wchar_t buff[size];
-    va_list arg_ptr;
-    va_start(arg_ptr, fmt);
-    std::vswprintf(buff, size - 1, fmt, arg_ptr);
-    va_end(arg_ptr);
-    return buff;
-}
-
-/*
 class wfmt {
     const size_t size = 1024;
     wchar_t* buff;
@@ -176,7 +164,6 @@ class wfmt {
             return buff;
         }
 };
-*/
 
 inline std::string wstoc(const wchar_t *s) {
     return g_converter.to_bytes(s);
@@ -186,8 +173,8 @@ inline std::string wstoc(const std::wstring s) {
     return g_converter.to_bytes(s);
 }
 
-inline std::string wstoc(wchar_t *s) {
-    return g_converter.to_bytes(s);
+inline std::string wstoc(wfmt s) {
+    return g_converter.to_bytes(s.c_str());
 }
 
 /*
