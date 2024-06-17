@@ -530,7 +530,7 @@ class cvar_mngr {
             // CREATE CVAR
             m_cvar_t m_cvar;
             // SAVE CVAR PARAMS
-            m_cvar.name = std::tolower(wstoc(name).c_str(), _LOCALE);
+            m_cvar.name = wstoc(name).c_str();
             m_cvar.value = wstoc(value).c_str();
             m_cvar.desc = desc;
             m_cvar.has_min = has_min;
