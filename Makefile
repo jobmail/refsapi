@@ -11,7 +11,7 @@ LINK = -ldl -m32 -s -static-libgcc -static-libstdc++
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -flto=auto -pipe -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fexceptions
+OPT_FLAGS = -O3 -msse3 -flto=auto -pipe -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer
 
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
