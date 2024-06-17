@@ -68,7 +68,7 @@ extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
 extern int gmsgTeamInfo;
-extern std::wstring_convert<std::codecvt_utf8<wchar_t>> g_converter;
+extern std::wstring_convert<std::codecvt_utf8<char*>> g_converter;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
 extern funEventCall modMsgs[MAX_REG_MSGS];
 extern void (*function)(void*);
@@ -493,10 +493,7 @@ class cvar_mngr {
             //name = std::tolower(name, _LOCALE);
             // IS NUMBER?
             if (is_number(s)) {
-                std::string num = std::to_string(stof(s, has_min, min_val, has_max, max_val));
-                rtrim_zero(num);
-                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): num = %s\n", num.c_str());
-                value = g_converter.from_bytes(num);
+                value = g_converter.from_bytes(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
             }
             // PLUGIN EXIST?
             if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
