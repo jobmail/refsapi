@@ -18,6 +18,7 @@
 #include <fstream>
 #include <codecvt>
 #include <cstdio>
+#include <bits/stdc++.h>
 
 // platform defs
 #include "platform.h"

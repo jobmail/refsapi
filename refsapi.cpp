@@ -14,6 +14,8 @@ wchar_t g_wfmt_buff[1024];
 sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
 
+std::wstring_convert<std::codecvt_utf8<wchar_t>> g_converter;
+
 funEventCall modMsgsEnd[MAX_REG_MSGS];
 funEventCall modMsgs[MAX_REG_MSGS];
 
@@ -701,30 +703,30 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
     }
     return result;
 }
-/*
-char* fmt(char *fmt, ...) {
 
-    va_list arg_ptr;
-
-    va_start(arg_ptr, fmt);
-
-    Q_vsnprintf(g_fmt_buff, sizeof(g_fmt_buff) - 1, fmt, arg_ptr);
-
-    va_end(arg_ptr);
-
-    return g_fmt_buff;
+bool is_number(std::string &s) {
+    trim(s);
+    if (s.empty()) return false;
+    char* l_decimal_point = localeconv()->decimal_point;
+    auto it = s.begin();
+    bool need_replace = DECIMAL_POINT != *l_decimal_point;
+    if (*it == '+' || *it == '-') it++;
+    while (it != s.end()) {
+        if (!std::isdigit(*it)) {
+            if (*it == DECIMAL_POINT && need_replace) {
+                s.replace(it, it + 1, l_decimal_point);
+                continue;
+            }
+            if (*it != *l_decimal_point) break;
+        }
+        it++;
+    }
+    return it == s.end();
 }
 
-wchar_t* wfmt(wchar_t *fmt, ...) {
-
-    va_list arg_ptr;
-
-    va_start(arg_ptr, fmt);
-
-    std::vswprintf(g_wfmt_buff, sizeof(g_wfmt_buff) - 1, fmt, arg_ptr);
-
-    va_end(arg_ptr);
-
-    return g_wfmt_buff;
+float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
+    float result = is_number(s) ? std::stof(s) : 0.0f;
+    if (has_min && result < min_val) result = min_val;
+    if (has_min && result > max_val) result = max_val;
+    return result;
 }
-*/
