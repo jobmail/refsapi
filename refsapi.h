@@ -456,8 +456,8 @@ class cvar_mngr {
                 cvar.name = name_c;
                 cvar.flags = flags;
                 cvar.string = value_c;
-                cvar.value = 0.0f;
-                cvar.next = nullptr;
+                //cvar.value = 0.0f;
+                //cvar.next = nullptr;
                 CVAR_REGISTER(&cvar);
                 p_cvar = CVAR_GET_POINTER(name_c);
                 cvar_direct_set(p_cvar, value_c);
