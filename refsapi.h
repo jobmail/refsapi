@@ -496,6 +496,7 @@ class cvar_mngr {
             wstoc* p_value = new wstoc(value);
             cvar_t* p_cvar = CVAR_GET_POINTER(p_name->c_str());
             if (p_cvar == nullptr) {
+                UTIL_ServerPrint("[DEBUG] create_cvar(): name = %s, value = %s\n", p_name->c_str(), p_value->c_str());
                 cvar_t cvar;
                 cvar.name = p_name->c_str();
                 cvar.flags = flags;
