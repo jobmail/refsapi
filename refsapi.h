@@ -456,12 +456,11 @@ class cvar_mngr {
                 cvar.name = p_name->c_str();
                 cvar.flags = flags;
                 cvar.string = p_value->c_str();
-                //cvar.value = 0.0f;
-                //cvar.next = nullptr;
+                cvar.value = 0.0f;
+                cvar.next = nullptr;
                 CVAR_REGISTER(&cvar);
                 p_cvar = CVAR_GET_POINTER(p_name->c_str());
                 UTIL_ServerPrint("[DEBUG] rf_config(): p_cvar = %d, name = <%s>, value = <%s>\n", p_cvar, p_name->c_str(), p_value->c_str());
-                //cvar_direct_set(p_name->c_str(), p_value->c_str());
             }
             delete p_name;
             delete p_value;
