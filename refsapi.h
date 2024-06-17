@@ -423,22 +423,12 @@ inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_
 }
 
 inline void rtrim_zero(std::string &s) {
-
-    auto start = std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
     
-        return ch != '0';
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
     
-    }).base();
+        return ch != '0' && ch != '.';
     
-    UTIL_ServerPrint("[DEBUG] rtrim_zero(): begin = %d, start = %d\n", s.begin(), start);
-
-    if (start != s.begin() && *(start - 1) == '.')
-    
-        start--;
-
-    //s.erase(start, s.end());
-
-    UTIL_ServerPrint("[DEBUG] rtrim_zero(): start_new = %d, s = <%s>\n", start, s.c_str());
+    }).base(), s.end());
 }
 
 inline std::string rtrim_zero_c(std::string s) {
