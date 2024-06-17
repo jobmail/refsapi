@@ -478,6 +478,7 @@ class cvar_mngr {
             }
             // PLUGIN EXIST?
             if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
+                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): plugin_it = %d\n", plugin_it);
                 p_cvar_list = plugin_it->second;
                 // CVAR EXIST?
                 if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
@@ -493,6 +494,7 @@ class cvar_mngr {
                 m_cvar.has_max = has_max;                
                 m_cvar.max_val = max_val;
                 auto result = p_cvar_list.insert({name, m_cvar});
+                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): result = %d, name = <%s>, value = <%s>, desc = <%s>\n", plugin_it, wstoc(name).c_str(), wstoc(value).c_str(), wstoc(desc).c_str());
                 // SAVE cvar_list
                 if (result.second) {
                     // PLUGIN EXIST?
