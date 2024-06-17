@@ -195,7 +195,7 @@ class wstoc {
         }
 };
 
-std::wstring convert(const std::string &s) {
+std::wstring str_to_wstring(const std::string &s) {
     try {
         return g_converter.from_bytes(s);
     } catch(std::range_error &e) {
@@ -508,7 +508,7 @@ class cvar_mngr {
             //name = std::tolower(name, _LOCALE);
             // IS NUMBER?
             if (is_number(s)) {
-                value = convert(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
+                value = str_to_wstring(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
             }
             // PLUGIN EXIST?
             if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
