@@ -212,13 +212,12 @@ inline int rm_quote(std::string &s) {
 
     bool f[2];
 
-    char qq[] = _QQ;
-
-    for (int i = 0; i < sizeof(qq) - 1; i++) {
+    //char qq[] = _QQ;
+    for (int i = 0; i < sizeof(_QQ) - 1; i++) {
 
         f[0] = f[1] = 0;
 
-        if ((f[0] = s.front() == qq[i]) && (f[1] = s.back() == qq[i])) {
+        if ((f[0] = s.front() == _QQ[i]) && (f[1] = s.back() == _QQ[i])) {
 
             s.erase(s.begin());
         
@@ -275,11 +274,10 @@ inline int rm_quote(std::wstring &s) {
 
 inline std::string rm_quote_c(std::string &s) {
 
-    char qq[] = _QQ;
+    //char qq[] = _QQ;
+    for (int i = 0; i < sizeof(_QQ) - 1; i++) {
 
-    for (int i = 0; i < sizeof(qq) - 1; i++) {
-
-        if (s.front() == qq[i] && s.back() == qq[i]) {
+        if (s.front() == _QQ[i] && s.back() == _QQ[i]) {
 
             s.erase(s.begin());
         
