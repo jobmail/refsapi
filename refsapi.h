@@ -550,11 +550,12 @@ class cvar_mngr {
             auto cvar = cvar_result.first->second.cvar;
             cvar_direct_set(cvar, wstoc(value).c_str());
         }
-        void set(CPluginMngr::CPlugin *plugin, cvar_list_t::iterator cvar_it, std::wstring value) {
-            if ((*cvar_it).second.cvar == nullptr)
+        void set(CPluginMngr::CPlugin *plugin, cvar_list_result_t cvar_result, std::wstring value) {
+            auto cvar = cvar_result.first->second.cvar;
+            if (cvar == nullptr)
                 return;
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::set(): &cvar = %d\n", cvar_it->second.cvar);
-            cvar_direct_set((*cvar_it).second.cvar, wstoc(value).c_str());
+            UTIL_ServerPrint("[DEBUG] cvar_mngr::set(): &cvar = %d\n", cvar);
+            cvar_direct_set(cvar, wstoc(value).c_str());
         }
         void clear() {
             cvars.plugin.clear();
