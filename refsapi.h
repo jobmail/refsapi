@@ -60,6 +60,8 @@ struct sClients {
     eRFS_TEAMS team;
 };
 
+typedef std::codecvt_utf8<wchar_t> convert_type;
+
 extern bool r_bMapHasBuyZone;
 extern char g_fmt_buff[1024];
 extern wchar_t g_wfmt_buff[1024];
@@ -68,7 +70,7 @@ extern sTries g_Tries;
 extern cell g_PlayersNum[6];
 extern int mState;
 extern int gmsgTeamInfo;
-extern std::wstring_convert<std::codecvt_utf8<wchar_t>> g_converter;
+extern std::wstring_convert<convert_type, wchar_t> g_converter;
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
 extern funEventCall modMsgs[MAX_REG_MSGS];
 extern void (*function)(void*);
