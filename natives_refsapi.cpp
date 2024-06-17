@@ -224,6 +224,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
                         trim(var_value);
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstoc(var_name).c_str(), wstoc(var_value).c_str());
+
+                    g_cvar_mngr.add(plugin, var_name, var_value, 0, L"TEST");
                 }
 
             } else {

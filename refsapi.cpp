@@ -8,8 +8,10 @@ int a = sizeof(eRFS_TEAMS);
 
 bool r_bMapHasBuyZone;
 
-char g_fmt_buff[1024];
-wchar_t g_wfmt_buff[1024];
+//char g_fmt_buff[1024];
+//wchar_t g_wfmt_buff[1024];
+
+cvar_mngr g_cvar_mngr;
 
 sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
