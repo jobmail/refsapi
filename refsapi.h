@@ -195,18 +195,29 @@ class wstoc {
         }
 };
 
-inline std::wstring ws_conv(const std::string &s) {
-    try {
-        return g_converter.from_bytes(s);
-    } catch(std::range_error &e) {
-        size_t length = s.length();
-        std::wstring result;
-        result.reserve(length);
-        for(size_t i = 0; i < length; i++)
-            result.push_back(s[i] & 0xFF);
-        return result;
-    }
-}
+class ws_conv {
+    std::wstring* result = new std::wstring;
+    public:
+        ws_conv(const std::string &s) {
+            try {
+                *result = g_converter.from_bytes(s);
+            } catch(std::range_error &e) {
+                result->clear();
+                size_t length = s.length();
+                result->reserve(length);
+                for(size_t i = 0; i < length; i++)
+                    result->push_back(s[i] & 0xFF);
+            }
+        }
+        std::wstring get() {
+            return *result;
+        }
+        ~ws_conv() {
+            delete result;
+        }
+};
+
+
 
 inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
     float result = std::stof(s); //is_number(s) ? std::stof(s) : 0.0f;
@@ -511,7 +522,7 @@ class cvar_mngr {
                 std::string num = std::to_string(stof(s, has_min, min_val, has_max, max_val));
                 rtrim_zero(num);
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): num = %s\n", num.c_str());
-                value = ws_conv(num);
+                value = ws_conv(num).get();
             }
             // PLUGIN EXIST?
             if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
