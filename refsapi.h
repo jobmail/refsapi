@@ -173,7 +173,7 @@ inline std::string wstoc(const std::wstring &s) {
     return g_converter.to_bytes(s);
 }
 
-inline std::string wstoc(wfmt &s) {
+inline std::string wstoc(wfmt s) {
     return g_converter.to_bytes(s.c_str());
 }
 
