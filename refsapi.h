@@ -166,6 +166,19 @@ class wfmt {
         }
 };
 
+inline std::string wstoc(const wchar_t *s) {
+    return g_converter.to_bytes(s);
+}
+
+inline std::string wstoc(const std::wstring s) {
+    return g_converter.to_bytes(s);
+}
+
+inline std::string wstoc(wchar_t *s) {
+    return g_converter.to_bytes(s);
+}
+
+/*
 class wstoc {
     const size_t size = 1024;
     char* buff;
@@ -189,6 +202,7 @@ class wstoc {
             return buff;
         }
 };
+*/
 
 inline std::wstring stows(const std::string &s) {
     try {
