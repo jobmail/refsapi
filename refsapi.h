@@ -422,6 +422,23 @@ inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_
             pEdict_1->v.absmax.z < pEdict_2->v.absmin.z);
 }
 
+inline std::string rtrim_zero(std::string &s) {
+
+    auto start = std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+    
+        return ch != '0';
+    
+    }).base();
+    
+    if (start != s.begin() && *(start - 1) == '.')
+    
+        start--;
+    
+    s.erase(start, s.end());
+
+    return s;
+}
+
 typedef struct m_cvar_s {
     cvar_t *cvar;
     std::wstring value;
@@ -477,7 +494,8 @@ class cvar_mngr {
             //name = std::tolower(name, _LOCALE);
             // IS NUMBER?
             if (is_number(s)) {
-                value = g_converter.from_bytes(std::to_string(stof(s, has_min, min_val, has_max, max_val)));
+                std::string number = std::to_string(stof(s, has_min, min_val, has_max, max_val));
+                value = g_converter.from_bytes(rtrim_zero(number));
             }
             // PLUGIN EXIST?
             if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end()) {
