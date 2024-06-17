@@ -199,9 +199,6 @@ class ws_conv {
     std::wstring* result = new std::wstring;
     public:
         ws_conv(const std::string &s) {
-            *result = g_converter.from_bytes(s);
-            UTIL_ServerPrint("[DEBUG] ws_conv(): done\n");
-            /*
             try {
                 *result = g_converter.from_bytes(s);
                 UTIL_ServerPrint("[DEBUG] ws_conv(): done\n");
@@ -213,7 +210,6 @@ class ws_conv {
                 for(size_t i = 0; i < length; i++)
                     result->push_back(s[i] & 0xFF);
             }
-            */
         }
         std::wstring get() {
             return *result;
@@ -504,13 +500,13 @@ class cvar_mngr {
                 cvar_t cvar;
                 cvar.name = wstoc(name).c_str();
                 cvar.flags = flags;
-                cvar.string = wstoc(name).c_str();
+                cvar.string = wstoc(value).c_str();
                 cvar.value = 0.0f;
                 cvar.next = nullptr;
                 UTIL_ServerPrint("[DEBUG] create_cvar(): before create\n");
                 CVAR_REGISTER(&cvar);
                 UTIL_ServerPrint("[DEBUG] create_cvar(): after create\n");
-                p_cvar = CVAR_GET_POINTER(p_name->c_str());
+                p_cvar = CVAR_GET_POINTER(wstoc(name).c_str());
                 UTIL_ServerPrint("[DEBUG] rf_config(): p_cvar = %d, name = <%s>, value = <%s>\n", p_cvar, p_name->c_str(), p_value->c_str());
             }
             delete p_name;
@@ -565,8 +561,8 @@ class cvar_mngr {
                         cvars.plugin[plugin->getId()] = p_cvar_list;
                     return result;
                 }
-            }
-            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstoc(name).c_str(), wstoc(value).c_str());
+            } else
+                AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstoc(name).c_str(), wstoc(value).c_str());
             return {cvar_it, false};
         }
         void clear() {
