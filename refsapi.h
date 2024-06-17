@@ -498,9 +498,9 @@ class cvar_mngr {
             if (p_cvar == nullptr) {
                 UTIL_ServerPrint("[DEBUG] create_cvar(): name = %s, value = %s\n", p_name->c_str(), p_value->c_str());
                 cvar_t cvar;
-                cvar.name = p_name->c_str();
+                cvar.name = wstoc(name).c_str();
                 cvar.flags = flags;
-                cvar.string = "";//p_value->c_str();
+                cvar.string = wstoc(name).c_str();
                 //cvar.value = 0.0f;
                 //cvar.next = nullptr;
                 UTIL_ServerPrint("[DEBUG] create_cvar(): before create\n");
