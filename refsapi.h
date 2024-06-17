@@ -507,7 +507,9 @@ class cvar_mngr {
                 CVAR_REGISTER(&cvar);
                 p_cvar = CVAR_GET_POINTER(c.name.data());
                 UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, p_cvar->name, p_cvar->string);
-                UTIL_ServerPrint("[DEBUG] create_cvar(): &cvar.name = %d, &p_cvar.name = %d\n", &cvar.name, &p_cvar->name);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): TEST_1 ==> &cvar.name = %d, &p_cvar.name = %d\n", &cvar.name, &p_cvar->name);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): TEST_2 ==> &cvar.string = %d, &p_cvar.string = %d\n", &cvar.string, &p_cvar->string);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): TEST_3 ==> &cvar.flags = %d, &p_cvar.flags = %d\n", &cvar.flags, &p_cvar->flags);
             }
             return p_cvar;
         }
