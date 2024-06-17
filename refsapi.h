@@ -553,6 +553,7 @@ class cvar_mngr {
         void set(CPluginMngr::CPlugin *plugin, cvar_list_t::iterator cvar_it, std::wstring value) {
             if (cvar_it->second.cvar == nullptr)
                 return;
+            UTIL_ServerPrint("[DEBUG] cvar_mngr::set(): &cvar = %d\n", cvar_it->second.cvar);
             cvar_direct_set(cvar_it->second.cvar, wstoc(value).c_str());
         }
         void clear() {
