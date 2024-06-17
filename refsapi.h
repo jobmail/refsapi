@@ -201,9 +201,11 @@ class ws_conv {
         ws_conv(const std::string &s) {
             try {
                 *result = g_converter.from_bytes(s);
+                UTIL_ServerPrint("[DEBUG] ws_conv(): done\n");
             } catch(std::range_error &e) {
                 result->clear();
                 size_t length = s.length();
+                UTIL_ServerPrint("[DEBUG] ws_conv(): catch !!! length = %d\n", length);
                 result->reserve(length);
                 for(size_t i = 0; i < length; i++)
                     result->push_back(s[i] & 0xFF);
