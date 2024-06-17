@@ -181,7 +181,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     path = stows(buff);
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", wstoc(name.c_str()), wstoc(path.c_str()), buff);
+    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", wstoc(name), wstoc(path), buff);
 
     bool is_exist;
 
