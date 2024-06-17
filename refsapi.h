@@ -511,7 +511,7 @@ class cvar_mngr {
             return p_cvar;
         }
     public:
-        cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring &value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
+        cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
             std::string s = g_converter.to_bytes(value);
             plugin_cvar_t::iterator plugin_it;
             cvar_list_t::iterator cvar_it;
