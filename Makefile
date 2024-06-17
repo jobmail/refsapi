@@ -22,7 +22,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -fvisibility=hidden -shared -std=gnu++17
+CFLAGS += -fvisibility=hidden -fno-exception -shared -std=gnu++17
 
 #-fabi-version=11 -fabi-compat-version=11 -Wabi=11
 

@@ -199,6 +199,9 @@ class ws_conv {
     std::wstring* result = new std::wstring;
     public:
         ws_conv(const std::string &s) {
+            *result = g_converter.from_bytes(s);
+            UTIL_ServerPrint("[DEBUG] ws_conv(): done\n");
+            /*
             try {
                 *result = g_converter.from_bytes(s);
                 UTIL_ServerPrint("[DEBUG] ws_conv(): done\n");
@@ -210,6 +213,7 @@ class ws_conv {
                 for(size_t i = 0; i < length; i++)
                     result->push_back(s[i] & 0xFF);
             }
+            */
         }
         std::wstring get() {
             return *result;
