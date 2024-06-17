@@ -227,13 +227,19 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     g_cvar_mngr.add(plugin, var_name, var_value, FCVAR_SERVER | FCVAR_SPONLY, L"TEST");
 
-                    result = TRUE;
+                    // CHECK
+
+                    auto cvar_result = g_cvar_mngr.get(plugin, var_name);
+
+                    UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, value = <%s>\n", cvar_result.second, cvar_result.first->second.cvar->string);
                 }
 
             } else {
 
                 file << L"TEST_CVAR = Тестовая строка\n";
             }
+
+            result = TRUE;
 
             file.close();
         
