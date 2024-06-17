@@ -467,8 +467,9 @@ inline std::string rtrim_zero_c(std::string s) {
 }
 
 typedef struct m_cvar_s {
-    cvar_t *cvar;
-    std::wstring value;
+    cvar_t cvar;
+    std::string name;
+    std::string value;
     std::wstring desc;
     bool has_min;
     bool has_max;
@@ -491,27 +492,17 @@ class cvar_mngr {
             if (cvar != nullptr)
                 g_engfuncs.pfnCvar_DirectSet(cvar, value);
         }
-        cvar_t* create_cvar(std::wstring name, std::wstring value, int flags = 0) {
-            wstoc* p_name = new wstoc(name);
-            wstoc* p_value = new wstoc(value);
-            cvar_t* p_cvar = CVAR_GET_POINTER(p_name->c_str());
+        bool create_cvar(m_cvar_t &c) {
+            cvar_t* p_cvar = CVAR_GET_POINTER(c.cvar.name);
             if (p_cvar == nullptr) {
-                UTIL_ServerPrint("[DEBUG] create_cvar(): name = %s, value = %s\n", p_name->c_str(), p_value->c_str());
-                cvar_t cvar;
-                cvar.name = p_name->c_str();
-                cvar.flags = flags;
-                cvar.string = p_value->c_str();
-                //cvar.value = 0.0f;
-                //cvar.next = nullptr;
-                UTIL_ServerPrint("[DEBUG] create_cvar(): before create\n");
-                CVAR_REGISTER(&cvar);
-                UTIL_ServerPrint("[DEBUG] create_cvar(): after create\n");
-                p_cvar = CVAR_GET_POINTER(p_name->c_str());
-                UTIL_ServerPrint("[DEBUG] rf_config(): p_cvar = %d, name = <%s>, value = <%s>\n", p_cvar, p_name->c_str(), p_value->c_str());
+                UTIL_ServerPrint("[DEBUG] create_cvar(): name = %s, value = %s\n", c.cvar.name, c.cvar.value);
+                CVAR_REGISTER(&c.cvar);
+                p_cvar = CVAR_GET_POINTER(c.cvar.name);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, c.cvar.name, c.cvar.value);
+                if (p_cvar == &c.cvar)
+                    UTIL_ServerPrint("[DEBUG] create_cvar(): succesfully created!");
             }
-            delete p_name;
-            delete p_value;
-            return p_cvar;
+            return false;
         }
     public:
         cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
@@ -519,15 +510,11 @@ class cvar_mngr {
             plugin_cvar_t::iterator plugin_it;
             cvar_list_t::iterator cvar_it;
             cvar_list_t p_cvar_list;
-            if (name.empty() || value.empty()) return {cvar_it, false};
-            // FIX NAME
-            //name = std::tolower(name, _LOCALE);
+            if (name.empty() || value.empty())
+                return {cvar_it, false};
             // IS NUMBER?
             if (is_number(s)) {
-                std::string num = std::to_string(stof(s, has_min, min_val, has_max, max_val));
-                rtrim_zero(num);
-                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): num = %s\n", num.c_str());
-                value = ws_conv(num).get();
+                value = ws_conv(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val)))).get();
                 //std::wstring test = ws_conv(num).get();
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstoc(value).c_str());
             }
@@ -541,22 +528,29 @@ class cvar_mngr {
             }
             // CREATE CVAR
             m_cvar_t m_cvar;
+            // SAVE CVAR PARAMS
+            m_cvar.name = std::tolower(wstoc(name).c_str(), _LOCALE);
+            m_cvar.value = wstoc(value).c_str();
+            m_cvar.desc = desc;
+            m_cvar.has_min = has_min;
+            m_cvar.min_val = min_val;                
+            m_cvar.has_max = has_max;                
+            m_cvar.max_val = max_val;
+            // FILL CVAR_T
+            m_cvar.cvar.name = m_cvar.name.data();
+            m_cvar.cvar.string = m_cvar.value.data();
+            m_cvar.cvar.value = 0.0f;
+            m_cvar.cvar.flags = flags;
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): before create_var()\n");
-            if ((m_cvar.cvar = create_cvar(name, value, flags)) != nullptr) {
-                m_cvar.value = value;
-                m_cvar.desc = desc;
-                m_cvar.has_min = has_min;
-                m_cvar.min_val = min_val;                
-                m_cvar.has_max = has_max;                
-                m_cvar.max_val = max_val;
+            if (create_cvar(m_cvar)) {
                 auto result = p_cvar_list.insert({name, m_cvar});
-                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): result = %d, name = <%s>, value = <%s>, desc = <%s>\n", plugin_it, wstoc(name).c_str(), wstoc(value).c_str(), wstoc(desc).c_str());
-                // SAVE cvar_list
+                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, m_cvar.name.c_str(), m_cvar.value.c_str(), wstoc(m_cvar.desc).c_str());
+                // SAVE CVAR LIST
                 if (result.second) {
                     // PLUGIN EXIST?
                     if (plugin_it != cvars.plugin.end())
                         plugin_it->second = p_cvar_list;
-                    // CREATE PLUGINS CVAR
+                    // CREATE PLUGINS CVARS
                     else
                         cvars.plugin[plugin->getId()] = p_cvar_list;
                     return result;
