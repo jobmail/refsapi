@@ -460,6 +460,7 @@ class cvar_mngr {
                 cvar.next = nullptr;
                 CVAR_REGISTER(&cvar);
                 p_cvar = CVAR_GET_POINTER(name_c);
+                cvar_direct_set(p_cvar, value_c);
             }
             return p_cvar;
         }
