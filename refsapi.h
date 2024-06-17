@@ -195,7 +195,7 @@ class wstoc {
         }
 };
 
-inline std::wstring convert(const std::string& s) {
+std::wstring convert(const std::string &s) {
     try {
         return g_converter.from_bytes(s);
     } catch(std::range_error &e) {
