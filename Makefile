@@ -7,10 +7,11 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp
 
-LINK = -ldl -m32 -s -Llib/linux32 -static-libgcc -static-libc++
+LINK = -ldl -m32 -static-libstdc++
+#-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -flto=auto -pipe -fno-strict-aliasing -Wno-uninitialized -std=gnu++14
+OPT_FLAGS = -O3 -msse3 -flto=auto -pipe -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer
 
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
@@ -21,7 +22,9 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -fvisibility=hidden -fno-exceptions -shared -fabi-version=11 -fabi-compat-version=11 -Wabi=11
+CFLAGS += -fvisibility=hidden -fno-exceptions -shared -std=gnu++17
+
+#-fabi-version=11 -fabi-compat-version=11 -Wabi=11
 
 #-g0 -DNDEBUG -Dlinux -D__linux__ -std=gnu++14 -shared -m32 -D_GLIBCXX_USE_CXX11_ABI=0 -DHAVE_STRONG_TYPEDEF
 
