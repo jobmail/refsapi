@@ -194,7 +194,7 @@ class wstoc {
 };
 
 inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
-    float result = is_number(s) ? std::stof(s) : 0.0f;
+    float result = std::stof(s); //is_number(s) ? std::stof(s) : 0.0f;
     if (has_min && result < min_val) result = min_val;
     if (has_min && result > max_val) result = max_val;
     return result;
