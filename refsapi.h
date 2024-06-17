@@ -147,6 +147,17 @@ class fmt {
         }
 };
 
+inline wchar_t* wfmt(wchar_t *fmt, ...) {
+    const size_t size = 1024;
+    wchar_t buff[size];
+    va_list arg_ptr;
+    va_start(arg_ptr, fmt);
+    std::vswprintf(buff, size - 1, fmt, arg_ptr);
+    va_end(arg_ptr);
+    return buff;
+}
+
+/*
 class wfmt {
     const size_t size = 1024;
     wchar_t* buff;
@@ -165,6 +176,7 @@ class wfmt {
             return buff;
         }
 };
+*/
 
 inline std::string wstoc(const wchar_t *s) {
     return g_converter.to_bytes(s);
