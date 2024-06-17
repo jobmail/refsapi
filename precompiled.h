@@ -13,8 +13,6 @@
 // C++
 #include <vector>				// std::vector
 #include <list>					// std::list
-#include <iostream>
-#include <filesystem>
 #include <fstream>
 #include <codecvt>
 #include <cstdio>
