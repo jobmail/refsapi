@@ -541,6 +541,7 @@ class cvar_mngr {
             m_cvar.cvar.string = m_cvar.value.data();
             m_cvar.cvar.value = 0.0f;
             m_cvar.cvar.flags = flags;
+            m_cvar.cvar.next = nullptr;
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): before create_var()\n");
             if (create_cvar(m_cvar)) {
                 auto result = p_cvar_list.insert({name, m_cvar});
