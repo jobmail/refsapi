@@ -501,8 +501,8 @@ class cvar_mngr {
                 cvar.name = wstoc(name).c_str();
                 cvar.flags = flags;
                 cvar.string = wstoc(name).c_str();
-                //cvar.value = 0.0f;
-                //cvar.next = nullptr;
+                cvar.value = 0.0f;
+                cvar.next = nullptr;
                 UTIL_ServerPrint("[DEBUG] create_cvar(): before create\n");
                 CVAR_REGISTER(&cvar);
                 UTIL_ServerPrint("[DEBUG] create_cvar(): after create\n");
