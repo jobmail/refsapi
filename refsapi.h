@@ -495,13 +495,15 @@ class cvar_mngr {
         bool create_cvar(m_cvar_t &c) {
             cvar_t* p_cvar = CVAR_GET_POINTER(c.cvar.name);
             if (p_cvar == nullptr) {
-                UTIL_ServerPrint("[DEBUG] create_cvar(): name = %s, value = %s\n", c.cvar.name, c.cvar.value);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): name = %s, value = %s\n", c.cvar.name, c.cvar.string);
                 CVAR_REGISTER(&c.cvar);
                 p_cvar = CVAR_GET_POINTER(c.cvar.name);
-                UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, c.cvar.name, c.cvar.value);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, c.cvar.name, c.cvar.string);
                 if (p_cvar == &c.cvar)
                     UTIL_ServerPrint("[DEBUG] create_cvar(): succesfully created!");
-                return p_cvar == &c.cvar;
+                else
+                    UTIL_ServerPrint("[DEBUG] create_cvar(): something went wrong p_cvar = %d, c.cvar = %d\n", p_cvar, &c.cvar);
+                return p_cvar != nullptr;
             }
             return false;
         }
