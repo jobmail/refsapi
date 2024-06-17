@@ -502,7 +502,9 @@ class cvar_mngr {
                 cvar.string = p_value->c_str();
                 cvar.value = 0.0f;
                 cvar.next = nullptr;
+                UTIL_ServerPrint("[DEBUG] create_cvar(): before create\n");
                 CVAR_REGISTER(&cvar);
+                UTIL_ServerPrint("[DEBUG] create_cvar(): after create\n");
                 p_cvar = CVAR_GET_POINTER(p_name->c_str());
                 UTIL_ServerPrint("[DEBUG] rf_config(): p_cvar = %d, name = <%s>, value = <%s>\n", p_cvar, p_name->c_str(), p_value->c_str());
             }
