@@ -504,7 +504,7 @@ class cvar_mngr {
             // IS NUMBER?
             if (is_number(s)) {
                 std::string num = std::to_string(stof(s, has_min, min_val, has_max, max_val));
-                //rtrim_zero(num);
+                rtrim_zero(num);
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): num = %s\n", num.c_str());
                 value = g_converter.from_bytes(num);
             }
