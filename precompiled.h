@@ -17,7 +17,6 @@
 #include <codecvt>
 #include <cstdio>
 #include <bits/stdc++.h>
-#include <map>
 
 // platform defs
 #include "platform.h"
