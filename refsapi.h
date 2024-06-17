@@ -551,10 +551,10 @@ class cvar_mngr {
             cvar_direct_set(cvar, wstoc(value).c_str());
         }
         void set(CPluginMngr::CPlugin *plugin, cvar_list_t::iterator cvar_it, std::wstring value) {
-            if (cvar_it->second.cvar == nullptr)
+            if ((*cvar_it).second.cvar == nullptr)
                 return;
             UTIL_ServerPrint("[DEBUG] cvar_mngr::set(): &cvar = %d\n", cvar_it->second.cvar);
-            cvar_direct_set(cvar_it->second.cvar, "987.65400");//wstoc(value).c_str());
+            cvar_direct_set((*cvar_it).second.cvar, "987.65400");//wstoc(value).c_str());
         }
         void clear() {
             cvars.plugin.clear();
