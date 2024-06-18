@@ -436,7 +436,7 @@ inline std::string rtrim_zero_c(std::string s) {
 }
 
 typedef struct m_cvar_s {
-    cvar_t* cvar;
+    cvar_t** cvar;
     std::string name;
     std::string value;
     std::wstring desc;
@@ -512,7 +512,7 @@ class cvar_mngr {
             m_cvar.has_max = has_max;                
             m_cvar.max_val = max_val;
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): before create_var()\n");
-            if ((m_cvar.cvar = create_cvar(m_cvar)) != nullptr) {
+            if ((*m_cvar.cvar = create_cvar(m_cvar)) != nullptr) {
                 auto result = p_cvar_list.insert({name, m_cvar});
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, m_cvar.name.c_str(), m_cvar.value.c_str(), wstoc(m_cvar.desc).c_str());
                 // SAVE CVAR LIST
@@ -548,14 +548,14 @@ class cvar_mngr {
             if (!cvar_result.second)
                 return;
             auto cvar = cvar_result.first->second.cvar;
-            cvar_direct_set(cvar, wstoc(value).c_str());
+            cvar_direct_set(*cvar, wstoc(value).c_str());
         }
         void set(CPluginMngr::CPlugin *plugin, cvar_list_result_t cvar_result, std::wstring value) {
             auto cvar = cvar_result.first->second.cvar;
             if (cvar == nullptr)
                 return;
             UTIL_ServerPrint("[DEBUG] cvar_mngr::set(): &cvar = %d\n", cvar);
-            cvar_direct_set(cvar, wstoc(value).c_str());
+            cvar_direct_set(*cvar, wstoc(value).c_str());
         }
         void clear() {
             cvars.plugin.clear();
