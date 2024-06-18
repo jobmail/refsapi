@@ -1,5 +1,8 @@
 #pragma once
 #include "precompiled.h"
+
+extern std::wstring_convert<convert_type, wchar_t> g_converter;
+
 /*
 inline bool is_valid_index(const size_t index);
 inline bool is_valid_entity(const edict_t *pEdict);
