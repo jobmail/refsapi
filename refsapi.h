@@ -1,4 +1,5 @@
 #pragma once
+#include "precompiled.h"
 // gets rid of annoying "deprecated conversion from string constant blah blah" warning
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
