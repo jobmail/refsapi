@@ -2,7 +2,6 @@
 #include "precompiled.h"
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
-extern cvar_mngr g_cvar_mngr;
 
 typedef enum CVAR_TYPES_e {
     CVAR_NONE,
@@ -171,3 +170,5 @@ public:
         cvars.plugin.clear();
     }
 };
+
+extern cvar_mngr g_cvar_mngr;
