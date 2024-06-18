@@ -7,6 +7,7 @@ inline bool is_valid_team(const int team);
 inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2);
 
 bool is_number(std::string &s);
+/*
 inline std::string wstoc(const wchar_t *s);
 inline std::string wstoc(const std::wstring &s);
 inline std::string wstoc(wfmt s);
@@ -31,6 +32,7 @@ inline std::string trim_c(std::string s);
 inline std::wstring trim_c(std::wstring s);
 inline void rtrim_zero(std::string &s);
 inline std::string rtrim_zero_c(std::string s);
+*/
 
 class fmt
 {
