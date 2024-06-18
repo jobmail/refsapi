@@ -69,6 +69,7 @@ public:
         cvar_list_t p_cvar_list;
         plugin_cvar_it plugin_it;
         std::string s = g_converter.to_bytes(value);
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
         // Is number?
         if (is_number(s))
         {
@@ -90,8 +91,8 @@ public:
         }
         // Fill cvar
         m_cvar_t m_cvar;
-        m_cvar.name = name; //wstoc(name).c_str();
-        m_cvar.value = value; //wstoc(value).c_str();
+        m_cvar.name = name;
+        m_cvar.value = value;
         m_cvar.desc = desc;
         m_cvar.flags = flags;
         m_cvar.has_min = has_min;
