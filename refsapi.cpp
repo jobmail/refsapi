@@ -1,10 +1,11 @@
 #include "precompiled.h"
+#include <refsapi_cvar_mngr.h>
 
 int gmsgTeamInfo;
 int mState;
 int g_PlayersNum[6];
 
-int a = sizeof(eRFS_TEAMS);
+int a = sizeof(TEAMS_t);
 
 bool r_bMapHasBuyZone;
 
@@ -395,7 +396,7 @@ void Client_TeamInfo(void* mValue) {
 
     static int id;
     char *msg;
-    eRFS_TEAMS new_team;
+    TEAMS_t new_team;
 
     switch (mState++) {
     
