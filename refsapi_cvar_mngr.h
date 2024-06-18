@@ -79,8 +79,8 @@ public:
         cvar_list_t p_cvar_list;
         plugin_cvar_it plugin_it;
         std::string s = g_converter.to_bytes(value);
-        // Fix caps
-        std::transform(name.begin(), name.end(), name.begin(), std::bind(std::tolower<wchar_t>, std::placeholders::_1, _LOCALE));
+        // Fix caps in name
+        ws_convert_tolower(name); //std::transform(name.begin(), name.end(), name.begin(), std::bind(std::tolower<wchar_t>, std::placeholders::_1, _LOCALE));
         // Is number?
         if (is_number(s))
         {
@@ -137,6 +137,8 @@ public:
         plugin_cvar_it plugin_it;
         cvar_list_it cvar_it;
         cvar_list_t p_cvar_list;
+        // Fix caps in name
+        ws_convert_tolower(name);
         // Plugin cvars exist?
         if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
         {

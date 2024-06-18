@@ -328,3 +328,8 @@ inline std::wstring trim_c(std::wstring s)
     trim(s);
     return s;
 }
+
+inline void ws_convert_tolower(std::wstring &s)
+{
+    std::transform(s.begin(), s.end(), s.begin(), std::bind(std::tolower<wchar_t>, std::placeholders::_1, _LOCALE));
+}
