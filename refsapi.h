@@ -23,7 +23,7 @@
 
 typedef void (*funEventCall)(void*);
 
-typedef enum {
+typedef enum TEAMS_e{
 
     TEAM_UNASSIGNED,
     TEAM_TERRORIST,
@@ -32,7 +32,7 @@ typedef enum {
     TEAM_DEAD_TT,
     TEAM_DEAD_CT
 
-} eRFS_TEAMS;
+} TEAMS_t;
 
 struct g_RegUserMsg {
 
@@ -58,7 +58,7 @@ struct sTries {
 struct sClients {
     bool is_connected;
     bool is_bot;
-    eRFS_TEAMS team;
+    TEAMS_t team;
 };
 
 typedef std::codecvt_utf8<wchar_t> convert_type;
@@ -194,9 +194,11 @@ inline std::wstring stows(const std::string &s) {
 }
 
 inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
-    float result = std::stof(s); //is_number(s) ? std::stof(s) : 0.0f;
-    if (has_min && result < min_val) result = min_val;
-    if (has_min && result > max_val) result = max_val;
+    float result = std::stof(s);
+    if (has_min && result < min_val)
+        result = min_val;
+    if (has_min && result > max_val)
+        result = max_val;
     return result;
 }
 
