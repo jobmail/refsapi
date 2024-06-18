@@ -1,16 +1,14 @@
 #pragma once
 
 #include "refsapi.h"
-#include "precompiled.h"
 
 //extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
-/*
 inline bool is_valid_index(const size_t index);
 inline bool is_valid_entity(const edict_t *pEdict);
 inline bool is_valid_team(const int team);
 inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2);
-*/
+
 
 extern bool is_number(std::string &s);
 /*
