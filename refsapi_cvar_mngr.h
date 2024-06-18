@@ -6,8 +6,8 @@ extern std::wstring_convert<convert_type, wchar_t> g_converter;
 typedef struct m_cvar_s
 {
     cvar_t *cvar;
-    std::string name;
-    std::string value;
+    std::wstring name;
+    std::wstring value;
     std::wstring desc;
     int flags;
     bool has_min;
@@ -38,18 +38,23 @@ private:
     }
     cvar_t *create_cvar(m_cvar_t &c)
     {
-        cvar_t *p_cvar = CVAR_GET_POINTER(c.name.data());
+        enum { _name, _value, _count};
+        // Copy params
+        std::string p[_count] = { wstoc(c.name), wstoc(c.value) };
+        auto p_name = p[_name].data();
+        auto p_value = p[_value].data();
+        cvar_t *p_cvar = CVAR_GET_POINTER(p_name);
         if (p_cvar == nullptr)
         {
             cvar_t cvar;
-            cvar.name = c.name.data();
-            cvar.string = c.value.data();
+            cvar.name = p_name;
+            cvar.string = p_value;
             cvar.value = 0.0f;
             cvar.flags = c.flags;
             cvar.next = nullptr;
             UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
             CVAR_REGISTER(&cvar);
-            p_cvar = CVAR_GET_POINTER(c.name.data());
+            p_cvar = CVAR_GET_POINTER(p_name);
             UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, p_cvar->name, p_cvar->string);
         }
         return p_cvar;
@@ -85,8 +90,8 @@ public:
         }
         // Fill cvar
         m_cvar_t m_cvar;
-        m_cvar.name = wstoc(name).c_str();
-        m_cvar.value = wstoc(value).c_str();
+        m_cvar.name = name; //wstoc(name).c_str();
+        m_cvar.value = value; //wstoc(value).c_str();
         m_cvar.desc = desc;
         m_cvar.flags = flags;
         m_cvar.has_min = has_min;
