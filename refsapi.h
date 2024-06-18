@@ -11,6 +11,8 @@
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
 #define check_it_empty(x)           if (x._M_node == nullptr) return
 
+#define is_valid_team               __is_valid_team
+
 #define _QQ                         "\"'`"
 #define _LOCALE                     std::locale("ru_RU.UTF-8")
 #define _COUNT(x)                   (size_t)(sizeof(x)/sizeof(cell))
