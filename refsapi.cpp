@@ -1,5 +1,4 @@
 #include "precompiled.h"
-#include <refsapi_cvar_mngr.h>
 
 int gmsgTeamInfo;
 int mState;
