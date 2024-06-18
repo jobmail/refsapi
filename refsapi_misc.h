@@ -6,7 +6,7 @@ inline bool is_valid_team(const int team);
 inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2);
 */
 
-bool is_number(std::string &s);
+extern bool is_number(std::string &s);
 /*
 inline std::string wstoc(const wchar_t *s);
 inline std::string wstoc(const std::wstring &s);
