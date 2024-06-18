@@ -231,24 +231,19 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     cvar_list_it test;
 
-                    UTIL_ServerPrint("[DEBUG] rf_config(): emty_it = %d, is_nullptr = %d\n", test._M_node, test._M_node == nullptr);
-
                     auto cvar_it = g_cvar_mngr.get(plugin, var_name);
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, value = <%s>\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string);
-                    UTIL_ServerPrint("[DEBUG] rf_config(): cvar_it = %d, is_nullptr = %d\n", cvar_it._M_node, cvar_it._M_node == nullptr);
 
                     g_cvar_mngr.set(plugin, var_name, L"123.45678900000123");
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, value = <%s>\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string);
-                    UTIL_ServerPrint("[DEBUG] rf_config(): cvar_it = %d, is_nullptr = %d\n", cvar_it._M_node, cvar_it._M_node == nullptr);
 
                     //cvar_it = g_cvar_mngr.get(plugin, var_name);
 
                     g_cvar_mngr.set(plugin, cvar_it, L"987.654321000111222");
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, value = <%s>\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string);
-                    UTIL_ServerPrint("[DEBUG] rf_config(): cvar_it = %d, is_nullptr = %d\n", cvar_it._M_node, cvar_it._M_node == nullptr);
                 }
 
             } else {
