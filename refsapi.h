@@ -539,7 +539,7 @@ class cvar_mngr {
                 p_cvar_list = plugin_it->second;
                 // CVAR EXIST?
                 if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
-                    return &cvar_list_result_t({cvar_it, true});
+                    return &cvar_list_result_t(cvar_it, true);
             }
             return nullptr;
         }
