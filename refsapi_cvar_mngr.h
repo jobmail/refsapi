@@ -115,7 +115,7 @@ public:
         if ((m_cvar.cvar = create_cvar(m_cvar)) != nullptr)
         {
             auto result = p_cvar_list.insert({name, m_cvar});
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, m_cvar.name.c_str(), m_cvar.value.c_str(), wstos(m_cvar.desc).c_str());
+            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str(), wstos(m_cvar.desc).c_str());
             // Save cvars list
             if (result.second)
             {
