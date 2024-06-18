@@ -97,7 +97,7 @@ inline bool is_valid_entity(const edict_t *pEdict)
     return !(pEdict == NULL || pEdict == nullptr || pEdict->pvPrivateData == nullptr || pEdict->free || (pEdict->v.flags & FL_KILLME));
 }
 
-inline bool __is_valid_team(const int team)
+inline bool is_valid_team(const int team)
 {
     return team >= TEAM_TERRORIST && team <= TEAM_CT;
 }
