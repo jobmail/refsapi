@@ -3,7 +3,6 @@
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
 #include "precompiled.h"
-#include <refsapi_cvar_mngr.h>
 
 #define MAX_PLAYERS                 32
 #define _QQ                         "\"'`"
