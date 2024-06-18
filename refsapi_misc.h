@@ -1,5 +1,6 @@
 #pragma once
 #include "precompiled.h"
+#include "refsapi.h"
 /*
 inline bool is_valid_index(const size_t index);
 inline bool is_valid_entity(const edict_t *pEdict);
