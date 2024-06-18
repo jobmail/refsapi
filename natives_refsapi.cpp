@@ -240,8 +240,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, string = <%s>, value = %f\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string, cvar_it->second.cvar->value);
 
-                    UTIL_ServerPrint("[DEBUG] rf_config(): before print\n");
+                    g_cvar_mngr.set(plugin, cvar_it, L"LAST_TEST");
 
+                    UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, string = <%s>, value = %f\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string, cvar_it->second.cvar->value);
                 }
 
             } else {
