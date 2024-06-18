@@ -69,7 +69,6 @@ extern cell g_PlayersNum[6];
 extern int mState;
 extern int gmsgTeamInfo;
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
-extern cvar_mngr g_cvar_mngr;
 
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
 extern funEventCall modMsgs[MAX_REG_MSGS];
