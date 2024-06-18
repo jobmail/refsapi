@@ -14,7 +14,6 @@ sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
 
 std::wstring_convert<convert_type, wchar_t> g_converter;
-//std::wstring_convert<std::codecvt_utf8<wchar_t>> g_converter;
 
 funEventCall modMsgsEnd[MAX_REG_MSGS];
 funEventCall modMsgs[MAX_REG_MSGS];

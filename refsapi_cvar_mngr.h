@@ -2,6 +2,8 @@
 
 #include "precompiled.h"
 
+extern std::wstring_convert<convert_type, wchar_t> g_converter;
+
 typedef struct m_cvar_s
 {
     cvar_t *cvar;
