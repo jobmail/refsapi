@@ -4,10 +4,11 @@
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
 typedef enum CVAR_TYPES_e {
-    CVAR_NONE,
-    CVAR_NUM,
-    CVAR_FLOAT,
-    CVAR_STRING,
+    CVAR_TYPE_NONE,
+    CVAR_TYPE_NUM,
+    CVAR_TYPE_FLOAT,
+    CVAR_TYPE_STRING,
+    // Count
     CVAR_TYPES_SIZE
 } CVAR_TYPES_t;
 
@@ -17,6 +18,7 @@ typedef struct m_cvar_s
     std::wstring name;
     std::wstring value;
     std::wstring desc;
+    CVAR_TYPES_t type;
     int flags;
     bool has_min;
     bool has_max;
@@ -77,9 +79,8 @@ public:
         cvar_list_t p_cvar_list;
         plugin_cvar_it plugin_it;
         std::string s = g_converter.to_bytes(value);
-        
-        std::transform(name.begin(), name.end(), name.begin(), std::bind(std::tolower<wchar_t>, std::placeholders::_1, std::locale("ru_RU.UTF-8"))); // &std::tolower<wchar_t>, std::locale("ru_RU.UTF-8"))
-        
+        // Fix caps
+        std::transform(name.begin(), name.end(), name.begin(), std::bind(std::tolower<wchar_t>, std::placeholders::_1, _LOCALE));
         // Is number?
         if (is_number(s))
         {
@@ -103,6 +104,7 @@ public:
         m_cvar_t m_cvar;
         m_cvar.name = name;
         m_cvar.value = value;
+        m_cvar.type = CVAR_TYPE_NONE;
         m_cvar.desc = desc;
         m_cvar.flags = flags;
         m_cvar.has_min = has_min;
