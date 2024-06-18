@@ -436,7 +436,7 @@ inline std::string rtrim_zero_c(std::string s) {
 }
 
 typedef struct m_cvar_s {
-    cvar_t** cvar;
+    cvar_t* cvar;
     std::string name;
     std::string value;
     std::wstring desc;
@@ -479,10 +479,10 @@ class cvar_mngr {
             return p_cvar;
         }
     public:
-        cvar_list_result_t add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
+        cvar_list_result_t* add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f) {
             cvar_list_t::iterator cvar_it;
             if (name.empty() || value.empty())
-                return {cvar_it, false};
+                return nullptr;
             cvar_list_t p_cvar_list;
             plugin_cvar_t::iterator plugin_it;
             std::string s = g_converter.to_bytes(value);
@@ -498,7 +498,7 @@ class cvar_mngr {
                 p_cvar_list = plugin_it->second;
                 // CVAR EXIST?
                 if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
-                    return {cvar_it, true};
+                    return nullptr;
             }
             // CREATE CVAR
             m_cvar_t m_cvar;
@@ -512,7 +512,7 @@ class cvar_mngr {
             m_cvar.has_max = has_max;                
             m_cvar.max_val = max_val;
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): before create_var()\n");
-            if ((*m_cvar.cvar = create_cvar(m_cvar)) != nullptr) {
+            if ((m_cvar.cvar = create_cvar(m_cvar)) != nullptr) {
                 auto result = p_cvar_list.insert({name, m_cvar});
                 UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, m_cvar.name.c_str(), m_cvar.value.c_str(), wstoc(m_cvar.desc).c_str());
                 // SAVE CVAR LIST
@@ -523,13 +523,13 @@ class cvar_mngr {
                     // CREATE PLUGINS CVARS
                     else
                         cvars.plugin[plugin->getId()] = p_cvar_list;
-                    return result;
+                    return &result;
                 }
             } else
                 AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstoc(name).c_str(), wstoc(value).c_str());
-            return {cvar_it, false};
+            return nullptr;
         }
-        cvar_list_result_t get(CPluginMngr::CPlugin *plugin, std::wstring name) {
+        cvar_list_result_t* get(CPluginMngr::CPlugin *plugin, std::wstring name) {
             plugin_cvar_t::iterator plugin_it;
             cvar_list_t::iterator cvar_it;
             cvar_list_t p_cvar_list;
@@ -539,23 +539,23 @@ class cvar_mngr {
                 p_cvar_list = plugin_it->second;
                 // CVAR EXIST?
                 if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
-                    return {cvar_it, true};
+                    return &cvar_list_result_t({cvar_it, true});
             }
-            return {cvar_it, false};
+            return nullptr;
         }
         void set(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value) {
             auto cvar_result = get(plugin, name);
-            if (!cvar_result.second)
+            if (!cvar_result->second)
                 return;
-            auto cvar = cvar_result.first->second.cvar;
-            cvar_direct_set(*cvar, wstoc(value).c_str());
+            auto cvar = cvar_result->first->second.cvar;
+            cvar_direct_set(cvar, wstoc(value).c_str());
         }
-        void set(CPluginMngr::CPlugin *plugin, cvar_list_result_t cvar_result, std::wstring value) {
-            auto cvar = cvar_result.first->second.cvar;
+        void set(CPluginMngr::CPlugin *plugin, cvar_list_result_t *cvar_result, std::wstring value) {
+            auto cvar = cvar_result->first->second.cvar;
             if (cvar == nullptr)
                 return;
             UTIL_ServerPrint("[DEBUG] cvar_mngr::set(): &cvar = %d\n", cvar);
-            cvar_direct_set(*cvar, wstoc(value).c_str());
+            cvar_direct_set(cvar, wstoc(value).c_str());
         }
         void clear() {
             cvars.plugin.clear();
