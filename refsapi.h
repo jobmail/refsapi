@@ -4,7 +4,19 @@
 
 #include "precompiled.h"
 
+#define MAX_PLAYERS                 32
+#define DECIMAL_POINT               '.'
+#define WP_CLASS_PREFIX             "weapon_"
+#define WP_CLASS_PREFIX_LEN         (sizeof(WP_CLASS_PREFIX) - 1)
+#define REFSAPI_CVAR                "acs_refsapi_loaded"
+#define check_it_empty(x)           if (x._M_node == nullptr) return
 
+#define _QQ                         "\"'`"
+#define _LOCALE                     std::locale("ru_RU.UTF-8")
+#define _COUNT(x)                   (size_t)(sizeof(x)/sizeof(cell))
+
+#define amx_ftoc(f)                 ( * ((cell*)&f) )   /* float to cell */
+#define amx_ctof(c)                 ( * ((float*)&c) )  /* cell to float */
 
 typedef void (*funEventCall)(void*);
 

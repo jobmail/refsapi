@@ -1,4 +1,5 @@
 #include "precompiled.h"
+#include "refsapi.h"
 
 int gmsgTeamInfo;
 int mState;
