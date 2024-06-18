@@ -13,9 +13,9 @@ inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_
 
 extern bool is_number(std::string &s);
 /*
-inline std::string wstoc(const wchar_t *s);
-inline std::string wstoc(const std::wstring &s);
-inline std::string wstoc(wfmt s);
+inline std::string wstos(const wchar_t *s);
+inline std::string wstos(const std::wstring &s);
+inline std::string wstos(wfmt s);
 inline std::wstring stows(const std::string &s);
 inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f);
 inline bool file_exists(const std::wstring &name);
@@ -112,17 +112,17 @@ inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_
              pEdict_1->v.absmax.z < pEdict_2->v.absmin.z);
 }
 
-inline std::string wstoc(const wchar_t *s)
+inline std::string wstos(const wchar_t *s)
 {
     return g_converter.to_bytes(s);
 }
 
-inline std::string wstoc(const std::wstring &s)
+inline std::string wstos(const std::wstring &s)
 {
     return g_converter.to_bytes(s);
 }
 
-inline std::string wstoc(wfmt s)
+inline std::string wstos(wfmt s)
 {
     return g_converter.to_bytes(s.c_str());
 }
@@ -158,7 +158,7 @@ inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, boo
 inline bool file_exists(const std::wstring &name)
 {
     struct stat buff;
-    return (stat(wstoc(name).c_str(), &buff) == 0);
+    return (stat(wstos(name).c_str(), &buff) == 0);
 }
 
 inline int rm_quote(std::string &s)
