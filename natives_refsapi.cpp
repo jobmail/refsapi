@@ -171,17 +171,17 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
     std::wstring path = stows(getAmxString(amx, params[arg_folder], buff));
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], wstoc(name).c_str(), wstoc(path).c_str());
+    UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], wstos(name).c_str(), wstos(path).c_str());
 
     getcwd(buff, sizeof(buff));
 
     std::string root = buff;
 
-    Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? wstoc(name).c_str() : wstoc( wfmt( L"plugin-%s/%s", path.c_str(), name.c_str() ) ).c_str());
+    Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? wstos(name).c_str() : wstos( wfmt( L"plugin-%s/%s", path.c_str(), name.c_str() ) ).c_str());
 
     path = stows(buff);
 
-    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", wstoc(name).c_str(), wstoc(path).c_str(), buff);
+    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", wstos(name).c_str(), wstos(path).c_str(), buff);
 
     bool is_exist;
 
@@ -189,7 +189,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
         std::wfstream file;
     
-        file.open(wstoc(path).c_str(), is_exist ? std::ios::in | std::ios::binary : std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
+        file.open(wstos(path).c_str(), is_exist ? std::ios::in | std::ios::binary : std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
     
         UTIL_ServerPrint("[DEBUG] rf_config(): is_exist = %d, is_open = %d\n", is_exist, file.is_open());
 
@@ -205,7 +205,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                 while (std::getline(file, line, L'\n')) {
 
-                    UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", wstoc(line).c_str());
+                    UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", wstos(line).c_str());
 
                     // COMMENTS
                     if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L"=")) == std::string::npos) continue;
@@ -217,13 +217,13 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
 
                     if (rm_quote(var_value) == -1)
 
-                        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: the parameter <%s> has a value <%s> with a wrong quotation mark", __FUNCTION__, wstoc(var_name).c_str(), wstoc(var_value).c_str());
+                        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: the parameter <%s> has a value <%s> with a wrong quotation mark", __FUNCTION__, wstos(var_name).c_str(), wstos(var_value).c_str());
 
                     else                       
                         
                         trim(var_value);
 
-                    UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstoc(var_name).c_str(), wstoc(var_value).c_str());
+                    UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstos(var_name).c_str(), wstos(var_value).c_str());
 
                     g_cvar_mngr.add(plugin, var_name, var_value, FCVAR_SERVER | FCVAR_SPONLY, L"TEST");
 
@@ -257,7 +257,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params) {
         
         } else 
 
-            AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, wstoc(path).c_str());
+            AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s>", __FUNCTION__, wstos(path).c_str());
     }
 
     return result;

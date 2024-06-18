@@ -3,6 +3,14 @@
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
+typedef enum CVAR_TYPES_e {
+    CVAR_NONE,
+    CVAR_NUM,
+    CVAR_FLOAT,
+    CVAR_STRING,
+    CVAR_TYPES_SIZE
+} CVAR_TYPES_t;
+
 typedef struct m_cvar_s
 {
     cvar_t *cvar;
@@ -40,7 +48,7 @@ private:
     {
         enum { _name, _value, _count};
         // Copy params
-        std::string p[_count] = { wstoc(c.name), wstoc(c.value) };
+        std::string p[_count] = { wstos(c.name), wstos(c.value) };
         auto p_name = p[_name].data();
         auto p_value = p[_value].data();
         cvar_t *p_cvar = CVAR_GET_POINTER(p_name);
@@ -75,7 +83,7 @@ public:
         {
             value = stows(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
             // std::wstring test = stows(num).get();
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstoc(value).c_str());
+            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstos(value).c_str());
         }
         // Plugin cvars exist?
         if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
@@ -103,7 +111,7 @@ public:
         if ((m_cvar.cvar = create_cvar(m_cvar)) != nullptr)
         {
             auto result = p_cvar_list.insert({name, m_cvar});
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, m_cvar.name.c_str(), m_cvar.value.c_str(), wstoc(m_cvar.desc).c_str());
+            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, m_cvar.name.c_str(), m_cvar.value.c_str(), wstos(m_cvar.desc).c_str());
             // Save cvars list
             if (result.second)
             {
@@ -117,7 +125,7 @@ public:
             }
         }
         else
-            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstoc(name).c_str(), wstoc(value).c_str());
+            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstos(name).c_str(), wstos(value).c_str());
         return cvar_list_it{};
     }
     cvar_list_it get(CPluginMngr::CPlugin *plugin, std::wstring name)
@@ -141,13 +149,13 @@ public:
         auto cvar_it = get(plugin, name);
         check_it_empty(cvar_it);
         auto cvar = cvar_it->second.cvar;
-        cvar_direct_set(cvar, wstoc(value).c_str());
+        cvar_direct_set(cvar, wstos(value).c_str());
     }
     void set(CPluginMngr::CPlugin *plugin, cvar_list_it cvar_it, std::wstring value)
     {
         check_it_empty(cvar_it);
         auto cvar = cvar_it->second.cvar;
-        cvar_direct_set(cvar, wstoc(value).c_str());
+        cvar_direct_set(cvar, wstos(value).c_str());
     }
     void clear(CPluginMngr::CPlugin *plugin)
     {
@@ -162,5 +170,3 @@ public:
         cvars.plugin.clear();
     }
 };
-
-extern cvar_mngr g_cvar_mngr;
