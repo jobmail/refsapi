@@ -1,7 +1,9 @@
 #pragma once
+
+#include "refsapi.h"
 #include "precompiled.h"
 
-extern std::wstring_convert<convert_type, wchar_t> g_converter;
+//extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
 /*
 inline bool is_valid_index(const size_t index);
