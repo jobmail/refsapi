@@ -77,7 +77,8 @@ public:
         cvar_list_t p_cvar_list;
         plugin_cvar_it plugin_it;
         std::string s = g_converter.to_bytes(value);
-        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        std::transform(name.begin(), name.end(), name.begin(), std::bind2nd(std::ptr_fun(&std::tolower<wchar_t>), std::locale("ru_RU.UTF-8")));
+        
         // Is number?
         if (is_number(s))
         {
