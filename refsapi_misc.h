@@ -4,11 +4,12 @@
 
 //extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
+/*
 inline bool is_valid_index(const size_t index);
 inline bool is_valid_entity(const edict_t *pEdict);
 inline bool is_valid_team(const int team);
 inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2);
-
+*/
 
 extern bool is_number(std::string &s);
 /*
@@ -96,7 +97,7 @@ inline bool is_valid_entity(const edict_t *pEdict)
     return !(pEdict == NULL || pEdict == nullptr || pEdict->pvPrivateData == nullptr || pEdict->free || (pEdict->v.flags & FL_KILLME));
 }
 
-inline bool is_valid_team(const int team)
+inline bool __is_valid_team(const int team)
 {
     return team >= TEAM_TERRORIST && team <= TEAM_CT;
 }
