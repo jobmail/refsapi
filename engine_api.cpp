@@ -1,9 +1,5 @@
 #include "precompiled.h"
 
-//#include <extdll.h>
-//#include <meta_api.h>
-//#include <refsapi.h>
-
 enginefuncs_t g_EngineFunctionsTable =
 {
 	NULL,		// pfnPrecacheModel()

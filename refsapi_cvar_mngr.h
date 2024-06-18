@@ -79,7 +79,7 @@ public:
             // Cvar exist?
             if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
             {
-                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): cvar exist allready!");
+                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): cvar exist allready!\n");
                 return cvar_it;
             }
         }
