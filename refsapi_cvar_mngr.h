@@ -94,6 +94,7 @@ private:
 public:
     void bind(CPluginMngr::CPlugin *plugin, cvar_list_it cvar_it, cell *ptr, size_t size = 0)
     {
+        check_it_empty_r(cvar_it);
         std::list<ptr_bind_t> bind_list;
         cvar_bind_it bind_it;
         ptr_bind_t bind;
@@ -119,6 +120,7 @@ public:
     }
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
+        check_it_empty_r(cvar_it);
         UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
         cvar_bind_it bind_it;
         // Bind exists?
