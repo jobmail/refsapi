@@ -150,6 +150,7 @@ public:
             return cvar_list_it{};
         // Fill cvar
         m_cvar_t m_cvar;
+        m_cvar.cvar = p_cvar;
         m_cvar.name = stows(p_cvar->name);
         m_cvar.value = stows(p_cvar->string);
         //m_cvar.type = CVAR_TYPE_NONE;
