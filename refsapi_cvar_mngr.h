@@ -119,7 +119,8 @@ public:
         // Bind exists?
         if ((bind_it = cvars.bind.find(cvar_it)) != cvars.bind.end())
         {
-            for (auto bind = bind_it->second.begin(); bind != bind_it->second.end(); bind++) //(auto& bind : (bind_it->second))
+            std::list<p_bind_t> cvar_bind = bind_it->second;
+            for (auto bind = cvar_bind.begin(); bind != cvar_bind.end(); bind++) //(auto& bind : (bind_it->second))
             {
                 /*
                 // Is number?
