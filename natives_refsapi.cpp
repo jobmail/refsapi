@@ -247,6 +247,7 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
     std::wstring value = stows(getAmxString(amx, params[arg_value], g_buff));
     std::wstring desc = stows(getAmxString(amx, params[arg_desc], g_buff));
     auto result = g_cvar_mngr.add(plugin, name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val]));
+    UTIL_ServerPrint("[DEBUG] rf_create_cvar(): result = %d\n", &result);
     return check_it_empty(result) ? 0 : (cell)((void*)(&result));
 }
 
