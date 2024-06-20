@@ -29,13 +29,13 @@ typedef struct m_cvar_s
     float min_val;
     float max_val;
 } m_cvar_t;
-
+/*
 typedef struct p_bind_s
 {
     cell* ptr;
     size_t size;
 } p_bind_t;
-
+*/
 typedef std::map<std::wstring, m_cvar_t> cvar_list_t;
 typedef cvar_list_t::iterator cvar_list_it;
 
@@ -45,8 +45,8 @@ typedef plugin_cvar_t::iterator plugin_cvar_it;
 typedef std::map<cvar_t*, cvar_list_it> p_cvar_t;
 typedef p_cvar_t::iterator p_cvar_it;
 
-typedef std::map<cvar_list_it, std::list<p_bind_t>> cvar_bind_t;
-typedef cvar_bind_t::iterator cvar_bind_it;
+//typedef std::map<cvar_list_it, std::list<p_bind_t>> cvar_bind_t;
+//typedef cvar_bind_t::iterator cvar_bind_it;
 
 typedef struct cvar_mngr_s
 {
