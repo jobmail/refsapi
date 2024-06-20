@@ -53,7 +53,7 @@ typedef struct cvar_mngr_s
     cvar_list_t cvar_list;
     plugin_cvar_t plugin;    
     p_cvar_t p_cvar;
-    cvar_bind_t bind;
+    cvar_bind_t p_bind;
 } cvar_mngr_t;
 
 class cvar_mngr
@@ -288,7 +288,7 @@ public:
     }
     void clear_bind_all()
     {
-        cvars.bind.clear();
+        cvars.p_bind.clear();
     }
     void clear_all()
     {
