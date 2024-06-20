@@ -47,6 +47,7 @@ typedef p_cvar_t::iterator p_cvar_it;
 
 typedef std::map<cvar_list_it, std::list<p_bind_t>> cvar_bind_t;
 typedef cvar_bind_t::iterator cvar_bind_it;
+typedef std::list<p_bind_t>::iterator p_bind_it;
 
 typedef struct cvar_mngr_s
 {
