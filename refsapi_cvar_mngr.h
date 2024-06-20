@@ -141,7 +141,7 @@ public:
                     *bind.ptr = amx_ftoc(cvar_it->second.cvar->value);
                 // Copy string
                 else
-                    Q_memcpy(bind.ptr, cvar_it->second.cvar->string, bind.size);
+                    Q_memcpy(bind.ptr, cvar_it->second.cvar->string, bind.size << 2);
             }
         }
     }
