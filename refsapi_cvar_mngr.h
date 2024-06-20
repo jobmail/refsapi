@@ -113,7 +113,7 @@ public:
     */
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
-        //UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
+        UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
         cvar_bind_it bind_it;
         // Bind exists?
         /*
