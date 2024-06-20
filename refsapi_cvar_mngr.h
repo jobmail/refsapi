@@ -3,7 +3,8 @@
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
-typedef enum CVAR_TYPES_e {
+typedef enum CVAR_TYPES_e
+{
     CVAR_TYPE_NONE,
     CVAR_TYPE_NUM,
     CVAR_TYPE_FLOAT,
@@ -18,7 +19,8 @@ typedef struct m_cvar_s
     std::wstring name;
     std::wstring value;
     std::wstring desc;
-    CVAR_TYPES_t type;
+    //CVAR_TYPES_t type;
+    CPluginMngr::CPlugin *plugin;
     int flags;
     bool has_min;
     bool has_max;
@@ -27,13 +29,20 @@ typedef struct m_cvar_s
 } m_cvar_t;
 
 typedef std::map<std::wstring, m_cvar_t> cvar_list_t;
-typedef std::map<int, cvar_list_t> plugin_cvar_t;
 typedef cvar_list_t::iterator cvar_list_it;
+
+typedef std::map<int, std::list<cvar_list_it>> plugin_cvar_t;
 typedef plugin_cvar_t::iterator plugin_cvar_it;
+
+typedef std::map<cvar_t*, cvar_list_it> p_cvar_t;
+typedef p_cvar_t::iterator p_cvar_it;
 
 typedef struct cvar_mngr_s
 {
-    plugin_cvar_t plugin;
+    cvar_list_t cvar_list;
+    plugin_cvar_t plugin;    
+    p_cvar_t p_cvar;
+
 } cvar_mngr_t;
 
 class cvar_mngr
@@ -48,9 +57,14 @@ private:
     }
     cvar_t *create_cvar(m_cvar_t &c)
     {
-        enum { _name, _value, _count};
+        enum
+        {
+            _name,
+            _value,
+            _count
+        };
         // Copy params
-        std::string p[_count] = { wstos(c.name), wstos(c.value) };
+        std::string p[_count] = {wstos(c.name), wstos(c.value)};
         auto p_name = p[_name].data();
         auto p_value = p[_value].data();
         cvar_t *p_cvar = CVAR_GET_POINTER(p_name);
@@ -71,16 +85,38 @@ private:
     }
 
 public:
+    cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
+    {
+        if (p_cvar == nullptr)
+            return cvar_list_it{};
+        // Fill cvar
+        m_cvar_t m_cvar;
+        m_cvar.name = stows(p_cvar->name);
+        m_cvar.value = stows(p_cvar->string);
+        //m_cvar.type = CVAR_TYPE_NONE;
+        m_cvar.desc = desc;
+        m_cvar.flags = p_cvar->flags;
+        m_cvar.plugin = nullptr;
+        m_cvar.has_min = has_min;
+        m_cvar.min_val = min_val;
+        m_cvar.has_max = has_max;
+        m_cvar.max_val = max_val;
+        // Save cvars list
+        auto result = cvars.cvar_list.insert({ m_cvar.name, m_cvar });
+        if (result.second)
+        {
+            cvars.p_cvar.insert({ m_cvar.cvar, result.first });
+        }   
+    }
     cvar_list_it add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
-        if (name.empty() || value.empty())
+        if (name.empty() || value.empty() || plugin == nullptr)
             return cvar_list_it{};
         cvar_list_it cvar_it;
-        cvar_list_t p_cvar_list;
         plugin_cvar_it plugin_it;
         std::string s = g_converter.to_bytes(value);
         // Fix caps in name
-        ws_convert_tolower(name); //std::transform(name.begin(), name.end(), name.begin(), std::bind(std::tolower<wchar_t>, std::placeholders::_1, _LOCALE));
+        ws_convert_tolower(name);
         // Is number?
         if (is_number(s))
         {
@@ -88,43 +124,45 @@ public:
             // std::wstring test = stows(num).get();
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstos(value).c_str());
         }
-        // Plugin cvars exist?
-        if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
+        // Cvar exist?
+        if (((cvar_it = cvars.cvar_list.find(name)) != cvars.cvar_list.end()))
         {
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): plugin_it = %d\n", plugin_it);
-            p_cvar_list = plugin_it->second;
-            // Cvar exist?
-            if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
-            {
-                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): cvar exist allready!\n");
-                return cvar_it;
-            }
+            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): cvar exist allready!\n");
+            return cvar_it;
         }
         // Fill cvar
         m_cvar_t m_cvar;
         m_cvar.name = name;
         m_cvar.value = value;
-        m_cvar.type = CVAR_TYPE_NONE;
+        //m_cvar.type = CVAR_TYPE_NONE;
         m_cvar.desc = desc;
         m_cvar.flags = flags;
+        m_cvar.plugin = plugin;
         m_cvar.has_min = has_min;
         m_cvar.min_val = min_val;
         m_cvar.has_max = has_max;
         m_cvar.max_val = max_val;
         UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): before create_var()\n");
+        // Create cvar
         if ((m_cvar.cvar = create_cvar(m_cvar)) != nullptr)
         {
-            auto result = p_cvar_list.insert({name, m_cvar});
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str(), wstos(m_cvar.desc).c_str());
             // Save cvars list
+            auto result = cvars.cvar_list.insert({ m_cvar.name, m_cvar });
             if (result.second)
             {
+                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str(), wstos(m_cvar.desc).c_str());
                 // Plugin cvars exist?
-                if (plugin_it != cvars.plugin.end())
-                    plugin_it->second = p_cvar_list;
+                if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
+                {
+                    plugin_it->second.push_back(result.first);
+                }
                 // Create plugin cvars
                 else
-                    cvars.plugin[plugin->getId()] = p_cvar_list;
+                {
+                    cvars.plugin[plugin->getId()].push_back(result.first);
+                }
+                // Create p_cvar
+                cvars.p_cvar.insert({ m_cvar.cvar, result.first });
                 return result.first;
             }
         }
@@ -132,38 +170,53 @@ public:
             AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstos(name).c_str(), wstos(value).c_str());
         return cvar_list_it{};
     }
-    cvar_list_it get(CPluginMngr::CPlugin *plugin, std::wstring name)
+    cvar_list_it get(std::wstring name)
     {
-        plugin_cvar_it plugin_it;
         cvar_list_it cvar_it;
-        cvar_list_t p_cvar_list;
         // Fix caps in name
         ws_convert_tolower(name);
-        // Plugin cvars exist?
-        if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
+        // Cvar exist?
+        if ((cvar_it = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
         {
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::get(): plugin_it = %d\n", plugin_it);
-            p_cvar_list = plugin_it->second;
+            return cvar_it;
+        }
+        // Check global cvar
+        else
+        {
+            std::string p = wstos(name);
+            cvar_t *p_cvar = CVAR_GET_POINTER(p.data());
             // Cvar exist?
-            if ((cvar_it = p_cvar_list.find(name)) != p_cvar_list.end())
-                return cvar_it;
+            if (p_cvar != nullptr)
+            {
+                return add_exists(p_cvar);
+            }
         }
         return cvar_list_it{};
     }
-    void set(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value)
+    cvar_list_it get(cvar_t *p_cvar)
     {
-        auto cvar_it = get(plugin, name);
+        p_cvar_it cvar_it;
+        // Cvar exist?
+        if ((cvar_it = cvars.p_cvar.find(p_cvar)) != cvars.p_cvar.end())
+        {
+            return cvar_it->second;
+        }
+        return cvar_list_it{};
+    }
+    void set(std::wstring name, std::wstring value)
+    {
+        auto cvar_it = get(name);
         check_it_empty(cvar_it);
         auto cvar = cvar_it->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }
-    void set(CPluginMngr::CPlugin *plugin, cvar_list_it cvar_it, std::wstring value)
+    void set(cvar_list_it cvar_it, std::wstring value)
     {
         check_it_empty(cvar_it);
         auto cvar = cvar_it->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }
-    void clear(CPluginMngr::CPlugin *plugin)
+    void clear_plugin(CPluginMngr::CPlugin *plugin)
     {
         plugin_cvar_it plugin_it;
         cvar_list_t p_cvar_list;
@@ -171,9 +224,23 @@ public:
         if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
             plugin_it->second.clear();
     }
-    void clear_all()
+    void clear_plugin_all()
     {
         cvars.plugin.clear();
+    }
+    void clear_cvar_list()
+    {
+        cvars.cvar_list.clear();
+    }
+    void clear_pcvar_all()
+    {
+        cvars.p_cvar.clear();
+    }
+    void clear_all()
+    {
+        clear_plugin_all();
+        clear_pcvar_all();
+        clear_cvar_list();
     }
 };
 
