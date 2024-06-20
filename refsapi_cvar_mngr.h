@@ -46,7 +46,6 @@ typedef std::map<cvar_t*, cvar_list_it> p_cvar_t;
 typedef p_cvar_t::iterator p_cvar_it;
 
 typedef std::map<cvar_t*, std::list<ptr_bind_t>> cvar_bind_t;
-        
 typedef cvar_bind_t::iterator cvar_bind_it;
 
 typedef struct cvar_mngr_s
@@ -97,21 +96,27 @@ public:
         check_it_empty_r(cvar_it);
         std::list<ptr_bind_t> bind_list;
         cvar_bind_it bind_it;
-        ptr_bind_t bind;
+        ptr_bind_t ptr_bind;
         bool is_exist;
         // Bind exists?
         if (is_exist = (bind_it = cvars.bind.find(cvar_it->second.cvar)) != cvars.bind.end())
             bind_list = bind_it->second;
-        // Fill bind
-        bind.ptr = ptr;
-        bind.size = size;
-        // Bind exist?
-        if (!bind_list.empty() && std::find(bind_list.begin(), bind_list.end(), bind) != bind_list.end()) {
+        // Bind not empty?
+        if (!bind_list.empty())
+        {
+            // Finding exists record with same prt+size
+            auto temp = std::find_if(bind_list.begin(), bind_list.end(), [&](ptr_bind_t b)
+            {
+                return (b.ptr == ptr) && (b.size = size);
+            });
             AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: bind cvar <%s> exists already", __FUNCTION__, wstos(cvar_it->first).c_str());
             return;
         }
+        // Fill bind
+        ptr_bind.ptr = ptr;
+        ptr_bind.size = size;
         // Push bind
-        bind_list.push_back(bind);
+        bind_list.push_back(ptr_bind);
         // Update bind
         if (is_exist)
             bind_it->second = bind_list;
