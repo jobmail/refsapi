@@ -45,7 +45,7 @@ typedef plugin_cvar_t::iterator plugin_cvar_it;
 typedef std::map<cvar_t*, cvar_list_it> p_cvar_t;
 typedef p_cvar_t::iterator p_cvar_it;
 
-typedef std::map<cvar_list_it*, std::list<ptr_bind_t>> cvar_bind_t;
+typedef std::map<std::_Rb_tree_node_base*, std::list<ptr_bind_t>> cvar_bind_t;
         
 typedef cvar_bind_t::iterator cvar_bind_it;
 
@@ -99,7 +99,7 @@ public:
         ptr_bind_t bind;
         bool is_exist;
         // Bind exists?
-        if (is_exist = (bind_it = cvars.bind.find(&cvar_it)) != cvars.bind.end())
+        if (is_exist = (bind_it = cvars.bind.find(cvar_it._M_node)) != cvars.bind.end())
             bind_list = bind_it->second;
         bind.ptr = ptr;
         bind.size = size;
@@ -108,14 +108,15 @@ public:
         if (is_exist)
             bind_it->second = bind_list;
         else
-            cvars.bind[&cvar_it] = bind_list;
+            cvars.bind[cvar_it._M_node] = bind_list;
     }
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
         UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
         cvar_bind_it bind_it;
+        auto temp = cvar_it._M_node;
         // Bind exists?
-        if ((bind_it = cvars.bind.find(&cvar_it)) != cvars.bind.end())
+        if ((bind_it = cvars.bind.find(cvar_it._M_node)) != cvars.bind.end())
         {
             for (auto& bind : bind_it->second)
             {
