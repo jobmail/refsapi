@@ -92,7 +92,6 @@ private:
     }
 
 public:
-    /*
     void bind(cvar_list_it cvar_it, cell *ptr, size_t size = 0)
     {
         std::list<ptr_bind_t> bind_list;
@@ -100,7 +99,7 @@ public:
         ptr_bind_t bind;
         bool is_exist;
         // Bind exists?
-        if (is_exist = (bind_it = cvars.bind.find(cvar_it)) != cvars.bind.end())
+        if (is_exist = (bind_it = cvars.bind.find(&cvar_it)) != cvars.bind.end())
             bind_list = bind_it->second;
         bind.ptr = ptr;
         bind.size = size;
@@ -109,9 +108,8 @@ public:
         if (is_exist)
             bind_it->second = bind_list;
         else
-            cvars.bind[cvar_it] = bind_list;
+            cvars.bind[&cvar_it] = bind_list;
     }
-    */
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
         UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
@@ -119,7 +117,7 @@ public:
         // Bind exists?
         if ((bind_it = cvars.bind.find(&cvar_it)) != cvars.bind.end())
         {
-            for (auto& bind : (bind_it->second)) //(auto bind = bind_it->second.begin(); bind != bind_it->second.end(); bind++) //
+            for (auto& bind : bind_it->second)
             {
                 // Is number?
                 if (bind.size == 0)
