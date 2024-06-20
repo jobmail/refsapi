@@ -251,6 +251,21 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
     return check_it_empty(result) ? 0 : (cell)((void*)(&result));
 }
 
+// native rf_bind_pcvar_s(pcvar, any:var[], varlen);
+cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_pcvar,
+        arg_var,
+        arg_var_size,
+    };
+    g_cvar_mngr.bind(*(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    return TRUE;
+}
+
+
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
     {"rf_get_user_weapons", rf_get_user_weapons},
@@ -260,6 +275,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_user_buyzone", rf_get_user_buyzone},
     {"rf_config", rf_config},
     {"rf_create_cvar", rf_create_cvar},
+    {"rf_bind_pcvar_s", rf_bind_pcvar_s},
     {nullptr, nullptr}
 };
 
