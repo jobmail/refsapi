@@ -1,5 +1,7 @@
 #include "precompiled.h"
+
 inline CPluginMngr::CPlugin *findPluginFast(AMX *amx) { return (CPluginMngr::CPlugin *)(amx->userdata[UD_FINDPLUGIN]); }
+
 // native rf_get_players_num(nums[], nums_size, bool:teams_only);
 cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params)
 {
@@ -16,6 +18,7 @@ cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params)
     int total = g_PlayersNum[TEAM_TERRORIST] + g_PlayersNum[TEAM_CT];
     return params[arg_teams_only] ? total : total + g_PlayersNum[TEAM_UNASSIGNED] + g_PlayersNum[TEAM_SPECTRATOR];
 }
+
 // native rf_get_user_weapons(const id, ent[], ent_size);
 cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params)
 {
@@ -35,6 +38,7 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params)
         Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v.data(), max_size << 2);
     return max_size;
 }
+
 // native rf_get_weaponname(const ent, name[], name_len);
 cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params)
 {
@@ -54,6 +58,7 @@ cell AMX_NATIVE_CALL rf_get_weaponname(AMX *amx, cell *params)
     }
     return FALSE;
 }
+
 // native rf_get_ent_by_class(const classname[], const owner, ent[], ent_size);
 cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params)
 {
@@ -118,6 +123,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params)
     }
     return result;
 }
+
 // native rf_roundfloat(const Float:value, const precision);
 cell AMX_NATIVE_CALL rf_roundfloat(AMX *amx, cell *params)
 {
@@ -130,6 +136,7 @@ cell AMX_NATIVE_CALL rf_roundfloat(AMX *amx, cell *params)
     float result = acs_roundfloat(amx_ctof(params[arg_value]), params[arg_precision]);
     return amx_ftoc(result);
 }
+
 // native rf_get_user_buyzone(const id);
 cell AMX_NATIVE_CALL rf_get_user_buyzone(AMX *amx, cell *params)
 {
@@ -141,6 +148,7 @@ cell AMX_NATIVE_CALL rf_get_user_buyzone(AMX *amx, cell *params)
     CHECK_ISPLAYER(arg_index);
     return (qboolean)acs_get_user_buyzone(INDEXENT(params[arg_index]));
 }
+
 // native rf_config(const bool:auto_create = true, const name[] = "", const folder[] = "");
 cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
 {
@@ -154,18 +162,17 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     bool result = FALSE;
     UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
-    char buff[256];
-    std::wstring name = stows(getAmxString(amx, params[arg_name], buff));
+    std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
     if (name.empty())
         name = stows(plugin->getName());
     name.replace(name.find(L".amxx"), sizeof(L".amxx") - 1, L"");
-    std::wstring path = stows(getAmxString(amx, params[arg_folder], buff));
+    std::wstring path = stows(getAmxString(amx, params[arg_folder], g_buff));
     UTIL_ServerPrint("[DEBUG] rf_config(): plugin = %d, auto_create = %d, name = %s, folder = %s\n", plugin, params[arg_auto_create], wstos(name).c_str(), wstos(path).c_str());
-    getcwd(buff, sizeof(buff));
-    std::string root = buff;
-    Q_snprintf(buff, sizeof(buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? wstos(name).c_str() : wstos(wfmt(L"plugin-%s/%s", path.c_str(), name.c_str())).c_str());
-    path = stows(buff);
-    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", wstos(name).c_str(), wstos(path).c_str(), buff);
+    getcwd(g_buff, sizeof(g_buff));
+    std::string root = g_buff;
+    Q_snprintf(g_buff, sizeof(g_buff), "%s/%s/%s/plugins/%s.cfg", root.c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? wstos(name).c_str() : wstos(wfmt(L"plugin-%s/%s", path, name)).c_str());
+    path = stows(g_buff);
+    UTIL_ServerPrint("[DEBUG] rf_config(): name = %s, path = %s, current = %s\n", wstos(name).c_str(), wstos(path).c_str(), g_buff);
     bool is_exist;
     if ((is_exist = file_exists(path)) || params[arg_auto_create])
     {
@@ -182,10 +189,10 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 while (std::getline(file, line, L'\n'))
                 {
                     UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", wstos(line).c_str());
-                    // COMMENTS
+                    // Is comments?
                     if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L"=")) == std::string::npos)
                         continue;
-                    // SPLIT VAR
+                    // Split var
                     std::wstring var_name = trim_c(line.substr(0, pos++));
                     std::wstring var_value = trim_c(line.substr(pos, line.size() - pos));
                     if (rm_quote(var_value) == -1)
@@ -193,6 +200,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     else
                         trim(var_value);
                     UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstos(var_name).c_str(), wstos(var_value).c_str());
+                    /*
                     g_cvar_mngr.add(plugin, var_name, var_value, FCVAR_SERVER | FCVAR_SPONLY, L"TEST");
                     // CHECK
                     auto cvar_it = g_cvar_mngr.get(var_name);
@@ -203,6 +211,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, string = <%s>, value = %f\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string, cvar_it->second.cvar->value);
                     g_cvar_mngr.set(cvar_it, L"LAST_TEST");
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, string = <%s>, value = %f\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string, cvar_it->second.cvar->value);
+                    */
                 }
             }
             else
@@ -217,6 +226,30 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     }
     return result;
 }
+
+// native rf_create_cvar(const name[], const value[], flags = FCVAR_NONE, const desc[] = "", bool:has_min = false, Float:min_val = 0.0, bool:has_max = false, Float:max_val = 0.0);
+cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_name,
+        arg_value,
+        arg_flags,
+        arg_desc,
+        arg_has_min,
+        arg_min_val,
+        arg_has_max,
+        arg_max_val
+    };
+    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
+    std::wstring value = stows(getAmxString(amx, params[arg_value], g_buff));
+    std::wstring desc = stows(getAmxString(amx, params[arg_desc], g_buff));
+    auto result = g_cvar_mngr.add(plugin, name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val]));
+    return check_it_empty(result) ? 0 : (cell)((void*)(&result));
+}
+
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
     {"rf_get_user_weapons", rf_get_user_weapons},
@@ -225,7 +258,9 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_roundfloat", rf_roundfloat},
     {"rf_get_user_buyzone", rf_get_user_buyzone},
     {"rf_config", rf_config},
-    {nullptr, nullptr}};
+    {nullptr, nullptr}
+};
+
 void RegisterNatives_Misc()
 {
     g_amxxapi.AddNatives(Misc_Natives);
