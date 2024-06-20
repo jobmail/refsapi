@@ -29,13 +29,13 @@ typedef struct m_cvar_s
     float min_val;
     float max_val;
 } m_cvar_t;
-/*
+
 typedef struct p_bind_s
 {
     cell* ptr;
     size_t size;
 } p_bind_t;
-*/
+
 typedef std::map<std::wstring, m_cvar_t> cvar_list_t;
 typedef cvar_list_t::iterator cvar_list_it;
 
@@ -45,8 +45,8 @@ typedef plugin_cvar_t::iterator plugin_cvar_it;
 typedef std::map<cvar_t*, cvar_list_it> p_cvar_t;
 typedef p_cvar_t::iterator p_cvar_it;
 
-//typedef std::map<cvar_list_it, std::list<p_bind_t>> cvar_bind_t;
-//typedef cvar_bind_t::iterator cvar_bind_it;
+typedef std::map<cvar_list_it, std::list<p_bind_t>> cvar_bind_t;
+typedef cvar_bind_t::iterator cvar_bind_it;
 
 typedef struct cvar_mngr_s
 {
@@ -115,6 +115,7 @@ public:
     {
         UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
         cvar_bind_it bind_it;
+        /*
         // Bind exists?
         if ((bind_it = cvars.bind.find(cvar_it)) != cvars.bind.end())
         {
@@ -128,6 +129,7 @@ public:
                     Q_memcpy(bind.ptr, cvar_it->second.cvar->string, bind.size);
             }
         }
+        */
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
