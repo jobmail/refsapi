@@ -261,7 +261,8 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
         arg_var,
         arg_var_size,
     };
-    g_cvar_mngr.bind(*(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    g_cvar_mngr.bind(plugin, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
 
