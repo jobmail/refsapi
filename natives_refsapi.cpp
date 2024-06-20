@@ -251,6 +251,7 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
     UTIL_ServerPrint("[DEBUG] rf_create_cvar(): result = %d\n", &result);
     */
     //return check_it_empty(result) ? 0 : (cell)((void*)(&result));
+    return TRUE;
 }
 
 // native rf_bind_pcvar_s(pcvar, any:var[], varlen);
