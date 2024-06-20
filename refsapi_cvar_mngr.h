@@ -91,6 +91,7 @@ private:
     }
 
 public:
+    /*
     void bind(cvar_list_it cvar_it, cell *ptr, size_t size = 0)
     {
         std::list<p_bind_t> bind_list;
@@ -109,6 +110,7 @@ public:
         else
             cvars.bind[cvar_it] = bind_list;
     }
+    */
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
         UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
