@@ -141,7 +141,10 @@ public:
                     *bind.ptr = amx_ftoc(cvar_it->second.cvar->value);
                 // Copy string
                 else
+                {
+                    UTIL_ServerPrint("[DEBUG] on_change(): from = %s\n", cvar_it->second.cvar->string);
                     Q_memcpy(bind.ptr, cvar_it->second.cvar->string, std::min(cvar_it->second.value.size() + 1, bind.size << 2));
+                }
             }
         }
     }
