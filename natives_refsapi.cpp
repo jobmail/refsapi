@@ -266,8 +266,9 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
     if (params[arg_var] > plugin->getAMX()->hlw)
     {
         AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: Cvars can only be bound to global variables", __FUNCTION__);
-        return;
+        return FALSE;
     }
+    //atoi();
     g_cvar_mngr.bind(plugin, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
