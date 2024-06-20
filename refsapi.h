@@ -9,7 +9,8 @@
 #define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN         (sizeof(WP_CLASS_PREFIX) - 1)
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
-#define check_it_empty(x)           if (x._M_node == nullptr) return
+#define check_it_empty(x)           (x._M_node == nullptr)
+#define check_it_empty_r(x)         if (check_it_empty(x)) return
 
 #define _QQ                         "\"'`"
 #define _LOCALE                     std::locale("ru_RU.UTF-8")

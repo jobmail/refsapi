@@ -195,13 +195,13 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstos(var_name).c_str(), wstos(var_value).c_str());
                     g_cvar_mngr.add(plugin, var_name, var_value, FCVAR_SERVER | FCVAR_SPONLY, L"TEST");
                     // CHECK
-                    auto cvar_it = g_cvar_mngr.get(plugin, var_name);
+                    auto cvar_it = g_cvar_mngr.get(var_name);
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, string = <%s>, value = %f\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string, cvar_it->second.cvar->value);
-                    g_cvar_mngr.set(plugin, var_name, L"123.45678900000123");
+                    g_cvar_mngr.set(var_name, L"123.45678900000123");
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, string = <%s>, value = %f\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string, cvar_it->second.cvar->value);
-                    g_cvar_mngr.set(plugin, cvar_it, L"987.654321000111222");
+                    g_cvar_mngr.set(cvar_it, L"987.654321000111222");
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, string = <%s>, value = %f\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string, cvar_it->second.cvar->value);
-                    g_cvar_mngr.set(plugin, cvar_it, L"LAST_TEST");
+                    g_cvar_mngr.set(cvar_it, L"LAST_TEST");
                     UTIL_ServerPrint("[DEBUG] rf_config(): CHECK ==> exist = %d, name = <%s>, string = <%s>, value = %f\n", cvar_it->second, cvar_it->second.cvar->name, cvar_it->second.cvar->string, cvar_it->second.cvar->value);
                 }
             }
