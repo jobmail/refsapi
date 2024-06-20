@@ -118,7 +118,7 @@ public:
         // Bind exists?
         if ((bind_it = cvars.bind.find(cvar_it)) != cvars.bind.end())
         {
-            auto cvar_bind = bind_it->second;
+            //auto cvar_bind = bind_it->second;
                 /*
             for (auto bind = cvar_bind.begin(); bind != cvar_bind.end(); bind++) //(auto& bind : (bind_it->second))
             {
