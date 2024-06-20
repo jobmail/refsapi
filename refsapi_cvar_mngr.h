@@ -45,8 +45,7 @@ typedef plugin_cvar_t::iterator plugin_cvar_it;
 typedef std::map<cvar_t*, cvar_list_it> p_cvar_t;
 typedef p_cvar_t::iterator p_cvar_it;
 
-typedef std::list<p_bind_t>::iterator p_bind_it;
-typedef std::map<cvar_list_it, std::list<p_bind_it>> cvar_bind_t;
+typedef std::map<cvar_list_it, std::list<p_bind_t>> cvar_bind_t;
 typedef cvar_bind_t::iterator cvar_bind_it;
 
 typedef struct cvar_mngr_s
@@ -120,17 +119,17 @@ public:
         if ((bind_it = cvars.bind.find(cvar_it)) != cvars.bind.end())
         {
             auto cvar_bind = bind_it->second;
+                /*
             for (auto bind = cvar_bind.begin(); bind != cvar_bind.end(); bind++) //(auto& bind : (bind_it->second))
             {
-                /*
                 // Is number?
                 if (bind->size == 0)
                     *bind->ptr = amx_ftoc(cvar_it->second.cvar->value);
                 // Copy string
                 else
                     Q_memcpy(bind->ptr, cvar_it->second.cvar->string, bind->size);
-                */
             }
+                */
         }
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
