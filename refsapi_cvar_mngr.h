@@ -119,18 +119,15 @@ public:
         // Bind exists?
         if ((bind_it = cvars.bind.find(&cvar_it)) != cvars.bind.end())
         {
-            /*
-            //auto cvar_bind = bind_it->second;
-            for (auto bind = cvar_bind.begin(); bind != cvar_bind.end(); bind++) //(auto& bind : (bind_it->second))
+            for (auto& bind : (bind_it->second)) //(auto bind = bind_it->second.begin(); bind != bind_it->second.end(); bind++) //
             {
                 // Is number?
-                if (bind->size == 0)
-                    *bind->ptr = amx_ftoc(cvar_it->second.cvar->value);
+                if (bind.size == 0)
+                    *bind.ptr = amx_ftoc(cvar_it->second.cvar->value);
                 // Copy string
                 else
-                    Q_memcpy(bind->ptr, cvar_it->second.cvar->string, bind->size);
+                    Q_memcpy(bind.ptr, cvar_it->second.cvar->string, bind.size);
             }
-            */
         }
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
