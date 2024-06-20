@@ -269,7 +269,6 @@ inline void rtrim(std::wstring &s)
 
 inline void rtrim_zero(std::string &s)
 {
-    if (s.size() < 2) return;
     s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
     {
         return ch != '0' && ch != '.';
