@@ -30,6 +30,12 @@ typedef struct m_cvar_s
     float max_val;
 } m_cvar_t;
 
+typedef struct p_bind_s
+{
+    cell* ptr;
+    size_t size;
+} p_bind_t;
+
 typedef std::map<std::wstring, m_cvar_t> cvar_list_t;
 typedef cvar_list_t::iterator cvar_list_it;
 
@@ -39,12 +45,15 @@ typedef plugin_cvar_t::iterator plugin_cvar_it;
 typedef std::map<cvar_t*, cvar_list_it> p_cvar_t;
 typedef p_cvar_t::iterator p_cvar_it;
 
+typedef std::map<cvar_list_it, std::list<p_bind_t>> cvar_bind_t;
+typedef cvar_bind_t::iterator cvar_bind_it;
+
 typedef struct cvar_mngr_s
 {
     cvar_list_t cvar_list;
     plugin_cvar_t plugin;    
     p_cvar_t p_cvar;
-
+    cvar_bind_t bind;
 } cvar_mngr_t;
 
 class cvar_mngr
@@ -82,10 +91,41 @@ private:
     }
 
 public:
-    void on_change(cvar_list_it cvar_list, std::string &new_value)
+    void bind(cvar_list_it cvar_it, cell *ptr, size_t size = 0)
     {
-        //////////////
-        UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_list->second.name).c_str(), wstos(cvar_list->second.value).c_str(), new_value.c_str());
+        std::list<p_bind_t> bind_list;
+        cvar_bind_it bind_it;
+        p_bind_t bind;
+        bool is_exist;
+        // Bind exists?
+        if (is_exist = (bind_it = cvars.bind.find(cvar_it)) != cvars.bind.end())
+            bind_list = bind_it->second;
+        bind.ptr = ptr;
+        bind.size = size;
+        bind_list.push_back(bind);
+        // Update bind
+        if (is_exist)
+            bind_it->second = bind_list;
+        else
+            cvars.bind[cvar_it] = bind_list;
+    }
+    void on_change(cvar_list_it cvar_it, std::string &new_value)
+    {
+        UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
+        cvar_bind_it bind_it;
+        // Bind exists?
+        if ((bind_it = cvars.bind.find(cvar_it)) != cvars.bind.end())
+        {
+            for (auto& bind : bind_it->second)
+            {
+                // Is number?
+                if (bind.size == 0)
+                    *bind.ptr = amx_ftoc(cvar_it->second.cvar->value);
+                // Copy string
+                else
+                    Q_memcpy(bind.ptr, cvar_it->second.cvar->string, bind.size);
+            }
+        }
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
@@ -241,11 +281,16 @@ public:
     {
         cvars.p_cvar.clear();
     }
+    void clear_bind_all()
+    {
+        cvars.bind.clear();
+    }
     void clear_all()
     {
         clear_plugin_all();
         clear_pcvar_all();
         clear_cvar_list();
+        clear_bind_all();
     }
 };
 
