@@ -286,7 +286,7 @@ public:
     {
         cvars.p_cvar.clear();
     }
-    void clear_bind_all()
+    void clear_pbind_all()
     {
         cvars.p_bind.clear();
     }
@@ -295,7 +295,7 @@ public:
         clear_plugin_all();
         clear_pcvar_all();
         clear_cvar_list();
-        clear_bind_all();
+        clear_pbind_all();
     }
 };
 
