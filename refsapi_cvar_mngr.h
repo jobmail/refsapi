@@ -110,7 +110,7 @@ public:
                 return (b.ptr == ptr) && (b.size = size);
             });
             if (result != bind_list.end()) {
-                AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: bind cvar <%s> exists already", __FUNCTION__, wstos(cvar_it->first).c_str());
+                AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> exists already", __FUNCTION__, wstos(cvar_it->first).c_str());
                 return;
             }
         }
@@ -128,11 +128,11 @@ public:
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
         check_it_empty_r(cvar_it);
-        UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
         cvar_bind_it bind_it;
         // Bind exists?
         if ((bind_it = cvars.bind.find(cvar_it->second.cvar)) != cvars.bind.end())
         {
+            UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
             for (auto& bind : bind_it->second)
             {
                 // Is number?
