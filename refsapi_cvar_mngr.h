@@ -107,7 +107,7 @@ public:
         auto result = cvars.cvar_list.insert({ m_cvar.name, m_cvar });
         if (result.second)
         {
-            UTIL_ServerPrint("[DEBUG] add_exists(): cvar = %d \n", m_cvar.cvar);
+            UTIL_ServerPrint("[DEBUG] add_exists(): cvar = %d, name = <%s>, value = <%s>\n", m_cvar.cvar, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str());
             cvars.p_cvar.insert({ m_cvar.cvar, result.first });
             return result.first;
         }
