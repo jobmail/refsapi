@@ -62,8 +62,7 @@ struct sClients {
 typedef std::codecvt_utf8<wchar_t> convert_type;
 
 extern bool r_bMapHasBuyZone;
-extern char g_fmt_buff[1024];
-extern wchar_t g_wfmt_buff[1024];
+extern char g_buff[4096];
 extern sClients g_Clients[MAX_PLAYERS + 1];
 extern sTries g_Tries;
 extern cell g_PlayersNum[6];

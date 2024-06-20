@@ -4,12 +4,10 @@ int gmsgTeamInfo;
 int mState;
 int g_PlayersNum[6];
 
-int a = sizeof(TEAMS_t);
-
 bool r_bMapHasBuyZone;
+char g_buff[4096];
 
 cvar_mngr g_cvar_mngr;
-
 sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
 

@@ -59,12 +59,7 @@ private:
     }
     cvar_t *create_cvar(m_cvar_t &c)
     {
-        enum
-        {
-            _name,
-            _value,
-            _count
-        };
+        enum { _name, _value, _count };
         // Copy params
         std::string p[_count] = {wstos(c.name), wstos(c.value)};
         auto p_name = p[_name].data();
