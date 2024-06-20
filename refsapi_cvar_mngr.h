@@ -104,7 +104,7 @@ public:
         // Bind not empty?
         if (!bind_list.empty())
         {
-            // Finding exists record with same prt+size
+            // Finding exists record with same (ptr & size)
             auto temp = std::find_if(bind_list.begin(), bind_list.end(), [&](ptr_bind_t b)
             {
                 return (b.ptr == ptr) && (b.size = size);
