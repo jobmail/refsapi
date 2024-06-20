@@ -243,14 +243,12 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
         arg_max_val
     };
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
-    /*
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
     std::wstring value = stows(getAmxString(amx, params[arg_value], g_buff));
     std::wstring desc = stows(getAmxString(amx, params[arg_desc], g_buff));
     auto result = g_cvar_mngr.add(plugin, name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val]));
     UTIL_ServerPrint("[DEBUG] rf_create_cvar(): result = %d\n", &result);
-    */
-    //return check_it_empty(result) ? 0 : (cell)((void*)(&result));
+    return check_it_empty(result) ? 0 : (cell)((void*)(&result));
     return TRUE;
 }
 
@@ -264,7 +262,7 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
         arg_var,
         arg_var_size,
     };
-    //g_cvar_mngr.bind(*(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    g_cvar_mngr.bind(*(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
 
