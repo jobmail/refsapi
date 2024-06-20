@@ -92,7 +92,7 @@ private:
     }
 
 public:
-    void bind(cvar_list_it cvar_it, cell *ptr, size_t size = 0)
+    void bind(CPluginMngr::CPlugin *plugin, cvar_list_it cvar_it, cell *ptr, size_t size = 0)
     {
         std::list<ptr_bind_t> bind_list;
         cvar_bind_it bind_it;
@@ -101,8 +101,15 @@ public:
         // Bind exists?
         if (is_exist = (bind_it = cvars.bind.find(cvar_it._M_node)) != cvars.bind.end())
             bind_list = bind_it->second;
+        // Fill bind
         bind.ptr = ptr;
         bind.size = size;
+        // Bind exist?
+        if (!bind_list.empty() && std::find(bind_list.begin(), bind_list.end(), bind) != bind_list.end()) {
+            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: bind cvar <%s> exists already", __FUNCTION__, wstos(cvar_it->first).c_str());
+            return;
+        }
+        // Push bind
         bind_list.push_back(bind);
         // Update bind
         if (is_exist)
