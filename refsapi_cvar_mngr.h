@@ -85,7 +85,7 @@ public:
     void on_change(cvar_list_it cvar_list, std::string &new_value)
     {
         //////////////
-        
+        UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_list->second.name).c_str(), wstos(cvar_list->second.value).c_str(), new_value.c_str());
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
@@ -107,6 +107,7 @@ public:
         auto result = cvars.cvar_list.insert({ m_cvar.name, m_cvar });
         if (result.second)
         {
+            UTIL_ServerPrint("[DEBUG] add_exists(): cvar = %d \n", m_cvar.cvar);
             cvars.p_cvar.insert({ m_cvar.cvar, result.first });
             return result.first;
         }

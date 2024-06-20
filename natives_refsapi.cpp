@@ -259,6 +259,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_roundfloat", rf_roundfloat},
     {"rf_get_user_buyzone", rf_get_user_buyzone},
     {"rf_config", rf_config},
+    {"rf_create_cvar", rf_create_cvar},
     {nullptr, nullptr}
 };
 
