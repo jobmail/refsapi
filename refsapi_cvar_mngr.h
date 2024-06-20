@@ -116,10 +116,10 @@ public:
         //UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
         cvar_bind_it bind_it;
         // Bind exists?
+        /*
         if ((bind_it = cvars.bind.find(cvar)) != cvars.bind.end())
         {
             //auto cvar_bind = bind_it->second;
-                /*
             for (auto bind = cvar_bind.begin(); bind != cvar_bind.end(); bind++) //(auto& bind : (bind_it->second))
             {
                 // Is number?
@@ -129,8 +129,8 @@ public:
                 else
                     Q_memcpy(bind->ptr, cvar_it->second.cvar->string, bind->size);
             }
-                */
         }
+        */
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
