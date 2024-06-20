@@ -45,7 +45,8 @@ typedef plugin_cvar_t::iterator plugin_cvar_it;
 typedef std::map<cvar_t*, cvar_list_it> p_cvar_t;
 typedef p_cvar_t::iterator p_cvar_it;
 
-typedef std::map<cvar_list_it, std::list<ptr_bind_t>> cvar_bind_t;
+typedef std::map<cvar_list_it*, std::list<ptr_bind_t>> cvar_bind_t;
+        
 typedef cvar_bind_t::iterator cvar_bind_it;
 
 typedef struct cvar_mngr_s
@@ -116,7 +117,7 @@ public:
         UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
         cvar_bind_it bind_it;
         // Bind exists?
-        if ((bind_it = cvars.bind.find(cvar_it)) != cvars.bind.end())
+        if ((bind_it = cvars.bind.find(&cvar_it)) != cvars.bind.end())
         {
             /*
             //auto cvar_bind = bind_it->second;
