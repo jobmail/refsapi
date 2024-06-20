@@ -3,6 +3,8 @@
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
+void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
+
 typedef enum CVAR_TYPES_e
 {
     CVAR_TYPE_NONE,
@@ -85,6 +87,11 @@ private:
     }
 
 public:
+    void on_change(cvar_list_it cvar_list, std::string &new_value)
+    {
+        //////////////
+        
+    }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
         if (p_cvar == nullptr)
@@ -106,7 +113,9 @@ public:
         if (result.second)
         {
             cvars.p_cvar.insert({ m_cvar.cvar, result.first });
-        }   
+            return result.first;
+        }
+        return cvar_list_it{};
     }
     cvar_list_it add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
@@ -114,7 +123,7 @@ public:
             return cvar_list_it{};
         cvar_list_it cvar_it;
         plugin_cvar_it plugin_it;
-        std::string s = g_converter.to_bytes(value);
+        std::string s = wstos(value); //g_converter.to_bytes(value);
         // Fix caps in name
         ws_convert_tolower(name);
         // Is number?
@@ -206,13 +215,13 @@ public:
     void set(std::wstring name, std::wstring value)
     {
         auto cvar_it = get(name);
-        check_it_empty(cvar_it);
+        check_it_empty_r(cvar_it);
         auto cvar = cvar_it->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }
     void set(cvar_list_it cvar_it, std::wstring value)
     {
-        check_it_empty(cvar_it);
+        check_it_empty_r(cvar_it);
         auto cvar = cvar_it->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }

@@ -63,6 +63,7 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	//g_RehldsHookchains->ED_Alloc()->registerHook(ED_Alloc_RH);
 	//g_RehldsHookchains->ED_Free()->registerHook(ED_Free_RH);
 	g_RehldsHookchains->CreateFakeClient()->registerHook(CreateFakeClient_RH);
+	g_RehldsHookchains->Cvar_DirectSet()->registerHook(Cvar_DirectSet_RH);
 
 	g_ReGameHookchains->CBasePlayer_Killed()->registerHook(CBasePlayer_Killed_RG);
 	g_ReGameHookchains->CSGameRules_CheckMapConditions()->registerHook(CSGameRules_CheckMapConditions_RG);
@@ -91,6 +92,7 @@ void ServerDeactivate_Post()
 	//g_RehldsHookchains->ED_Alloc()->unregisterHook(ED_Alloc_RH);
 	//g_RehldsHookchains->ED_Free()->unregisterHook(ED_Free_RH);
 	g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
+	g_RehldsHookchains->Cvar_DirectSet()->unregisterHook(Cvar_DirectSet_RH);
 
 	g_ReGameHookchains->CBasePlayer_Killed()->unregisterHook(CBasePlayer_Killed_RG);
 	g_ReGameHookchains->CSGameRules_CheckMapConditions()->unregisterHook(CSGameRules_CheckMapConditions_RG);
