@@ -105,12 +105,14 @@ public:
         if (!bind_list.empty())
         {
             // Finding exists record with same (ptr & size)
-            auto temp = std::find_if(bind_list.begin(), bind_list.end(), [&](ptr_bind_t b)
+            auto result = std::find_if(bind_list.begin(), bind_list.end(), [&](ptr_bind_t b)
             {
                 return (b.ptr == ptr) && (b.size = size);
             });
-            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: bind cvar <%s> exists already", __FUNCTION__, wstos(cvar_it->first).c_str());
-            return;
+            if (result != bind_list.end()) {
+                AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: bind cvar <%s> exists already", __FUNCTION__, wstos(cvar_it->first).c_str());
+                return;
+            }
         }
         // Fill bind
         ptr_bind.ptr = ptr;
