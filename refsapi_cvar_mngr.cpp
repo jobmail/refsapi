@@ -17,11 +17,11 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     else
     {
         m_cvar_t* m_cvar = &cvar_list->second;
-        // Is callback after fix value or samething went wrong?
-        if (m_cvar->value == stows(value))
-            return;
         // Convert to string
         std::string s = value;
+        // Is callback after fix value or samething went wrong?
+        if (m_cvar->value.compare(stows(s)) == 0)//(m_cvar->value.size() == s.size() && std::equal( begin(), m_cvar->value.end(), ))
+            return;
         // Is number?
         if (is_number(s))
             s = rtrim_zero_c(std::to_string(stod(s, m_cvar)));
