@@ -1,4 +1,5 @@
 #pragma once
+
 #include "precompiled.h"
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
@@ -107,7 +108,7 @@ private:
     }
 
 public:
-    void bind(CPluginMngr::CPlugin *plugin, cvar_list_it cvar_it, cell *ptr, size_t size = 0, CVAR_TYPES_t type = CVAR_TYPE_NONE)
+    void bind(CPluginMngr::CPlugin *plugin, CVAR_TYPES_t type, cvar_list_it cvar_it, cell *ptr, size_t size = 0)
     {
         check_it_empty_r(cvar_it);
         std::list<ptr_bind_t> bind_list;
