@@ -23,9 +23,9 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
             bool was_override = false;
             auto result = std::stod(s);
             // Check bind type and conver
-            if (m_cvar->type = CVAR_TYPE_NUM)
+            if (m_cvar->type == CVAR_TYPE_NUM)
                 result = (int)result;
-            UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f\n", s.c_str(), result);
+            UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f, type = %d\n", s.c_str(), result, m_cvar->type);
             if (was_override |= m_cvar->has_min && result < m_cvar->min_val)
                 result = m_cvar->min_val;
             if (was_override |= m_cvar->has_min && result > m_cvar->max_val)
