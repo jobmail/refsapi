@@ -145,7 +145,7 @@ inline std::wstring stows(const std::string &s)
     }
 }
 
-inline double stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
+inline double stod(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
 {
     auto result = std::strtold(s.c_str(), 0);//std::strtof(s.c_str(), 0); //(float)std::stod(s);
     UTIL_ServerPrint("[DEBUG] stof(): in = %s, out = %f\n", s.c_str(), result);
