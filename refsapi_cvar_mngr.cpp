@@ -16,6 +16,7 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     }
     else
     {
+        return;
         m_cvar_t* m_cvar = &cvar_list->second;
         // Convert to string
         std::string s = value;
