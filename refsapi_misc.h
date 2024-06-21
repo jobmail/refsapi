@@ -1,7 +1,6 @@
 #pragma once
 
 #include "refsapi.h"
-#include "refsapi_cvar_mngr.h"
 
 extern bool is_number(std::string &s);
 
@@ -109,22 +108,6 @@ inline std::wstring stows(const std::string &s)
             result.push_back(s[i] & 0xFF);
         return result;
     }
-}
-
-inline double stod(std::string s, m_cvar_t *m)
-{
-    bool was_override = false;
-    auto result = std::stod(s);
-    UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f\n", s.c_str(), result);
-    if (was_override |= m->has_min && result < m->min_val)
-        result = m->min_val;
-    if (was_override |= m->has_min && result > m->max_val)
-        result = m->max_val;
-    if (was_override) {
-        CVAR_SET_FLOAT(wstos(m->name).c_str(), result);
-        UTIL_ServerPrint("[DEBUG] stod(): override = %f, new_string = %s\n", result, m->cvar->string);
-    }
-    return result;
 }
 
 inline double stod(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
