@@ -14,19 +14,17 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
         result->second.value = stows(value);
     }
     else
-    {
-        //UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): old_value = %s, old_cvar_value = %s, new_value = %s\n", wstos(cvar_list->second.value).c_str(), cvar->string, value);
+    {        
         m_cvar_t* m_cvar = &cvar_list->second;
-        // Convert to string
         std::string s = value;
-        // Is callback after fix value or samething went wrong?
-        //if (m_cvar->value.compare(stows(s)) == 0)
-        //    return;
         // Is number?
         if (is_number(s))
         {
             bool was_override = false;
             auto result = std::stod(s);
+            // Check bind type and conver
+            if (m_cvar->type = CVAR_TYPE_NUM)
+                result = (int)result;
             UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f\n", s.c_str(), result);
             if (was_override |= m_cvar->has_min && result < m_cvar->min_val)
                 result = m_cvar->min_val;
