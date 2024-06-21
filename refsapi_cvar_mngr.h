@@ -187,7 +187,7 @@ public:
         // Is number?
         if (is_number(s))
         {
-            value = stows(rtrim_zero_c(std::to_string(zzz(s, has_min, min_val, has_max, max_val))));
+            value = stows(rtrim_zero_c(std::to_string(stof(s, has_min, min_val, has_max, max_val))));
             // std::wstring test = stows(num).get();
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstos(value).c_str());
         }
