@@ -4,6 +4,7 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
 {
     chain->callNext(cvar, value);
     cvar_list_it cvar_list = g_cvar_mngr.get(cvar);
+    UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): old_value = %s, old_cvar_value = %s, new_value = %s\n", wstos(cvar_list->second.value).c_str(), cvar->string, value);
     // Cvar not register?
     if (check_it_empty(cvar_list))
     {
@@ -17,7 +18,7 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     {
         m_cvar_t* m_cvar = &cvar_list->second;
         // Is callback after fix value or samething went wrong?
-        if (strcmp(m_cvar->cvar->string, value) == 0)
+        if (m_cvar->value == stows(value))
             return;
         // Convert to string
         std::string s = value;
