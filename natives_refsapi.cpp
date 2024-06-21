@@ -251,6 +251,57 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
     return check_it_empty(result) ? NULL : (cell)((void*)(&result));
 }
 
+// native rf_bind_pcvar(type, pcvar, any:var[], varlen = 0);
+cell AMX_NATIVE_CALL rf_bind_pcvar(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_type,
+        arg_pcvar,
+        arg_var,
+        arg_var_size,
+    };
+    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    // Variable address is not inside global area?
+    check_global_r(params[arg_var]);
+    check_type_r(params[arg_type]);
+    g_cvar_mngr.bind(plugin, (CVAR_TYPES_t)params[arg_type], *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    return TRUE;
+}
+
+// native rf_bind_pcvar_n(pcvar, &any:var);
+cell AMX_NATIVE_CALL rf_bind_pcvar_n(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_pcvar,
+        arg_var
+    };
+    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    // Variable address is not inside global area?
+    check_global_r(params[arg_var]);
+    g_cvar_mngr.bind(plugin, CVAR_TYPE_NUM, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]));
+    return TRUE;
+}
+
+// native rf_bind_pcvar_f(pcvar, &Float:var);
+cell AMX_NATIVE_CALL rf_bind_pcvar_f(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_pcvar,
+        arg_var
+    };
+    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    // Variable address is not inside global area?
+    check_global_r(params[arg_var]);
+    g_cvar_mngr.bind(plugin, CVAR_TYPE_NUM, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]));
+    return TRUE;
+}
+
 // native rf_bind_pcvar_s(pcvar, any:var[], varlen);
 cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
 {
@@ -263,16 +314,10 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
     };
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     // Variable address is not inside global area?
-    if (params[arg_var] > plugin->getAMX()->hlw)
-    {
-        AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: Cvars can only be bound to global variables", __FUNCTION__);
-        return FALSE;
-    }
-    //atoi();
-    g_cvar_mngr.bind(plugin, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size], CVAR_TYPE_STRING);
+    check_global_r(params[arg_var]);
+    g_cvar_mngr.bind(plugin, CVAR_TYPE_NUM, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
-
 
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
@@ -283,6 +328,9 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_user_buyzone", rf_get_user_buyzone},
     {"rf_config", rf_config},
     {"rf_create_cvar", rf_create_cvar},
+    {"rf_bind_pcvar", rf_bind_pcvar},
+    {"rf_bind_pcvar_n", rf_bind_pcvar_n},
+    {"rf_bind_pcvar_f", rf_bind_pcvar_f},
     {"rf_bind_pcvar_s", rf_bind_pcvar_s},
     {nullptr, nullptr}
 };
