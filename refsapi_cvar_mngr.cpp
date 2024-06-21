@@ -20,7 +20,7 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
         // Is number?
         if (is_number(s))
         {
-            s = rtrim_zero_c(std::to_string(parse_number(s, m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val)));
+            s = rtrim_zero_c(std::to_string(to_double(s, m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val)));
         }
         // Do event
         g_cvar_mngr.on_change(cvar_list, s);
