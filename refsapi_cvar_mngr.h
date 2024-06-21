@@ -142,7 +142,7 @@ public:
                 // Copy string
                 else
                 {
-                    UTIL_ServerPrint("[DEBUG] on_change(): from = %s\n", cvar_it->second.cvar->string);
+                    UTIL_ServerPrint("[DEBUG] on_change(): from = %s, size = %d\n", cvar_it->second.cvar->string, std::min(cvar_it->second.value.size() + 1, bind.size << 2));
                     Q_memcpy(bind.ptr, cvar_it->second.cvar->string, std::min(cvar_it->second.value.size() + 1, bind.size << 2));
                 }
             }
