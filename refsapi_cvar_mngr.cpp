@@ -16,15 +16,14 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     else
     {
         m_cvar_t* m_cvar = &cvar_list->second;
+        // Is callback after fix value or samething went wrong?
+        if (strcmp(m_cvar->cvar->string, value) == 0)
+            return;
+        // Convert to string
         std::string s = value;
         // Is number?
         if (is_number(s))
-        {
             s = rtrim_zero_c(std::to_string(stod(s, m_cvar)));
-        }
-        // Same value after fix ?
-        if (s == value)
-            return;
         // Do event
         g_cvar_mngr.on_change(cvar_list, s);
         // Set new value
