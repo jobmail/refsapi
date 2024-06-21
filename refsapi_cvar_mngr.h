@@ -214,7 +214,7 @@ public:
         // Cvar exist?
         if (((cvar_it = cvars.cvar_list.find(name)) != cvars.cvar_list.end()))
         {
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): cvar exist allready!\n");
+            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): cvar <%s> exist allready!\n", wstos(name).c_str());
             return cvar_it;
         }
         // Fill cvar
