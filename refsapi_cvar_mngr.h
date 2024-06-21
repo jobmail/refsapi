@@ -31,6 +31,7 @@ typedef struct m_cvar_s
     float max_val;
 } m_cvar_t;
 
+/*
 inline double stod(std::string s, m_cvar_t *m)
 {
     bool was_override = false;
@@ -46,6 +47,7 @@ inline double stod(std::string s, m_cvar_t *m)
     }
     return result;
 }
+*/
 
 typedef struct ptr_bind_s
 {
