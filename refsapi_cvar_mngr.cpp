@@ -21,14 +21,10 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
         if (is_number(s))
         {
             s = rtrim_zero_c(std::to_string(stod(s, m_cvar)));
-            /*
-            // Was fixes?
-            if (s == value)
-                return;
-            rtrim_zero(s);
-            */
         }
-        // Was fixed ?
+        // Same value after fix ?
+        if (s == value)
+            return;
         // Do event
         g_cvar_mngr.on_change(cvar_list, s);
         // Set new value
