@@ -1,13 +1,16 @@
 #include "precompiled.h"
 
 bool is_number(std::string &s) {
-    trim(s);
+    remove_chars(s); // trim(s);
     if (s.empty()) return false;
     char* l_decimal_point = localeconv()->decimal_point;
     auto it = s.begin();
     bool need_replace = DECIMAL_POINT != *l_decimal_point;
     if (*it == '+' || *it == '-')
-        it++;
+        if (s.size() == 1)
+            return false;
+        else
+            it++;
     while (it != s.end()) {
         if (!std::isdigit(*it)) {
             if (*it == DECIMAL_POINT && need_replace) {
