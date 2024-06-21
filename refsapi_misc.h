@@ -147,7 +147,7 @@ inline std::wstring stows(const std::string &s)
 
 double zzz(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
 {
-    auto result = std::stod(s.c_str());
+    auto result = std::stod(s);
     UTIL_ServerPrint("[DEBUG] stof(): in = %s, out = %Lf\n", s.c_str(), result);
     if (has_min && result < min_val)
         result = min_val;
