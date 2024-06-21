@@ -1,43 +1,8 @@
 #pragma once
 
-#include "refsapi.h"
-
-//extern std::wstring_convert<convert_type, wchar_t> g_converter;
-
-/*
-inline bool is_valid_index(const size_t index);
-inline bool is_valid_entity(const edict_t *pEdict);
-inline bool is_valid_team(const int team);
-inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_2);
-*/
+#include "precompiled.h"
 
 extern bool is_number(std::string &s);
-/*
-inline std::string wstos(const wchar_t *s);
-inline std::string wstos(const std::wstring &s);
-inline std::string wstos(wfmt s);
-inline std::wstring stows(const std::string &s);
-inline float stof(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f);
-inline bool file_exists(const std::wstring &name);
-inline int rm_quote(std::string &s);
-inline int rm_quote(std::wstring &s);
-inline std::string rm_quote_c(std::string &s);
-inline std::wstring rm_quote_c(std::wstring &s);
-inline void ltrim(std::string &s);
-inline void ltrim(std::wstring &s);
-inline void rtrim(std::string &s);
-inline void rtrim(std::wstring &s);
-inline void trim(std::string &s);
-inline void trim(std::wstring &s);
-inline std::string ltrim_c(std::string s);
-inline std::wstring ltrim_c(std::wstring s);
-inline std::string rtrim_c(std::string s);
-inline std::wstring rtrim_c(std::wstring s);
-inline std::string trim_c(std::string s);
-inline std::wstring trim_c(std::wstring s);
-inline void rtrim_zero(std::string &s);
-inline std::string rtrim_zero_c(std::string s);
-*/
 
 class fmt
 {
@@ -143,6 +108,22 @@ inline std::wstring stows(const std::string &s)
             result.push_back(s[i] & 0xFF);
         return result;
     }
+}
+
+inline double stod(std::string s, m_cvar_t *m)
+{
+    bool was_override = false;
+    auto result = std::stod(s);
+    UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f\n", s.c_str(), result);
+    if (was_override |= m->has_min && result < m->min_val)
+        result = m->min_val;
+    if (was_override |= m->has_min && result > m->max_val)
+        result = m->max_val;
+    if (was_override) {
+        CVAR_SET_FLOAT(wstos(m->name).c_str(), result);
+        UTIL_ServerPrint("[DEBUG] stod(): override = %f, new_string = %s\n", result, m->cvar->string);
+    }
+    return result;
 }
 
 inline double stod(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)

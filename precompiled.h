@@ -67,8 +67,8 @@
 
 // Refs API
 #include "refsapi.h"
-#include "refsapi_misc.h"
 #include "refsapi_cvar_mngr.h"
+#include "refsapi_misc.h"
 #include "natives_helper.h"
 #include "natives_refsapi.h"
 #include "sdk_util.h"
