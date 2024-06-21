@@ -1,6 +1,7 @@
 #pragma once
 
-#include "precompiled.h"
+#include "refsapi.h"
+#include "refsapi_cvar_mngr.h"
 
 extern bool is_number(std::string &s);
 
