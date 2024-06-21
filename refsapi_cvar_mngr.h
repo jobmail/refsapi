@@ -10,8 +10,8 @@ typedef enum CVAR_TYPES_e
 {
     CVAR_TYPE_NONE,
     CVAR_TYPE_NUM,
-    CVAR_TYPE_FLOAT,
-    CVAR_TYPE_STRING,
+    CVAR_TYPE_FLT,
+    CVAR_TYPE_STR,
     // Count
     CVAR_TYPES_SIZE
 } CVAR_TYPES_t;
@@ -22,7 +22,7 @@ typedef struct m_cvar_s
     std::wstring name;
     std::wstring value;
     std::wstring desc;
-    //CVAR_TYPES_t type;
+    CVAR_TYPES_t type;
     CPluginMngr::CPlugin *plugin;
     int flags;
     bool has_min;
@@ -87,10 +87,10 @@ private:
             case CVAR_TYPE_NUM:
                 *bind->ptr = (int)roundd(std::stod(cvar->string), 0);
                 break;
-            case CVAR_TYPE_FLOAT:
+            case CVAR_TYPE_FLT:
                 *bind->ptr = amx_ftoc(cvar->value);
                 break;
-            case CVAR_TYPE_STRING:
+            case CVAR_TYPE_STR:
                 UTIL_ServerPrint("[DEBUG] on_change(): from = %s, size = %d\n", cvar->string, bind->size);
                 setAmxString(bind->ptr, cvar->string, bind->size);
                 break;
@@ -129,12 +129,19 @@ public:
     void bind(CPluginMngr::CPlugin *plugin, CVAR_TYPES_t type, cvar_list_it cvar_it, cell *ptr, size_t size = 0)
     {
         check_it_empty_r(cvar_it);
+        m_cvar_t* m_cvar = &cvar_it->second;
+        // Check previos type of m_cvar
+        if (m_cvar->type != CVAR_TYPE_NONE && m_cvar->type != type)
+        {
+            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded with type = %d, tried to set type = %d\n", __FUNCTION__, wstos(cvar_it->first).c_str(), m_cvar->type, type);
+            return;
+        }
         std::list<ptr_bind_t> bind_list;
         cvar_bind_it bind_it;
         ptr_bind_t ptr_bind;
         bool is_exist;
         // Bind exists?
-        if (is_exist = (bind_it = cvars.bind.find(cvar_it->second.cvar)) != cvars.bind.end())
+        if (is_exist = (bind_it = cvars.bind.find(m_cvar->cvar)) != cvars.bind.end())
             bind_list = bind_it->second;
         // Bind not empty?
         if (!bind_list.empty())
@@ -145,7 +152,7 @@ public:
                 return (b.ptr == ptr); // && (b.size = size);
             });
             if (result != bind_list.end()) {
-                AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> binding already", __FUNCTION__, wstos(cvar_it->first).c_str());
+                AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded on this global variable\n", __FUNCTION__, wstos(cvar_it->first).c_str());
                 return;
             }
         }
@@ -155,23 +162,26 @@ public:
         ptr_bind.type = type;
         // Push bind
         bind_list.push_back(ptr_bind);
+        // Fix m_cvar type
+        m_cvar->type = type;
         // Update bind
         if (is_exist)
             bind_it->second = bind_list;
         else
-            cvars.bind[cvar_it->second.cvar] = bind_list;
-        UTIL_ServerPrint("[DEBUG] bind(): name = %s, value = %s, size = %d\n", cvar_it->second.cvar->name, cvar_it->second.cvar->string, size);
+            cvars.bind[m_cvar->cvar] = bind_list;
+        UTIL_ServerPrint("[DEBUG] bind(): name = %s, value = %s, size = %d\n", m_cvar->cvar->name, m_cvar->cvar->string, size);
     }
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
         check_it_empty_r(cvar_it);
+        m_cvar_t* m_cvar = &cvar_it->second;
         cvar_bind_it bind_it;
         // Bind exists?
-        if ((bind_it = cvars.bind.find(cvar_it->second.cvar)) != cvars.bind.end())
+        if ((bind_it = cvars.bind.find(m_cvar->cvar)) != cvars.bind.end())
         {
-            UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
+            UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), new_value.c_str());
             for (auto& bind : bind_it->second)
-                copy_bind(&bind, cvar_it->second.cvar);
+                copy_bind(&bind, m_cvar->cvar);
         }
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
@@ -183,7 +193,7 @@ public:
         m_cvar.cvar = p_cvar;
         m_cvar.name = stows(p_cvar->name);
         m_cvar.value = stows(p_cvar->string);
-        //m_cvar.type = CVAR_TYPE_NONE;
+        m_cvar.type = CVAR_TYPE_NONE;
         m_cvar.desc = desc;
         m_cvar.flags = p_cvar->flags;
         m_cvar.plugin = nullptr;
@@ -226,7 +236,7 @@ public:
         m_cvar_t m_cvar;
         m_cvar.name = name;
         m_cvar.value = value;
-        //m_cvar.type = CVAR_TYPE_NONE;
+        m_cvar.type = CVAR_TYPE_NONE;
         m_cvar.desc = desc;
         m_cvar.flags = flags;
         m_cvar.plugin = plugin;
