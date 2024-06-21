@@ -133,7 +133,7 @@ cell AMX_NATIVE_CALL rf_roundfloat(AMX *amx, cell *params)
         arg_value,
         arg_precision
     };
-    float result = acs_roundfloat(amx_ctof(params[arg_value]), params[arg_precision]);
+    float result = roundd(amx_ctof(params[arg_value]), params[arg_precision]);
     return amx_ftoc(result);
 }
 
@@ -269,7 +269,7 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
         return FALSE;
     }
     //atoi();
-    g_cvar_mngr.bind(plugin, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    g_cvar_mngr.bind(plugin, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size], CVAR_TYPE_STRING);
     return TRUE;
 }
 

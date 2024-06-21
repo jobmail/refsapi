@@ -646,14 +646,15 @@ int acs_vector_remove(std::vector<cell> *v, int value) {
     return v->size();
 }
 
+/*
 float acs_roundfloat(float value, int precision) {
 
     //UTIL_ServerPrint("[DEBUG] acs_roundfloat(): value = %f, precision = %d", value, precision);
 
-    float power = pow(10.0f, -precision);
-
+    auto power = pow(10.0f, -precision);
     return floor(value * power + 0.5) / power;
 }
+*/
 
 bool acs_get_user_buyzone(const edict_t *pEdict) {
 

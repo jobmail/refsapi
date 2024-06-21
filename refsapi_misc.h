@@ -156,6 +156,13 @@ inline double stod(std::string s, bool has_min = false, float min_val = 0.0f, bo
     return result;
 }
 
+inline double roundd(double value, int precision = -6)
+{
+    //UTIL_ServerPrint("[DEBUG] acs_roundfloat(): value = %f, precision = %d", value, precision);
+    auto power = pow(10.0f, -precision);
+    return floor(value * power + 0.5) / power;
+}
+
 inline bool file_exists(const std::wstring &name)
 {
     struct stat buff;

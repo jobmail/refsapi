@@ -33,6 +33,7 @@ typedef struct m_cvar_s
 typedef struct ptr_bind_s
 {
     cell* ptr;
+    uint8_t type;
     size_t size;
 } ptr_bind_t;
 
@@ -61,6 +62,21 @@ class cvar_mngr
     cvar_mngr_t cvars;
 
 private:
+    void copy_bind(ptr_bind_t *bind, cvar_t *cvar) {
+        switch (bind->type)
+        {
+            case CVAR_TYPE_NUM:
+                *bind->ptr = (int)roundd(std::stod(cvar->string), 0);
+                break;
+            case CVAR_TYPE_FLOAT:
+                *bind->ptr = amx_ftoc(cvar->value);
+                break;
+            case CVAR_TYPE_STRING:
+                UTIL_ServerPrint("[DEBUG] on_change(): from = %s, size = %d\n", cvar->string, bind->size);
+                setAmxString(bind->ptr, cvar->string, bind->size);
+                break;
+        }
+    }
     void cvar_direct_set(cvar_t *cvar, const char *value)
     {
         if (cvar != nullptr)
@@ -91,7 +107,7 @@ private:
     }
 
 public:
-    void bind(CPluginMngr::CPlugin *plugin, cvar_list_it cvar_it, cell *ptr, size_t size = 0)
+    void bind(CPluginMngr::CPlugin *plugin, cvar_list_it cvar_it, cell *ptr, size_t size = 0, CVAR_TYPES_t type = CVAR_TYPE_NONE)
     {
         check_it_empty_r(cvar_it);
         std::list<ptr_bind_t> bind_list;
@@ -117,6 +133,7 @@ public:
         // Fill bind
         ptr_bind.ptr = ptr;
         ptr_bind.size = size;
+        ptr_bind.type = type;
         // Push bind
         bind_list.push_back(ptr_bind);
         // Update bind
@@ -135,6 +152,8 @@ public:
         {
             UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
             for (auto& bind : bind_it->second)
+                copy_bind(&bind, cvar_it->second.cvar);
+            /*
             {
                 // Is number?
                 if (bind.size == 0)
@@ -146,6 +165,7 @@ public:
                     setAmxString(bind.ptr, cvar_it->second.cvar->string, std::min(strlen(cvar_it->second.cvar->string) + 1, bind.size));
                 }
             }
+            */
         }
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
@@ -181,14 +201,13 @@ public:
             return cvar_list_it{};
         cvar_list_it cvar_it;
         plugin_cvar_it plugin_it;
-        std::string s = wstos(value); //g_converter.to_bytes(value);
+        std::string s = wstos(value);
         // Fix caps in name
         ws_convert_tolower(name);
         // Is number?
         if (is_number(s))
         {
             value = stows(rtrim_zero_c(std::to_string(stod(s, has_min, min_val, has_max, max_val))));
-            // std::wstring test = stows(num).get();
             UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstos(value).c_str());
         }
         // Cvar exist?
