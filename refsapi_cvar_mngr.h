@@ -154,19 +154,6 @@ public:
             UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(cvar_it->second.name).c_str(), wstos(cvar_it->second.value).c_str(), new_value.c_str());
             for (auto& bind : bind_it->second)
                 copy_bind(&bind, cvar_it->second.cvar);
-            /*
-            {
-                // Is number?
-                if (bind.size == 0)
-                    *bind.ptr = amx_ftoc(cvar_it->second.cvar->value);
-                // Copy string
-                else
-                {
-                    UTIL_ServerPrint("[DEBUG] on_change(): from = %s, size = %d\n", cvar_it->second.cvar->string, std::min(strlen(cvar_it->second.cvar->string) + 1, bind.size));
-                    setAmxString(bind.ptr, cvar_it->second.cvar->string, std::min(strlen(cvar_it->second.cvar->string) + 1, bind.size));
-                }
-            }
-            */
         }
     }
     cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
