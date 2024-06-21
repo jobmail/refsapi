@@ -13,6 +13,7 @@
 #define check_it_empty_r(x)         if (check_it_empty(x)) return
 
 #define _QQ                         "\"'`"
+#define _TRIM_CHARS                 " \r\t\n"
 #define _LOCALE                     std::locale("ru_RU.UTF-8")
 #define _COUNT(x)                   (size_t)(sizeof(x)/sizeof(cell))
 

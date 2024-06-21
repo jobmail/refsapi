@@ -6,14 +6,16 @@ bool is_number(std::string &s) {
     char* l_decimal_point = localeconv()->decimal_point;
     auto it = s.begin();
     bool need_replace = DECIMAL_POINT != *l_decimal_point;
-    if (*it == '+' || *it == '-') it++;
+    if (*it == '+' || *it == '-')
+        it++;
     while (it != s.end()) {
         if (!std::isdigit(*it)) {
             if (*it == DECIMAL_POINT && need_replace) {
                 s.replace(it, it + 1, l_decimal_point);
                 continue;
             }
-            if (*it != *l_decimal_point) break;
+            if (*it != *l_decimal_point)
+                break;
         }
         it++;
     }

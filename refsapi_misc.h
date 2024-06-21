@@ -208,44 +208,68 @@ inline std::wstring rm_quote_c(std::wstring &s)
     return s;
 }
 
-inline void ltrim(std::string &s)
+inline void remove_chars(std::string &s, std::string chars = _TRIM_CHARS)
 {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch)
+    s.erase(std::remove_if(s.begin(), s.end(), [&](unsigned char ch)
     {
-        return !std::isspace(ch) && ch != '\t';
+        for (auto& sub : chars)
+            if (ch == sub)
+                return true;
+        return false;
+    }), s.end());
+}
+
+inline void ltrim(std::string &s, std::string chars = _TRIM_CHARS)
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch)
+    {
+        bool result = false;
+        for (auto& sub : chars)
+            if (result |= ch == sub)
+                return false;
+        return true;
     }));
 }
 
-inline void ltrim(std::wstring &s)
+inline void ltrim(std::wstring &s, std::string chars = _TRIM_CHARS)
 {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch)
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch)
     {
-        return !std::isspace(ch) && ch != '\t';
+        bool result = false;
+        for (auto& sub : chars)
+            if (result |= ch == sub)
+                return false;
+        return true;
     }));
 }
 
-inline void rtrim(std::string &s)
+inline void rtrim(std::string &s, std::string chars = _TRIM_CHARS)
 {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
+    s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch)
     {
-        return !std::isspace(ch) && ch != '\t';
+        bool result = false;
+        for (auto& sub : chars)
+            if (result |= ch == sub)
+                return false;
+        return true;
     }).base(), s.end());
 }
 
-inline void rtrim(std::wstring &s)
+inline void rtrim(std::wstring &s, std::string chars = _TRIM_CHARS)
 {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
+    s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch)
     {
-        return !std::isspace(ch) && ch != '\t';
+        bool result = false;
+        for (auto& sub : chars)
+            if (result |= ch == sub)
+                return false;
+        return true;
     }).base(), s.end());
 }
 
 inline void rtrim_zero(std::string &s)
 {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
-    {
-        return ch != '0' && ch != '.';
-    }).base(), s.end());
+    rtrim(s, ".0");
 }
 
 inline std::string rtrim_zero_c(std::string s)
@@ -254,51 +278,51 @@ inline std::string rtrim_zero_c(std::string s)
     return s;
 }
 
-inline void trim(std::string &s)
+inline void trim(std::string &s, std::string chars = _TRIM_CHARS)
 {
-    rtrim(s);
-    ltrim(s);
+    rtrim(s, chars);
+    ltrim(s, chars);
 }
 
-inline void trim(std::wstring &s)
+inline void trim(std::wstring &s, std::string chars = _TRIM_CHARS)
 {
-    rtrim(s);
-    ltrim(s);
+    rtrim(s, chars);
+    ltrim(s, chars);
 }
 
-inline std::string ltrim_c(std::string s)
+inline std::string ltrim_c(std::string s, std::string chars = _TRIM_CHARS)
 {
-    ltrim(s);
+    ltrim(s, chars);
     return s;
 }
 
-inline std::wstring ltrim_c(std::wstring s)
+inline std::wstring ltrim_c(std::wstring s, std::string chars = _TRIM_CHARS)
 {
-    ltrim(s);
+    ltrim(s, chars);
     return s;
 }
 
-inline std::string rtrim_c(std::string s)
+inline std::string rtrim_c(std::string s, std::string chars = _TRIM_CHARS)
 {
-    rtrim(s);
+    rtrim(s, chars);
     return s;
 }
 
-inline std::wstring rtrim_c(std::wstring s)
+inline std::wstring rtrim_c(std::wstring s, std::string chars = _TRIM_CHARS)
 {
-    rtrim(s);
+    rtrim(s, chars);
     return s;
 }
 
-inline std::string trim_c(std::string s)
+inline std::string trim_c(std::string s, std::string chars = _TRIM_CHARS)
 {
-    trim(s);
+    trim(s, chars);
     return s;
 }
 
-inline std::wstring trim_c(std::wstring s)
+inline std::wstring trim_c(std::wstring s, std::string chars = _TRIM_CHARS)
 {
-    trim(s);
+    trim(s, chars);
     return s;
 }
 
