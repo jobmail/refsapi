@@ -142,8 +142,8 @@ public:
                 // Copy string
                 else
                 {
-                    UTIL_ServerPrint("[DEBUG] on_change(): from = %s, size = %d\n", cvar_it->second.cvar->string, std::min(strlen(cvar_it->second.cvar->string) + 1, bind.size << 2));
-                    Q_memcpy(bind.ptr, cvar_it->second.cvar->string, std::min(strlen(cvar_it->second.cvar->string) + 1, bind.size << 2));
+                    UTIL_ServerPrint("[DEBUG] on_change(): from = %s, size = %d\n", cvar_it->second.cvar->string, std::min(strlen(cvar_it->second.cvar->string) + 1, bind.size));
+                    setAmxString(bind.ptr, cvar_it->second.cvar->string, std::min(strlen(cvar_it->second.cvar->string) + 1, bind.size));
                 }
             }
         }
