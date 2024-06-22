@@ -161,8 +161,8 @@ private:
             UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
             CVAR_REGISTER(&cvar);
             ////////////////////////////////////////// COMMENT THIS
-            //p_cvar = CVAR_GET_POINTER(p_name);
-            //UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>, is_created = %d\n", p_cvar->name, p_cvar->string, p_cvar != nullptr);
+            p_cvar = CVAR_GET_POINTER(p_name);
+            UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>, is_created = %d\n", p_cvar->name, p_cvar->string, p_cvar != nullptr);
             ////////////////////////////////
         }
         return get(name);
@@ -200,8 +200,8 @@ public:
             return;
         }
         // Check range
-        //if (!check_range(m_cvar))
-        //    return;
+        if (!check_range(m_cvar))
+            return;
         // Do event
         on_change(cvar_list, value);
     }
@@ -292,9 +292,15 @@ public:
     }
     cvar_list_it add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
-        cvar_list_it cvar_it;
-        if (name.empty() || value.empty() || plugin == nullptr || check_it_empty(cvar_it = create_cvar(name, value, flags)))
+        if (name.empty() || value.empty() || plugin == nullptr)
             return cvar_list_it{};
+        cvar_list_it cvar_it = create_cvar(name, value, flags);
+        UTIL_ServerPrint("[DEBUG] add(): cvar_it = %d", cvar_it);
+        if (check_it_empty(cvar_it))
+        {
+            UTIL_ServerPrint("[DEBUG] add(): ERROR => cvar is empty!\n");
+            return cvar_list_it{};
+        }
         // Set m_cvar
         m_cvar_t* m_cvar = &cvar_it->second;
         m_cvar->desc = desc;
