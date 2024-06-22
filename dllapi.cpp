@@ -123,7 +123,7 @@ NEW_DLL_FUNCTIONS g_NewDllFunctionTable_Post =
 	NULL,					//! pfnOnFreeEntPrivateData()	Called right before the object's memory is freed.  Calls its destructor.
 	NULL,					//! pfnGameShutdown()
 	NULL,					//! pfnShouldCollide()
-	NULL,					//! pfnCvarValue()
+	CvarValue_Post,			//! pfnCvarValue()
 	NULL,					//! pfnCvarValue2()
 };
 
