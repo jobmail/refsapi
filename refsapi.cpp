@@ -71,7 +71,7 @@ void Alloc_EntPrivateData(edict_t *pEdict) {
     g_Tries.classnames[entity_index] = key;
 
     // ADD WP_ENTITIES
-    if ((key.find(WP_CLASS_PREFIX) == 0) && (key.length() > WP_CLASS_PREFIX_LEN)) {
+    if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
         acs_vector_add(&g_Tries.wp_entities, entity_index);
 
@@ -88,7 +88,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     std::string key;
 
     // CHECK CREATION CLASSNAME
-    if ((pEdict == nullptr) || (pEdict->pvPrivateData == nullptr) || FStringNull(pEdict->v.classname)) {
+    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || FStringNull(pEdict->v.classname)) {
 
         // WAS REGISTERED?
         if (g_Tries.classnames.find(entity_index) != g_Tries.classnames.end()) {
@@ -106,7 +106,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
                 acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
             
             // REMOVE WP_ENITITIES
-            if ((key.find(WP_CLASS_PREFIX) == 0) && (key.length() > WP_CLASS_PREFIX_LEN))
+            if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN)
                 
                 acs_vector_remove(&g_Tries.wp_entities, entity_index);
 
@@ -143,7 +143,7 @@ void Free_EntPrivateData(edict_t *pEdict) {
     g_Tries.classnames.erase(entity_index);
 
     // REMOVE WP_ENTITIES
-    if ((key.find(WP_CLASS_PREFIX) == 0) && (key.length() > WP_CLASS_PREFIX_LEN)) {
+    if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN) {
 
         acs_vector_remove(&g_Tries.wp_entities, entity_index);
 
@@ -156,7 +156,7 @@ void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPl
     int id = pPlayer->entindex();
 
     // FIX TEAMS DEAD COUNT
-    if (is_valid_index(id) && is_valid_team(g_Clients[id].team) && (pPlayer->edict()->v.deadflag != DEAD_NO) && (g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0))
+    if (is_valid_index(id) && is_valid_team(g_Clients[id].team) && pPlayer->edict()->v.deadflag != DEAD_NO && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
 
         g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
 
@@ -214,7 +214,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
 
         acs_vector_add(&g_Tries.player_entities[id], entity_index);
 
-        if ((is_valid_index(owner_index) || ((owner_index > 0) && is_valid_index(owner_index = ENTINDEX(pItem->pev->owner->v.owner)))) && (id != owner_index)) {
+        if ((is_valid_index(owner_index) || (owner_index > 0 && is_valid_index(owner_index = ENTINDEX(pItem->pev->owner->v.owner)))) && (id != owner_index)) {
 
             acs_vector_remove(&g_Tries.player_entities[owner_index], entity_index);
 
@@ -268,7 +268,7 @@ void R_ClientPutInServer_Post(edict_t *pEntity) {
 
     CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(ENTINDEX(pEntity));
 
-    if ((pPlayer != nullptr) && !pPlayer->IsBot())
+    if (pPlayer != nullptr && !pPlayer->IsBot())
 
         Client_PutInServer(pEntity, STRING(pEntity->v.netname), false);
 
@@ -377,7 +377,7 @@ void Client_Disconnected(edict_t *pEdict, bool crash, char *format) {
             g_PlayersNum[g_Clients[id].team]--;
             
             // FIX TEAMS DEAD COUNT
-            if (is_valid_entity(pEdict) && (pEdict->v.deadflag != DEAD_NO) && is_valid_team(g_Clients[id].team) && (g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0))
+            if (is_valid_entity(pEdict) && pEdict->v.deadflag != DEAD_NO && is_valid_team(g_Clients[id].team) && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
 
                 g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
 
@@ -433,18 +433,18 @@ void Client_TeamInfo(void* mValue) {
 
                 g_Clients[id].team = new_team;
 
-            } else if ((new_team != TEAM_UNASSIGNED) && (g_Clients[id].team != new_team)) {
+            } else if (new_team != TEAM_UNASSIGNED && g_Clients[id].team != new_team) {
 
                 edict_t* pEdict = INDEXENT(id);
 
                 // FIX TEAMS DEAD COUNT
-                if (is_valid_entity(pEdict) && (pEdict->v.deadflag != DEAD_NO)) {
+                if (is_valid_entity(pEdict) && pEdict->v.deadflag != DEAD_NO) {
 
-                    if (is_valid_team(g_Clients[id].team) && (g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0))
+                    if (is_valid_team(g_Clients[id].team) && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
 
                         g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
 
-                    if (is_valid_team(new_team) && (g_PlayersNum[TEAM_DEAD_TT + new_team - 1] > 0))
+                    if (is_valid_team(new_team) && g_PlayersNum[TEAM_DEAD_TT + new_team - 1] > 0)
 
                         g_PlayersNum[TEAM_DEAD_TT + new_team - 1]++;
                 } 
@@ -652,7 +652,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
     //UTIL_ServerPrint("[DEBUG] get_user_buyzone(): id = %d, team = %d, classname = %s\n", ENTINDEX(pEdict), pEdict->v.team, STRING(pEdict->v.classname));
 
-    if (is_valid_entity(pEdict) && is_valid_team(pEdict->v.team) && (pEdict->v.deadflag == DEAD_NO)) {
+    if (is_valid_entity(pEdict) && is_valid_team(pEdict->v.team) && pEdict->v.deadflag == DEAD_NO) {
 
         if (r_bMapHasBuyZone) {
 
@@ -664,7 +664,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
                 //UTIL_ServerPrint("[DEBUG] get_user_buyzone(): entity = %d, team = %d\n", buyzone, pBuyZone->v.team);
 
-                if (is_valid_entity(pBuyZone) && (pEdict->v.team == pBuyZone->v.team) && is_entity_intersects(pEdict, pBuyZone)) {
+                if (is_valid_entity(pBuyZone) && pEdict->v.team == pBuyZone->v.team && is_entity_intersects(pEdict, pBuyZone)) {
 
                     result = true;
 
@@ -680,7 +680,7 @@ bool acs_get_user_buyzone(const edict_t *pEdict) {
 
                 //UTIL_ServerPrint("[DEBUG] get_user_buyzone(): spawn = %d, classname = %s, kill = %d\n", spawn, STRING(pSpawn->v.classname), (pSpawn->v.flags & FL_KILLME));
 
-                if (is_valid_entity(pSpawn) && ((pSpawn->v.origin - pEdict->v.origin).Length() < 200.0f)) {
+                if (is_valid_entity(pSpawn) && (pSpawn->v.origin - pEdict->v.origin).Length() < 200.0f) {
 
                     result = true;
 
