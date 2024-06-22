@@ -191,11 +191,9 @@ public:
             m_cvar->value = stows(value);
             return;
         }
-        UTIL_ServerPrint("[DEBUG] on_direct_set(): TEST!!!\n");
         // Check range
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        //if (!check_range(m_cvar))
-        //    return;
+        if (!check_range(m_cvar))
+            return;
         // Do event
         on_change(cvar_list, value);
     }
