@@ -106,10 +106,11 @@ private:
         if (m_cvar->type == CVAR_TYPE_NUM)
             result = result >= 0.0 ? (int)result : -(int)(-result);
         UTIL_ServerPrint("[DEBUG] check_range(): in = %s, out = %f\n", s.c_str(), result);
+        UTIL_ServerPrint("[DEBUG] check_range(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
         // Check override
-        if (is_override |= m_cvar->has_min && (result < m_cvar->min_val))
+        if (is_override |= (m_cvar->has_min && (result < m_cvar->min_val)))
             result = m_cvar->min_val;
-        if (is_override |= m_cvar->has_max && (result > m_cvar->max_val))
+        if (is_override |= (m_cvar->has_max && (result > m_cvar->max_val)))
             result = m_cvar->max_val;
         // Fix overriden
         if (is_override)
