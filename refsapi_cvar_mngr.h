@@ -27,7 +27,7 @@ typedef struct m_cvar_s
     std::wstring value;
     std::wstring desc;
     CVAR_TYPES_t type;
-    CPluginMngr::CPlugin *plugin;
+    //CPluginMngr::CPlugin *plugin;
     int flags;
     bool has_min;
     bool has_max;
@@ -273,7 +273,7 @@ public:
         m_cvar.type = CVAR_TYPE_NONE;
         m_cvar.desc = desc;
         m_cvar.flags = p_cvar->flags;
-        m_cvar.plugin = nullptr;
+        //m_cvar.plugin = plugin;
         m_cvar.has_min = has_min;
         m_cvar.min_val = min_val;
         m_cvar.has_max = has_max;
@@ -292,22 +292,16 @@ public:
     {
         if (name.empty() || value.empty() || plugin == nullptr)
             return cvar_list_it{};
-        cvar_t* cvar = create_cvar(name, value, flags);
-        cvar_list_it cvar_it = get(cvar);
+        cvar_list_it cvar_it = add_exists(create_cvar(name, value, flags), desc, has_min, min_val, has_max, max_val);
         if (check_it_empty(cvar_it))
         {
-            UTIL_ServerPrint("[DEBUG] add(): ERROR => cvar is empty!\n");
+            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: m_cvar is empty\n", __FUNCTION__);
             return cvar_list_it{};
         }
         UTIL_ServerPrint("[DEBUG] add(): check cvar = %d\n", cvar_it->second.cvar);
         // Set m_cvar
         m_cvar_t* m_cvar = &cvar_it->second;
-        m_cvar->desc = desc;
-        m_cvar->has_min = has_min;
-        m_cvar->min_val = min_val;
-        m_cvar->has_max = has_max;
-        m_cvar->max_val = max_val;
-        UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", has_min, min_val, has_max, max_val);
+        UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
         // Plugin cvars exist?
         plugin_cvar_it plugin_it;
         if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
