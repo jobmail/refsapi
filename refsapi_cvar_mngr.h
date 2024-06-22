@@ -195,13 +195,13 @@ public:
         // Bind none-exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
         {
-            UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
+            //UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
             m_cvar->value = stows(value);
             return;
         }
         // Check range
-        if (!check_range(m_cvar))
-            return;
+        //if (!check_range(m_cvar))
+        //    return;
         // Do event
         on_change(cvar_list, value);
     }
