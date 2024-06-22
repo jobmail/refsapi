@@ -187,7 +187,7 @@ public:
         // Bind none-exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
         {
-            //UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
+            UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
             m_cvar->value = stows(value);
             return;
         }
@@ -257,6 +257,10 @@ public:
             for (auto& bind : bind_it->second)
                 copy_bind(&bind, m_cvar->cvar);
         }
+        else
+        {
+            UTIL_ServerPrint("[DEBUG] on_change(): none-bind\n");
+        } 
     }
     cvar_list_it add_exists(cvar_t *cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
