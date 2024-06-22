@@ -152,9 +152,9 @@ private:
 public:
     void on_register(cvar_t *cvar)
     {
-        cvar_list_it cvar_it = get(cvar);
+        cvar_list_it cvar_list = get(cvar);
         // Cvar not register?
-        if (check_it_empty(cvar_it))
+        if (check_it_empty(cvar_list))
             add_exists(cvar);
     }
     void on_direct_set(cvar_t *cvar, std::string value)
@@ -180,14 +180,14 @@ public:
         // Do event
         on_change(cvar_list, value);
     }
-    void bind(CPluginMngr::CPlugin *plugin, CVAR_TYPES_t type, cvar_list_it cvar_it, cell *ptr, size_t size = 0)
+    void bind(CPluginMngr::CPlugin *plugin, CVAR_TYPES_t type, cvar_list_it cvar_list, cell *ptr, size_t size = 0)
     {
-        check_it_empty_r(cvar_it);
-        m_cvar_t* m_cvar = &cvar_it->second;
+        check_it_empty_r(cvar_list);
+        m_cvar_t* m_cvar = &cvar_list->second;
         // Check previos type of m_cvar
         if (m_cvar->type != CVAR_TYPE_NONE && m_cvar->type != type)
         {
-            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded with type = %d, tried to set type = %d\n", __FUNCTION__, wstos(cvar_it->first).c_str(), m_cvar->type, type);
+            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded with type = %d, tried to set type = %d\n", __FUNCTION__, wstos(cvar_list->first).c_str(), m_cvar->type, type);
             return;
         }
         std::list<ptr_bind_t> bind_list;
@@ -206,7 +206,7 @@ public:
                 return (b.ptr == ptr); // && (b.size = size);
             });
             if (result != bind_list.end()) {
-                AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded on this global variable\n", __FUNCTION__, wstos(cvar_it->first).c_str());
+                AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded on this global variable\n", __FUNCTION__, wstos(cvar_list->first).c_str());
                 return;
             }
         }
@@ -227,10 +227,10 @@ public:
         // Check range
         check_range(m_cvar);
     }
-    void on_change(cvar_list_it cvar_it, std::string &new_value)
+    void on_change(cvar_list_it cvar_list, std::string &new_value)
     {
-        check_it_empty_r(cvar_it);
-        m_cvar_t* m_cvar = &cvar_it->second;
+        check_it_empty_r(cvar_list);
+        m_cvar_t* m_cvar = &cvar_list->second;
         cvar_bind_it bind_it;
         // Bind exists?
         if ((bind_it = cvars.bind.find(m_cvar->cvar)) != cvars.bind.end())
@@ -244,6 +244,10 @@ public:
     {
         if (cvar == nullptr)
             return cvar_list_it{};
+        // Cvar already exists?
+        p_cvar_it p_cvar;
+        if ((p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
+            return p_cvar->second;
         // Fill cvar
         m_cvar_t m_cvar;
         m_cvar.cvar = cvar;
@@ -273,36 +277,36 @@ public:
             return cvar_list_it{};
         cvar_t *cvar = create_cvar(name, value, flags);
         UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
-        cvar_list_it cvar_it = add_exists(cvar, desc, has_min, min_val, has_max, max_val);
-        if (check_it_empty(cvar_it))
+        cvar_list_it cvar_list = add_exists(cvar, desc, has_min, min_val, has_max, max_val);
+        if (check_it_empty(cvar_list))
         {
             AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: m_cvar is empty\n", __FUNCTION__);
             return cvar_list_it{};
         }
-        UTIL_ServerPrint("[DEBUG] add(): check cvar = %d\n", cvar_it->second.cvar);
+        UTIL_ServerPrint("[DEBUG] add(): check cvar = %d\n", cvar_list->second.cvar);
         // Set m_cvar
-        m_cvar_t* m_cvar = &cvar_it->second;
+        m_cvar_t* m_cvar = &cvar_list->second;
         UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
         // Plugin cvars exist?
         plugin_cvar_it plugin_it;
         if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
-            plugin_it->second.push_back(cvar_it);
+            plugin_it->second.push_back(cvar_list);
         // Create plugin cvars
         else
-            cvars.plugin[plugin->getId()].push_back(cvar_it);
-        return cvar_it;
+            cvars.plugin[plugin->getId()].push_back(cvar_list);
+        return cvar_list;
     }
     cvar_list_it get(std::wstring name)
     {
-        cvar_list_it cvar_it;
+        cvar_list_it cvar_list;
         if (!name.empty())
         {
             // Fix caps in name
             ws_convert_tolower(name);
             // Cvar exist?
-            if ((cvar_it = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
+            if ((cvar_list = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
             {
-                return cvar_it;
+                return cvar_list;
             }
             // Check global cvar
             else
@@ -320,25 +324,25 @@ public:
     }
     cvar_list_it get(cvar_t *cvar)
     {
-        p_cvar_it cvar_it;
+        p_cvar_it p_cvar;
         // Cvar exist?
-        if (cvar != nullptr && (cvar_it = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
+        if (cvar != nullptr && (p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
         {
-            return cvar_it->second;
+            return p_cvar->second;
         }
         return cvar_list_it{};
     }
     void set(std::wstring name, std::wstring value)
     {
-        auto cvar_it = get(name);
-        check_it_empty_r(cvar_it);
-        auto cvar = cvar_it->second.cvar;
+        auto cvar_list = get(name);
+        check_it_empty_r(cvar_list);
+        auto cvar = cvar_list->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }
-    void set(cvar_list_it cvar_it, std::wstring value)
+    void set(cvar_list_it cvar_list, std::wstring value)
     {
-        check_it_empty_r(cvar_it);
-        auto cvar = cvar_it->second.cvar;
+        check_it_empty_r(cvar_list);
+        auto cvar = cvar_list->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }
     void clear_plugin(CPluginMngr::CPlugin *plugin)
