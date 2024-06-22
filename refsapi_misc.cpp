@@ -22,6 +22,6 @@ bool is_number(std::string &s) {
         }
         it++;
     }
-    //UTIL_ServerPrint("[DEBUG] is_number(): s = <%s>, result = %d\n", s.c_str(), it == s.end());
+    UTIL_ServerPrint("[DEBUG] is_number(): s = <%s>, result = %d\n", s.c_str(), it == s.end());
     return it == s.end();
 }

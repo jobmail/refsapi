@@ -87,6 +87,7 @@ class cvar_mngr
 private:
     bool check_range(m_cvar_t *m_cvar)
     {
+        UTIL_ServerPrint("[DEBUG] check_range(): check_range(): type = %d, name = <%s>, value = <%s>", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->value);
         if (m_cvar->type == CVAR_TYPE_NONE || m_cvar->type == CVAR_TYPE_STR)
             return true;
         // Is number?
