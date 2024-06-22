@@ -169,7 +169,7 @@ public:
             bind_it->second = bind_list;
         else
             cvars.bind[m_cvar->cvar] = bind_list;
-        UTIL_ServerPrint("[DEBUG] bind(): name = %s, value = %s, size = %d\n", m_cvar->cvar->name, m_cvar->cvar->string, size);
+        UTIL_ServerPrint("[DEBUG] bind(): name = %s, value = <%s>, size = %d\n", m_cvar->cvar->name, m_cvar->cvar->string, size);
     }
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
@@ -179,7 +179,7 @@ public:
         // Bind exists?
         if ((bind_it = cvars.bind.find(m_cvar->cvar)) != cvars.bind.end())
         {
-            UTIL_ServerPrint("[DEBUG] on_change(): name = %s, old_value = %s, new_value = %s\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), new_value.c_str());
+            UTIL_ServerPrint("[DEBUG] on_change(): name = <%s>, old_value = <%s>, new_value = <%s>\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), new_value.c_str());
             for (auto& bind : bind_it->second)
                 copy_bind(&bind, m_cvar->cvar);
         }
@@ -224,7 +224,7 @@ public:
         if (is_number(s))
         {
             value = stows(rtrim_zero_c(std::to_string(stod(s, has_min, min_val, has_max, max_val))));
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = %s\n", wstos(value).c_str());
+            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = <%s>\n", wstos(value).c_str());
         }
         // Cvar exist?
         if (((cvar_it = cvars.cvar_list.find(name)) != cvars.cvar_list.end()))
