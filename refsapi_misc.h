@@ -2,7 +2,7 @@
 
 #include "refsapi.h"
 
-extern bool is_number(std::string s);
+bool is_number(std::string &s);
 
 class fmt
 {
