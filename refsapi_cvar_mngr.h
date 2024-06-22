@@ -194,7 +194,7 @@ public:
         // Bind none-exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
         {
-            UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => name = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
+            //UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => name = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
             m_cvar->value = stows(value);
             return;
         }
