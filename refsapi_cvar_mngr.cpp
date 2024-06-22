@@ -57,7 +57,7 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
 
 void CVarRegister_Post(cvar_t *pCvar)
 {
-    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, value = <%s>\n", pCvar->name, pCvar->value);
+    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, string = <%s>, value = %f\n", pCvar->name, pCvar->string, pCvar->value);
 }
 
 void CVarSetFloat_Post(const char *szVarName, float flValue)
