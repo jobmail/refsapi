@@ -311,7 +311,7 @@ enginefuncs_t g_EngineFunctionsTable_Post =
 	NULL,		// pfnDeltaUnsetFieldByIndex()
 	NULL,		// pfnSetGroupMask()
 	NULL,		// pfnCreateInstancedBaseline()
-	NULL,		// pfnCvar_DirectSet()
+	Cvar_DirectSet_Post,		// pfnCvar_DirectSet()
 	NULL,		// pfnForceUnmodified()
 	NULL,		// pfnGetPlayerStats()
 	NULL,		// pfnAddServerCommand()
