@@ -216,6 +216,7 @@ public:
         ptr_bind.type = type;
         // Push bind
         bind_list.push_back(ptr_bind);
+        copy_bind(&ptr_bind, m_cvar->cvar);
         // Update bind
         if (is_exist)
             bind_it->second = bind_list;
