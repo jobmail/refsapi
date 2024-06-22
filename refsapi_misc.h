@@ -223,9 +223,8 @@ inline void ltrim(std::string &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch)
     {
-        bool result = false;
         for (auto& sub : chars)
-            if (result |= ch == sub)
+            if (ch == sub)
                 return false;
         return true;
     }));
@@ -235,9 +234,8 @@ inline void ltrim(std::wstring &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch)
     {
-        bool result = false;
         for (auto& sub : chars)
-            if (result |= ch == sub)
+            if (ch == sub)
                 return false;
         return true;
     }));
@@ -247,9 +245,8 @@ inline void rtrim(std::string &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch)
     {
-        bool result = false;
         for (auto& sub : chars)
-            if (result |= ch == sub)
+            if (ch == sub)
                 return false;
         return true;
     }).base(), s.end());
@@ -259,9 +256,8 @@ inline void rtrim(std::wstring &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch)
     {
-        bool result = false;
         for (auto& sub : chars)
-            if (result |= ch == sub)
+            if (ch == sub)
                 return false;
         return true;
     }).base(), s.end());
