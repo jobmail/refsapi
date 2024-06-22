@@ -16,13 +16,14 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     else
     {
         m_cvar_t* m_cvar = &cvar_list->second;
-        // Bind exists?
+        std::string s = value;
+        // Bind not exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
         {
-            UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): no bind => name = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
+            UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): [none-binding] name = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
+            m_cvar->value = stows(s);
             return;
         }
-        std::string s = value;
         bool is_num = is_number(s);
         // Fix wrong value
         if (!is_num && (m_cvar->type == CVAR_TYPE_NUM || m_cvar->type == CVAR_TYPE_FLT))
