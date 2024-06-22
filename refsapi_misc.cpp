@@ -1,23 +1,23 @@
 #include "precompiled.h"
 
 bool is_number(std::string &s) {
-    //trim(s); //remove_chars(s);
-    if (s.empty()) return false;
-    char* l_decimal_point = localeconv()->decimal_point;
+    trim(s);
+    if (s.empty())
+        return false;
     auto it = s.begin();
-    bool need_replace = DECIMAL_POINT != *l_decimal_point;
     if (*it == '+' || *it == '-')
-        if (s.size() == 1)
+        if (++it == s.end())
             return false;
-        else
-            it++;
-    while (it != s.end()) {
-        if (!std::isdigit(*it)) {
-            if (*it == DECIMAL_POINT && need_replace) {
-                s.replace(it, it + 1, l_decimal_point);
-                continue;
-            }
-            if (*it != *l_decimal_point)
+    bool dp_found = false;
+    bool dp_not_last = false;
+    while (it != s.end())
+    {
+        if (!std::isdigit(*it))
+        {
+            // Check for decimal point and need to have one more digit after
+            if (!dp_found && *it == DECIMAL_POINT && (it + 1) != s.end())
+                dp_found = true;
+            else
                 break;
         }
         it++;

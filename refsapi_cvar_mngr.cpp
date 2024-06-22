@@ -1,85 +1,27 @@
 #include "precompiled.h"
 
-void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const char *value)
+//void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const char *value)
+//chain->callNext(cvar, value);
+void Cvar_DirectSet_Post(cvar_t *cvar, const char *value)
 {
-    chain->callNext(cvar, value);
-    cvar_list_it cvar_list = g_cvar_mngr.get(cvar);
-    // Cvar not register?
-    if (check_it_empty(cvar_list))
-    {
-        // Add cvar to list
-        auto result = g_cvar_mngr.add_exists(cvar);
-        check_it_empty_r(result);
-        // Set new value
-        result->second.value = stows(value);
-    }
-    else
-    {
-        m_cvar_t* m_cvar = &cvar_list->second;
-        std::string s = value;
-        // Bind not exists?
-        if (m_cvar->type == CVAR_TYPE_NONE)
-        {
-            UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): [none-binding] name = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
-            m_cvar->value = stows(s);
-            return;
-        }
-        bool is_num = is_number(s);
-        // Fix wrong value
-        if (!is_num && (m_cvar->type == CVAR_TYPE_NUM || m_cvar->type == CVAR_TYPE_FLT))
-        {
-            UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): wrong non-number value <%s>\n", value);
-            CVAR_SET_STRING(cvar->name, "0");
-            return;
-        }
-        // Is number?
-        if (is_num)
-        {
-            bool is_override = false;
-            auto result = std::stod(s);
-            // Check bind type and conver
-            if (m_cvar->type == CVAR_TYPE_NUM)
-                result = result >= 0.0 ? (int)result : -(int)(-result);
-            UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): in = %s, out = %f, type = %d\n", s.c_str(), result, m_cvar->type);
-            if (is_override |= m_cvar->has_min && result < m_cvar->min_val)
-                result = m_cvar->min_val;
-            if (is_override |= m_cvar->has_min && result > m_cvar->max_val)
-                result = m_cvar->max_val;
-            if (is_override) {
-                CVAR_SET_FLOAT(wstos(m_cvar->name).c_str(), result);
-                UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): override = %f, new_string = %s\n", result, m_cvar->cvar->string);
-                return;
-            }
-            s = rtrim_zero_c(std::to_string(result));
-        }
-        // Do event
-        g_cvar_mngr.on_change(cvar_list, s);
-        // Set new value
-        m_cvar->value = stows(s);
-    }
+    UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_Post(): cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
+    g_cvar_mngr.on_direct_set(cvar, value);
 }
 
 void CVarRegister_Post(cvar_t *cvar)
 {
     UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
-    cvar_list_it cvar_list = g_cvar_mngr.get(cvar);
-    // Cvar not register?
-    if (check_it_empty(cvar_list))
-    {
-        // Add cvar to list
-        auto result = g_cvar_mngr.add_exists(cvar);
-        check_it_empty_r(result);
-        // Set new value
-        result->second.value = stows(cvar->string);
-    }
+    g_cvar_mngr.on_register(cvar);
 }
 
-void CVarSetFloat_Post(const char *szVarName, float flValue)
+void CVarSetFloat_Post(const char *name, float value)
 {
-    UTIL_ServerPrint("[DEBUG] CVarSetFloat_Post(): cvar = <%s>, value = %f\n", szVarName, flValue);
+    UTIL_ServerPrint("[DEBUG] CVarSetFloat_Post(): cvar = <%s>, value = %f\n", name, value);
+    //cvar_t* cvar = CVAR_GET_POINTER(name);
+    //if (cvar != nullptr)
 }
 
-void CVarSetString_Post(const char *szVarName, const char *szValue)
+void CVarSetString_Post(const char *name, const char *value)
 {
-    UTIL_ServerPrint("[DEBUG] CVarSetString_Post(): cvar = <%s>, value = <%s>\n", szVarName, szValue);
+    UTIL_ServerPrint("[DEBUG] CVarSetString_Post(): cvar = <%s>, value = <%s>\n", name, value);
 }

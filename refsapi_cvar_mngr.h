@@ -4,7 +4,8 @@
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
-void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
+//void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
+void Cvar_DirectSet_Post(cvar_t *cvar, const char *value);
 void CVarRegister_Post(cvar_t *pCvar);
 void CVarSetFloat_Post(const char *szVarName, float flValue);
 void CVarSetString_Post(const char *szVarName, const char *szValue);
@@ -84,7 +85,41 @@ class cvar_mngr
     cvar_mngr_t cvars;
 
 private:
-    void copy_bind(ptr_bind_t *bind, cvar_t *cvar) {
+    bool check_range(m_cvar_t *m_cvar)
+    {
+        if (m_cvar->type == CVAR_TYPE_NONE || m_cvar->type == CVAR_TYPE_STR)
+            return true;
+        // Is number?
+        std::string s = m_cvar->cvar->string;
+        bool is_num = is_number(s);
+        if (!is_num)
+        {
+            // Fix wrong value for bind
+            UTIL_ServerPrint("[DEBUG] check_range(): wrong non-number value <%s>\n", s.c_str());
+            CVAR_SET_STRING(m_cvar->cvar->name, "0");
+            return false;
+        }
+        bool is_override = false;
+        auto result = std::stod(s);
+        // Check bind type and conver
+        if (m_cvar->type == CVAR_TYPE_NUM)
+            result = result >= 0.0 ? (int)result : -(int)(-result);
+        UTIL_ServerPrint("[DEBUG] check_range(): in = %s, out = %f, type = %d\n", s.c_str(), result, m_cvar->type);
+        // Check override
+        if (is_override |= m_cvar->has_min && result < m_cvar->min_val)
+            result = m_cvar->min_val;
+        if (is_override |= m_cvar->has_min && result > m_cvar->max_val)
+            result = m_cvar->max_val;
+        // Fix overriden
+        if (is_override)
+        {
+            UTIL_ServerPrint("[DEBUG] check_range(): override = %f, new_string = %s\n", result, s.c_str());
+            CVAR_SET_FLOAT(wstos(m_cvar->name).c_str(), result);
+        }
+        return !is_override;
+    }
+    void copy_bind(ptr_bind_t *bind, cvar_t *cvar)
+    {
         switch (bind->type)
         {
             case CVAR_TYPE_NUM:
@@ -94,7 +129,7 @@ private:
                 *bind->ptr = amx_ftoc(cvar->value);
                 break;
             case CVAR_TYPE_STR:
-                UTIL_ServerPrint("[DEBUG] on_change(): from = %s, size = %d\n", cvar->string, bind->size);
+                UTIL_ServerPrint("[DEBUG] copy_bind(): from = %s, size = %d\n", cvar->string, bind->size);
                 setAmxString(bind->ptr, cvar->string, bind->size);
                 break;
         }
@@ -104,31 +139,71 @@ private:
         if (cvar != nullptr)
             g_engfuncs.pfnCvar_DirectSet(cvar, value);
     }
-    cvar_t *create_cvar(m_cvar_t &c)
-    {
+    cvar_list_it create_cvar(std::wstring name, std::wstring value, int flags = CVAR_TYPE_NONE)
+    {   
         enum { _name, _value, _count };
         // Copy params
-        std::string p[_count] = {wstos(c.name), wstos(c.value)};
+        std::string p[_count] = {wstos(name), wstos(value)};
         auto p_name = p[_name].data();
         auto p_value = p[_value].data();
         cvar_t *p_cvar = CVAR_GET_POINTER(p_name);
+        // Cvar non-exists?
         if (p_cvar == nullptr)
         {
+            // Create new cvar
             cvar_t cvar;
             cvar.name = p_name;
             cvar.string = p_value;
             cvar.value = 0.0f;
-            cvar.flags = c.flags;
+            cvar.flags = flags;
             cvar.next = nullptr;
             UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
             CVAR_REGISTER(&cvar);
-            p_cvar = CVAR_GET_POINTER(p_name);
-            UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d, name = <%s>, value = <%s>\n", p_cvar != nullptr, p_cvar->name, p_cvar->string);
+            ////////////////////////////////////////// COMMENT THIS
+            //p_cvar = CVAR_GET_POINTER(p_name);
+            //UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>, is_created = %d\n", p_cvar->name, p_cvar->string, p_cvar != nullptr);
+            ////////////////////////////////
         }
-        return p_cvar;
+        return get(name);
     }
 
 public:
+    void on_register(cvar_t *cvar)
+    {
+        cvar_list_it cvar_list = get(cvar);
+        // Cvar not register?
+        if (check_it_empty(cvar_list))
+        {
+            // Add cvar to list
+            auto result = add_exists(cvar);
+            check_it_empty_r(result);
+            // Set new value
+            result->second.value = stows(cvar->string);
+        }
+    }
+    void on_direct_set(cvar_t *cvar, std::string value)
+    {
+        cvar_list_it cvar_list = get(cvar);
+        // Cvar not register? Samething went wrong...
+        if (check_it_empty(cvar_list))
+        {
+            UTIL_ServerPrint("\n[DEBUG] on_direct_set(): NOT REGISTERED! cvar = <%s>, string = <%s>, value = %f\n\n", cvar->name, cvar->string, cvar->value);
+            return;
+        }
+        m_cvar_t* m_cvar = &cvar_list->second;
+        // Bind none-exists?
+        if (m_cvar->type == CVAR_TYPE_NONE)
+        {
+            UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => name = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
+            m_cvar->value = stows(value);
+            return;
+        }
+        // Check range
+        if (!check_range(m_cvar))
+            return;
+        // Do event
+        on_change(cvar_list, value);
+    }
     void bind(CPluginMngr::CPlugin *plugin, CVAR_TYPES_t type, cvar_list_it cvar_it, cell *ptr, size_t size = 0)
     {
         check_it_empty_r(cvar_it);
@@ -216,64 +291,26 @@ public:
     }
     cvar_list_it add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
-        if (name.empty() || value.empty() || plugin == nullptr)
-            return cvar_list_it{};
         cvar_list_it cvar_it;
+        if (name.empty() || value.empty() || plugin == nullptr || check_it_empty(cvar_it = create_cvar(name, value, flags)))
+            return cvar_list_it{};
+        // Set m_cvar
+        m_cvar_t* m_cvar = &cvar_it->second;
+        m_cvar->desc = desc;
+        m_cvar->has_min = has_min;
+        m_cvar->min_val = min_val;
+        m_cvar->has_max = has_max;
+        m_cvar->max_val = max_val;
+        // Plugin cvars exist?
         plugin_cvar_it plugin_it;
-        std::string s = wstos(value);
-        // Fix caps in name
-        ws_convert_tolower(name);
-        // Is number?
-        if (is_number(s))
-        {
-            value = stows(rtrim_zero_c(std::to_string(stod(s, has_min, min_val, has_max, max_val))));
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): new_value = <%s>\n", wstos(value).c_str());
-        }
-        // Cvar exist?
-        if (((cvar_it = cvars.cvar_list.find(name)) != cvars.cvar_list.end()))
-        {
-            UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): cvar <%s> exist allready!\n", wstos(name).c_str());
-            return cvar_it;
-        }
-        // Fill cvar
-        m_cvar_t m_cvar;
-        m_cvar.name = name;
-        m_cvar.value = value;
-        m_cvar.type = CVAR_TYPE_NONE;
-        m_cvar.desc = desc;
-        m_cvar.flags = flags;
-        m_cvar.plugin = plugin;
-        m_cvar.has_min = has_min;
-        m_cvar.min_val = min_val;
-        m_cvar.has_max = has_max;
-        m_cvar.max_val = max_val;
-        UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): before create_var()\n");
-        // Create cvar
-        if ((m_cvar.cvar = create_cvar(m_cvar)) != nullptr)
-        {
-            // Save cvars list
-            auto result = cvars.cvar_list.insert({ m_cvar.name, m_cvar });
-            if (result.second)
-            {
-                UTIL_ServerPrint("[DEBUG] cvar_mngr::add(): is_add = %d, name = <%s>, value = <%s>, desc = <%s>\n", result.second, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str(), wstos(m_cvar.desc).c_str());
-                // Plugin cvars exist?
-                if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
-                {
-                    plugin_it->second.push_back(result.first);
-                }
-                // Create plugin cvars
-                else
-                {
-                    cvars.plugin[plugin->getId()].push_back(result.first);
-                }
-                // Create p_cvar
-                cvars.p_cvar.insert({ m_cvar.cvar, result.first });
-                return result.first;
-            }
-        }
+        if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
+            plugin_it->second.push_back(cvar_it);
+        // Create plugin cvars
         else
-            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar creation error <%s> => <%s>", __FUNCTION__, wstos(name).c_str(), wstos(value).c_str());
-        return cvar_list_it{};
+            cvars.plugin[plugin->getId()].push_back(cvar_it);
+        // Check range
+        check_range(m_cvar);
+        return cvar_it;
     }
     cvar_list_it get(std::wstring name)
     {
