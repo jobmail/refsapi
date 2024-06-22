@@ -2,7 +2,7 @@
 
 #include "refsapi.h"
 
-extern bool is_number(std::string &s);
+extern bool is_number(std::string s);
 
 class fmt
 {
@@ -269,7 +269,13 @@ inline void rtrim(std::wstring &s, std::string chars = _TRIM_CHARS)
 
 inline void rtrim_zero(std::string &s)
 {
-    rtrim(s, ".0");
+    auto it = std::find(s.rbegin(), s.rend(), ".");
+    if (it == s.rend())
+        return;
+    s.erase(std::find_if(s.rbegin(), it, [&](unsigned char ch)
+    {
+        return ch != '0';
+    }).base(), s.end());
 }
 
 inline std::string rtrim_zero_c(std::string s)
