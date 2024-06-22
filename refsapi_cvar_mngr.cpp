@@ -55,12 +55,17 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     }
 }
 
-void Cvar_DirectSet_Post(cvar_t *var, const char *value)
+void CVarRegister_Post(cvar_t *pCvar)
 {
-    UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_Post(!!!): cvar = <%s>, value = <%s>\n", var->name, value);
+    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, value = <%s>\n", pCvar->name, pCvar->value);
 }
 
-void CvarValue_Post(const edict_t *pEnt, const char *value)
+void CVarSetFloat_Post(const char *szVarName, float flValue)
 {
-    UTIL_ServerPrint("[DEBUG] CvarValue_Post(): ent = %d, value = <%s>\n", pEnt, value);
+    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, value = %f\n", szVarName, flValue);
+}
+
+void CVarSetString_Post(const char *szVarName, const char *szValue)
+{
+    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, value = <%s>\n", szVarName, szValue);
 }
