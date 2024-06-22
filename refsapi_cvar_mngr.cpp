@@ -17,8 +17,12 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     {        
         m_cvar_t* m_cvar = &cvar_list->second;
         std::string s = value;
+        bool is_num = is_number(s);
+        // Fix wrong bind type
+        if (!is_num && (m_cvar->type == CVAR_TYPE_NUM || m_cvar->type == CVAR_TYPE_FLT))
+            s.clear();
         // Is number?
-        if (is_number(s))
+        if (is_num)
         {
             bool was_override = false;
             auto result = std::stod(s);

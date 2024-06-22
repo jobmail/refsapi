@@ -1,7 +1,7 @@
 #include "precompiled.h"
 
 bool is_number(std::string &s) {
-    remove_chars(s); // trim(s);
+    //trim(s); //remove_chars(s);
     if (s.empty()) return false;
     char* l_decimal_point = localeconv()->decimal_point;
     auto it = s.begin();
