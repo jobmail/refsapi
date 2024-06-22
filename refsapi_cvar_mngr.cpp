@@ -62,10 +62,10 @@ void CVarRegister_Post(cvar_t *pCvar)
 
 void CVarSetFloat_Post(const char *szVarName, float flValue)
 {
-    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, value = %f\n", szVarName, flValue);
+    UTIL_ServerPrint("[DEBUG] CVarSetFloat_Post: cvar = <%s>, value = %f\n", szVarName, flValue);
 }
 
 void CVarSetString_Post(const char *szVarName, const char *szValue)
 {
-    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, value = <%s>\n", szVarName, szValue);
+    UTIL_ServerPrint("[DEBUG] CVarSetString_Post: cvar = <%s>, value = <%s>\n", szVarName, szValue);
 }
