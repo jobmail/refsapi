@@ -6,6 +6,7 @@ extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
 extern void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
 extern void CvarValue_Post(const edict_t *pEnt, const char *value);
+extern void Cvar_DirectSet_Post(cvar_t *var, const char *value);
 
 typedef enum CVAR_TYPES_e
 {
