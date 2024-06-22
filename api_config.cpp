@@ -38,7 +38,7 @@ void CAPI_Config::Init() {
 
 		cvar.name = REFSAPI_CVAR;
 		
-		cvar.flags = 0; (FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED);
+		cvar.flags = FCVAR_SERVER | FCVAR_SPONLY; //| FCVAR_UNLOGGED);
 		
 		cvar.string = "1";
 
