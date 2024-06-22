@@ -140,7 +140,7 @@ private:
         if (cvar != nullptr)
             g_engfuncs.pfnCvar_DirectSet(cvar, value);
     }
-    cvar_t* create_cvar(std::wstring name, std::wstring value, int flags = CVAR_TYPE_NONE)
+    cvar_t* create_cvar(std::wstring name, std::wstring value, int flags = 0)
     {   
         enum { _name, _value, _count };
         // Copy params
@@ -169,16 +169,10 @@ private:
 public:
     void on_register(cvar_t *cvar)
     {
-        cvar_list_it cvar_list = get(cvar);
+        cvar_list_it cvar_it = get(cvar);
         // Cvar not register?
-        if (check_it_empty(cvar_list))
-        {
-            // Add cvar to list
-            auto result = add_exists(cvar);
-            check_it_empty_r(result);
-            // Set new value
-            result->second.value = stows(cvar->string);
-        }
+        if (check_it_empty(cvar_it))
+            add_exists(cvar);
     }
     void on_direct_set(cvar_t *cvar, std::string value)
     {
@@ -264,18 +258,18 @@ public:
                 copy_bind(&bind, m_cvar->cvar);
         }
     }
-    cvar_list_it add_exists(cvar_t *p_cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
+    cvar_list_it add_exists(cvar_t *cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
-        if (p_cvar == nullptr)
+        if (cvar == nullptr)
             return cvar_list_it{};
         // Fill cvar
         m_cvar_t m_cvar;
-        m_cvar.cvar = p_cvar;
-        m_cvar.name = stows(p_cvar->name);
-        m_cvar.value = stows(p_cvar->string);
+        m_cvar.cvar = cvar;
+        m_cvar.name = stows(cvar->name);
+        m_cvar.value = stows(cvar->string);
         m_cvar.type = CVAR_TYPE_NONE;
         m_cvar.desc = desc;
-        m_cvar.flags = p_cvar->flags;
+        m_cvar.flags = cvar->flags;
         //m_cvar.plugin = plugin;
         m_cvar.has_min = has_min;
         m_cvar.min_val = min_val;
@@ -317,31 +311,34 @@ public:
     cvar_list_it get(std::wstring name)
     {
         cvar_list_it cvar_it;
-        // Fix caps in name
-        ws_convert_tolower(name);
-        // Cvar exist?
-        if ((cvar_it = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
+        if (!name.empty())
         {
-            return cvar_it;
-        }
-        // Check global cvar
-        else
-        {
-            std::string p = wstos(name);
-            cvar_t *p_cvar = CVAR_GET_POINTER(p.data());
+            // Fix caps in name
+            ws_convert_tolower(name);
             // Cvar exist?
-            if (p_cvar != nullptr)
+            if ((cvar_it = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
             {
-                return add_exists(p_cvar);
+                return cvar_it;
+            }
+            // Check global cvar
+            else
+            {
+                std::string p = wstos(name);
+                cvar_t *p_cvar = CVAR_GET_POINTER(p.data());
+                // Cvar exist?
+                if (p_cvar != nullptr)
+                {
+                    return add_exists(p_cvar);
+                }
             }
         }
         return cvar_list_it{};
     }
-    cvar_list_it get(cvar_t *p_cvar)
+    cvar_list_it get(cvar_t *cvar)
     {
         p_cvar_it cvar_it;
         // Cvar exist?
-        if ((cvar_it = cvars.p_cvar.find(p_cvar)) != cvars.p_cvar.end())
+        if (cvar != nullptr && (cvar_it = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
         {
             return cvar_it->second;
         }
