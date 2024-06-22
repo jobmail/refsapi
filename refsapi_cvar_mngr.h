@@ -114,7 +114,7 @@ private:
         // Fix overriden
         if (is_override)
         {
-            UTIL_ServerPrint("[DEBUG] check_range(): override = %f, new_string = %s\n", result, s.c_str());
+            UTIL_ServerPrint("[DEBUG] check_range(): override = %s, new_string = %f\n", s.c_str(), result);
             CVAR_SET_FLOAT(wstos(m_cvar->name).c_str(), result);
         }
         return !is_override;
