@@ -55,9 +55,19 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     }
 }
 
-void CVarRegister_Post(cvar_t *pCvar)
+void CVarRegister_Post(cvar_t *cvar)
 {
-    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, string = <%s>, value = %f\n", pCvar->name, pCvar->string, pCvar->value);
+    UTIL_ServerPrint("[DEBUG] CVarRegister_Post(): cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
+    cvar_list_it cvar_list = g_cvar_mngr.get(cvar);
+    // Cvar not register?
+    if (check_it_empty(cvar_list))
+    {
+        // Add cvar to list
+        auto result = g_cvar_mngr.add_exists(cvar);
+        check_it_empty_r(result);
+        // Set new value
+        result->second.value = stows(cvar->string);
+    }
 }
 
 void CVarSetFloat_Post(const char *szVarName, float flValue)
