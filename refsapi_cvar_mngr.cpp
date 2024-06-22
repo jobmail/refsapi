@@ -14,7 +14,7 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
         result->second.value = stows(value);
     }
     else
-    {        
+    {
         m_cvar_t* m_cvar = &cvar_list->second;
         // Bind exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
