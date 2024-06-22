@@ -18,7 +18,10 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
         m_cvar_t* m_cvar = &cvar_list->second;
         // Bind exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
+        {
+            UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): no bind => name = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
             return;
+        }
         std::string s = value;
         bool is_num = is_number(s);
         // Fix wrong value
