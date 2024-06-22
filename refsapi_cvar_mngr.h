@@ -288,9 +288,9 @@ public:
         m_cvar_t* m_cvar = &cvar_list->second;
         UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
         // Plugin cvars exist?
-        plugin_cvar_it plugin_it;
-        if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
-            plugin_it->second.push_back(cvar_list);
+        plugin_cvar_it plugin_cvar;
+        if ((plugin_cvar = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
+            plugin_cvar->second.push_back(cvar_list);
         // Create plugin cvars
         else
             cvars.plugin[plugin->getId()].push_back(cvar_list);
@@ -347,11 +347,10 @@ public:
     }
     void clear_plugin(CPluginMngr::CPlugin *plugin)
     {
-        plugin_cvar_it plugin_it;
-        cvar_list_t p_cvar_list;
+        plugin_cvar_it plugin_cvar;
         // Plugin cvars exist?
-        if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
-            plugin_it->second.clear();
+        if ((plugin_cvar = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
+            plugin_cvar->second.clear();
     }
     void clear_plugin_all()
     {
