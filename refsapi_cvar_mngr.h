@@ -140,7 +140,7 @@ private:
         if (cvar != nullptr)
             g_engfuncs.pfnCvar_DirectSet(cvar, value);
     }
-    cvar_list_it create_cvar(std::wstring name, std::wstring value, int flags = CVAR_TYPE_NONE)
+    cvar_t* create_cvar(std::wstring name, std::wstring value, int flags = CVAR_TYPE_NONE)
     {   
         enum { _name, _value, _count };
         // Copy params
@@ -160,12 +160,10 @@ private:
             cvar.next = nullptr;
             UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
             CVAR_REGISTER(&cvar);
-            ////////////////////////////////////////// COMMENT THIS
             p_cvar = CVAR_GET_POINTER(p_name);
-            UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>, is_created = %d\n", p_cvar->name, p_cvar->string, p_cvar != nullptr);
-            ////////////////////////////////
+            UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d\n", p_cvar->name, p_cvar->string, p_cvar != nullptr);
         }
-        return get(name);
+        return p_cvar;
     }
 
 public:
@@ -294,13 +292,14 @@ public:
     {
         if (name.empty() || value.empty() || plugin == nullptr)
             return cvar_list_it{};
-        cvar_list_it cvar_it = create_cvar(name, value, flags);
-        UTIL_ServerPrint("[DEBUG] add(): cvar_it = %d", cvar_it);
+        cvar_t* cvar = create_cvar(name, value, flags);
+        cvar_list_it cvar_it = get(cvar);
         if (check_it_empty(cvar_it))
         {
             UTIL_ServerPrint("[DEBUG] add(): ERROR => cvar is empty!\n");
             return cvar_list_it{};
         }
+        UTIL_ServerPrint("[DEBUG] add(): check cvar = %d\n", cvar_it->second.cvar);
         // Set m_cvar
         m_cvar_t* m_cvar = &cvar_it->second;
         m_cvar->desc = desc;
