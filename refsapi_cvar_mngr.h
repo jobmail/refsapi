@@ -87,7 +87,7 @@ class cvar_mngr
 private:
     bool check_range(m_cvar_t *m_cvar)
     {
-        UTIL_ServerPrint("[DEBUG] check_range(): check_range(): type = %d, name = <%s>, value = <%s>\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string);
+        UTIL_ServerPrint("[DEBUG] check_range(): type = %d, name = <%s>, value = <%s>\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string);
         if (m_cvar->type == CVAR_TYPE_NONE || m_cvar->type == CVAR_TYPE_STR)
             return true;
         // Is number?
@@ -161,7 +161,7 @@ private:
             UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
             CVAR_REGISTER(&cvar);
             p_cvar = CVAR_GET_POINTER(p_name);
-            UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d\n", p_cvar->name, p_cvar->string, p_cvar != nullptr);
+            UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d\n", p_cvar != nullptr);
         }
         return p_cvar;
     }
@@ -198,8 +198,9 @@ public:
             return;
         }
         // Check range
-        if (!check_range(m_cvar))
-            return;
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //if (!check_range(m_cvar))
+        //    return;
         // Do event
         on_change(cvar_list, value);
     }
@@ -239,14 +240,16 @@ public:
         ptr_bind.type = type;
         // Push bind
         bind_list.push_back(ptr_bind);
-        // Fix m_cvar type
-        m_cvar->type = type;
         // Update bind
         if (is_exist)
             bind_it->second = bind_list;
         else
             cvars.bind[m_cvar->cvar] = bind_list;
         UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, size);
+        // Set m_cvar type
+        m_cvar->type = type;
+        // Check range
+        check_range(m_cvar);
     }
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
@@ -309,8 +312,6 @@ public:
         // Create plugin cvars
         else
             cvars.plugin[plugin->getId()].push_back(cvar_it);
-        // Check range
-        check_range(m_cvar);
         return cvar_it;
     }
     cvar_list_it get(std::wstring name)
