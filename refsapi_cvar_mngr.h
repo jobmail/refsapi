@@ -271,7 +271,9 @@ public:
     {
         if (name.empty() || value.empty() || plugin == nullptr)
             return cvar_list_it{};
-        cvar_list_it cvar_it = add_exists(create_cvar(name, value, flags), desc, has_min, min_val, has_max, max_val);
+        cvar_t *cvar = create_cvar(name, value, flags);
+        UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
+        cvar_list_it cvar_it = add_exists(cvar, desc, has_min, min_val, has_max, max_val);
         if (check_it_empty(cvar_it))
         {
             AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: m_cvar is empty\n", __FUNCTION__);
