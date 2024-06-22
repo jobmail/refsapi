@@ -248,7 +248,7 @@ public:
             bind_it->second = bind_list;
         else
             cvars.bind[m_cvar->cvar] = bind_list;
-        UTIL_ServerPrint("[DEBUG] bind(): name = %s, value = <%s>, size = %d\n", m_cvar->cvar->name, m_cvar->cvar->string, size);
+        UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, size);
     }
     void on_change(cvar_list_it cvar_it, std::string &new_value)
     {
