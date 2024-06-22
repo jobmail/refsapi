@@ -88,7 +88,7 @@ private:
     bool check_range(m_cvar_t *m_cvar)
     {
         UTIL_ServerPrint("[DEBUG] check_range(): type = %d, name = <%s>, value = <%s>\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string);
-        if (m_cvar->type == CVAR_TYPE_NONE || m_cvar->type == CVAR_TYPE_STR)
+        if ((m_cvar->type == CVAR_TYPE_NONE) || (m_cvar->type == CVAR_TYPE_STR))
             return true;
         // Is number?
         std::string s = m_cvar->cvar->string;
@@ -105,11 +105,11 @@ private:
         // Check bind type and conver
         if (m_cvar->type == CVAR_TYPE_NUM)
             result = result >= 0.0 ? (int)result : -(int)(-result);
-        UTIL_ServerPrint("[DEBUG] check_range(): in = %s, out = %f, type = %d\n", s.c_str(), result, m_cvar->type);
+        UTIL_ServerPrint("[DEBUG] check_range(): in = %s, out = %f\n", s.c_str(), result);
         // Check override
-        if (is_override |= m_cvar->has_min && result < m_cvar->min_val)
+        if (is_override |= m_cvar->has_min && (result < m_cvar->min_val))
             result = m_cvar->min_val;
-        if (is_override |= m_cvar->has_min && result > m_cvar->max_val)
+        if (is_override |= m_cvar->has_max && (result > m_cvar->max_val))
             result = m_cvar->max_val;
         // Fix overriden
         if (is_override)
@@ -202,7 +202,7 @@ public:
         check_it_empty_r(cvar_it);
         m_cvar_t* m_cvar = &cvar_it->second;
         // Check previos type of m_cvar
-        if (m_cvar->type != CVAR_TYPE_NONE && m_cvar->type != type)
+        if ((m_cvar->type != CVAR_TYPE_NONE) && (m_cvar->type != type))
         {
             AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded with type = %d, tried to set type = %d\n", __FUNCTION__, wstos(cvar_it->first).c_str(), m_cvar->type, type);
             return;
@@ -286,7 +286,7 @@ public:
     }
     cvar_list_it add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
-        if (name.empty() || value.empty() || plugin == nullptr)
+        if (name.empty() || value.empty() || (plugin == nullptr))
             return cvar_list_it{};
         cvar_list_it cvar_it = add_exists(create_cvar(name, value, flags), desc, has_min, min_val, has_max, max_val);
         if (check_it_empty(cvar_it))
@@ -337,7 +337,7 @@ public:
     {
         p_cvar_it cvar_it;
         // Cvar exist?
-        if (cvar != nullptr && (cvar_it = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
+        if ((cvar != nullptr) && ((cvar_it = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end()))
         {
             return cvar_it->second;
         }
