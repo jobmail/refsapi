@@ -16,27 +16,34 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     else
     {        
         m_cvar_t* m_cvar = &cvar_list->second;
+        // Bind exists?
+        if (m_cvar->type == CVAR_TYPE_NONE)
+            return;
         std::string s = value;
         bool is_num = is_number(s);
-        // Fix wrong bind type
+        // Fix wrong value
         if (!is_num && (m_cvar->type == CVAR_TYPE_NUM || m_cvar->type == CVAR_TYPE_FLT))
-            s.clear();
+        {
+            UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): wrong non-number value <%s>\n", value);
+            CVAR_SET_STRING(cvar->name, "0");
+            return;
+        }
         // Is number?
         if (is_num)
         {
-            bool was_override = false;
+            bool is_override = false;
             auto result = std::stod(s);
             // Check bind type and conver
             if (m_cvar->type == CVAR_TYPE_NUM)
                 result = result >= 0.0 ? (int)result : -(int)(-result);
-            UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f, type = %d\n", s.c_str(), result, m_cvar->type);
-            if (was_override |= m_cvar->has_min && result < m_cvar->min_val)
+            UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): in = %s, out = %f, type = %d\n", s.c_str(), result, m_cvar->type);
+            if (is_override |= m_cvar->has_min && result < m_cvar->min_val)
                 result = m_cvar->min_val;
-            if (was_override |= m_cvar->has_min && result > m_cvar->max_val)
+            if (is_override |= m_cvar->has_min && result > m_cvar->max_val)
                 result = m_cvar->max_val;
-            if (was_override) {
+            if (is_override) {
                 CVAR_SET_FLOAT(wstos(m_cvar->name).c_str(), result);
-                UTIL_ServerPrint("[DEBUG] stod(): override = %f, new_string = %s\n", result, m_cvar->cvar->string);
+                UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): override = %f, new_string = %s\n", result, m_cvar->cvar->string);
                 return;
             }
             s = rtrim_zero_c(std::to_string(result));
