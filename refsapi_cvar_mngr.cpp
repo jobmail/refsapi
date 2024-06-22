@@ -55,7 +55,7 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
     }
 }
 
-void CvarValue(const edict_t *pEnt, const char *value)
+void CvarValue_Post(const edict_t *pEnt, const char *value)
 {
     UTIL_ServerPrint("[DEBUG] CvarValue(): ent = %d, value = <%s>\n", pEnt, value);
 }
