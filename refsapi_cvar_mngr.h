@@ -4,7 +4,7 @@
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
-//void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
+void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
 void Cvar_DirectSet_Post(cvar_t *cvar, const char *value);
 void CVarRegister_Post(cvar_t *pCvar);
 void CVarSetFloat_Post(const char *szVarName, float flValue);
