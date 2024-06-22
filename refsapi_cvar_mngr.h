@@ -301,6 +301,7 @@ public:
         m_cvar->min_val = min_val;
         m_cvar->has_max = has_max;
         m_cvar->max_val = max_val;
+        UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", has_min, min_val, has_max, max_val);
         // Plugin cvars exist?
         plugin_cvar_it plugin_it;
         if ((plugin_it = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
