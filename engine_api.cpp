@@ -230,7 +230,7 @@ enginefuncs_t g_EngineFunctionsTable_Post =
 	&R_WriteCoord_Post,		// pfnWriteCoord()
 	&R_WriteString_Post,	// pfnWriteString()
 	&R_WriteEntity_Post,	// pfnWriteEntity()
-	CVarRegister_Post,		// pfnCVarRegister()
+	&CVarRegister_Post,		// pfnCVarRegister()
 	NULL,		// pfnCVarGetFloat()
 	NULL,		// pfnCVarGetString()
 	&CVarSetFloat_Post,		// pfnCVarSetFloat()
