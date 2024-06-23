@@ -11,7 +11,7 @@ void (*meta_Cvar_RegisterVariable)(cvar_t *pCvar) = nullptr;
 
 void Cvar_RegisterVariable(cvar_t *pCvar)
 {
-	UTIL_ServerPrint("[DEBUG] [Cvar_RegisterVariable]: meta hook!!!!!!!!");
+	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook!!!!!!!!\nn");
 	if (meta_Cvar_RegisterVariable != nullptr)
 		meta_Cvar_RegisterVariable(pCvar);
 	Cvar_RegisterVariable_Post(pCvar);
