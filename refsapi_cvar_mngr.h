@@ -4,12 +4,12 @@
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
-void Cvar_RegisterVariable_Post(cvar_t *cvar);
-void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
-void Cvar_DirectSet_Post(cvar_t *cvar, const char *value);
-void CVarRegister_Post(cvar_t *pCvar);
-void CVarSetFloat_Post(const char *szVarName, float flValue);
-void CVarSetString_Post(const char *szVarName, const char *szValue);
+extern void Cvar_RegisterVariable_Post(cvar_t *cvar);
+extern void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
+extern void Cvar_DirectSet_Post(cvar_t *cvar, const char *value);
+extern void CVarRegister_Post(cvar_t *pCvar);
+extern void CVarSetFloat_Post(const char *szVarName, float flValue);
+extern void CVarSetString_Post(const char *szVarName, const char *szValue);
 
 typedef enum CVAR_TYPES_e
 {
