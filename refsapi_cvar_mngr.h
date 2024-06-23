@@ -256,13 +256,15 @@ public:
         cvar_hook_list_it hook_it;
         if ((hook_it = cvars.cvar_hook_list.find(m_cvar->cvar)) != cvars.cvar_hook_list.end())
         {
+            UTIL_ServerPrint("[DEBUG] on_change(): hooook!!!!!!!!!!!!!");
             for (auto& h : hook_it->second)
             {
-                UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d\n, enabled = %d", h->first, h->second);
+                UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
                 if (h->second)
                     g_amxxapi.ExecuteForward(h->first);
             }
-        }
+        } else
+            UTIL_ServerPrint("[DEBUG] on_change(): hook for cvar <%d> not found !!!\n", m_cvar->cvar);
     }
     cvar_list_it add_exists(cvar_t *cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
@@ -367,7 +369,7 @@ public:
                     hook_it->second.push_back(result.first);
                 else
                     cvars.cvar_hook_list[cvar].push_back(result.first);
-                UTIL_ServerPrint("[DEBUG] create_hook(): fwd = %d, hook = %d, enabled = %d\n", fwd, result.first, is_enable);
+                UTIL_ServerPrint("[DEBUG] create_hook(): fwd = %d, hook = %d, cvar = %d, enabled = %d\n", fwd, result.first, cvar, is_enable);
                 return result.first;
             }
         }
