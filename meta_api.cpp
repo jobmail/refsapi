@@ -5,6 +5,8 @@ gamedll_funcs_t *gpGamedllFuncs;
 mutil_funcs_t *gpMetaUtilFuncs;
 enginefuncs_t *g_pengfuncsTable;
 
+enginefuncs_t* meta_hack;
+
 plugin_info_t Plugin_info =
 {
 	META_INTERFACE_VERSION,							// ifvers
@@ -26,6 +28,8 @@ void Cvar_RegisterVariable(cvar_t *pCvar)
 	if (meta_Cvar_RegisterVariable != nullptr)
 		meta_Cvar_RegisterVariable(pCvar);
 	Cvar_RegisterVariable_Post(pCvar);
+	meta_hack->pfnCvar_RegisterVariable = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
+	meta_hack->pfnCVarRegister = Cvar_RegisterVariable;
 }
 
 C_DLLEXPORT int Meta_Query(char *interfaceVersion, plugin_info_t **plinfo, mutil_funcs_t *pMetaUtilFuncs)
@@ -61,10 +65,11 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
 
 	///////////////
-	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook %d!!!!!!!!\n", gpMetaGlobals->orig_ret);
-	meta_Cvar_RegisterVariable = ((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCvar_RegisterVariable; // pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
-	((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCvar_RegisterVariable = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
-	((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister = Cvar_RegisterVariable;
+	meta_hack = (enginefuncs_t*)gpMetaGlobals->orig_ret;
+	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook %d!!!!!!!!\n", meta_hack);
+	meta_Cvar_RegisterVariable = meta_hack->pfnCvar_RegisterVariable; // pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
+	meta_hack->pfnCvar_RegisterVariable = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
+	meta_hack->pfnCVarRegister = Cvar_RegisterVariable;
 	
 	return true;
 }
