@@ -315,8 +315,8 @@ public:
             // Check global cvar
             else
             {
-                std::string p = wstos(name).data();
-                cvar_t *p_cvar = CVAR_GET_POINTER(p.data());
+                //std::string p = wstos(name).data();
+                cvar_t *p_cvar = CVAR_GET_POINTER(wstos(name).data());//p.data()
                 // Cvar exist?
                 if (p_cvar != nullptr)
                 {
