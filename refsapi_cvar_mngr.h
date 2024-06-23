@@ -345,17 +345,18 @@ public:
     }
     cvar_hook_state_it create_hook(int fwd, cvar_list_it cvar_list, bool is_enable = true)
     {
-        check_it_empty_r(cvar_list);
-        bool is_error = false;
-        auto result = cvars.hook_state.insert({ fwd, is_enable });
-        if (result.second)
+        if (!check_it_empty(cvar_list))
         {
-            cvar_hook_list_it hook_it;
-            if ((hook_it = cvars.cvar_hook_list.find(cvar_list)) != cvars.cvar_hook_list.end())
-                hook_it->second.push_back(result.first);
-            else
-                cvars.cvar_hook_list[cvar_list].push_back(result.first);
-            return result.first;
+            auto result = cvars.hook_state.insert({ fwd, is_enable });
+            if (result.second)
+            {
+                cvar_hook_list_it hook_it;
+                if ((hook_it = cvars.cvar_hook_list.find(cvar_list)) != cvars.cvar_hook_list.end())
+                    hook_it->second.push_back(result.first);
+                else
+                    cvars.cvar_hook_list[cvar_list].push_back(result.first);
+                return result.first;
+            }
         }
         return cvar_hook_state_it{};
     }
