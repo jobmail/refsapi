@@ -189,6 +189,7 @@ public:
         // Check range
         if (!check_range(m_cvar))
             return;
+        UTIL_ServerPrint("[DEBUG] on_direct_set(): cvar_t = %d, cvar_list = %d <===\n", cvar, cvar_list->second.cvar);
         // Do event
         on_change(cvar_list, value);
     }
