@@ -2,7 +2,7 @@
 #include <extdll.h>
 #include <meta_api.h>
 #include "precompiled.h"
-#include "engine_t.h"
+//#include "engine_t.h"
 
 enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
@@ -26,9 +26,9 @@ C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pengfuncsFromEngine, glob
 	gpGlobals = pGlobals;
 
 	// Hook Silent-style, thanks :-))
-	//meta_Cvar_RegisterVariable = pengfuncsFromEngine->pfnCVarRegister;
-	//pengfuncsFromEngine->pfnCVarRegister = Cvar_RegisterVariable;
+	meta_Cvar_RegisterVariable = pengfuncsFromEngine->pfnCVarRegister;
+	pengfuncsFromEngine->pfnCVarRegister = Cvar_RegisterVariable;
 
-	meta_Cvar_RegisterVariable = g_engine.pl_funcs.pfnCVarRegister;
-	g_engine.pl_funcs.pfnCVarRegister = Cvar_RegisterVariable;
+	//meta_Cvar_RegisterVariable = g_engine.pl_funcs.pfnCVarRegister;
+	//g_engine.pl_funcs.pfnCVarRegister = Cvar_RegisterVariable;
 }
