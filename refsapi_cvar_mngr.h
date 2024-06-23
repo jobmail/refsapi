@@ -164,7 +164,7 @@ public:
         // Cvar not register? Samething went wrong...
         if (check_it_empty(cvar_list))
         {
-            UTIL_ServerPrint("\n[DEBUG] on_direct_set(): NOT REGISTERED! cvar = <%s>, string = <%s>, value = %f\n\n", cvar->name, cvar->string, cvar->value);
+            UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT REGISTERED! cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
             return;
         }
         m_cvar_t* m_cvar = &cvar_list->second;
