@@ -173,7 +173,7 @@ public:
         // Bind non-exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
         {
-            if (strcmp(cvar->name, "mp_timelimit") != 0)
+            if (strcmp(cvar->name, "mp_timeleft") != 0)
                 UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
             m_cvar->value = stows(value);
             return;
