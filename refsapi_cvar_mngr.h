@@ -167,6 +167,7 @@ public:
         {
             UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT REGISTERED! cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
             // Register cvar
+            return;
             cvar_list = add_exists(cvar);
             return;/////////////////////////
         }
