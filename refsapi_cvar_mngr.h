@@ -252,6 +252,14 @@ public:
             for (auto& bind : bind_it->second)
                 copy_bind(&bind, m_cvar->cvar);
         }
+        // Hook exists?
+        cvar_hook_list_it hook_it;
+        if ((hook_it = cvars.cvar_hook_list.find(m_cvar->cvar)) != cvars.cvar_hook_list.end())
+        {
+            for (auto& h : hook_it->second)
+                if (h->second)
+                    g_amxxapi.ExecuteForward(h->first);
+        }
     }
     cvar_list_it add_exists(cvar_t *cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
