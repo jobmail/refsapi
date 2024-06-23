@@ -1,11 +1,12 @@
 #include <string.h>
 #include <extdll.h>
-#include "precompiled.h"
+//#include "precompiled.h"
 //#include <meta_api.h>
 
 enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 
+/*
 void (*meta_Cvar_RegisterVariable)(cvar_t *pCvar) = nullptr;
 
 void Cvar_RegisterVariable(cvar_t *pCvar)
@@ -15,7 +16,7 @@ void Cvar_RegisterVariable(cvar_t *pCvar)
 		meta_Cvar_RegisterVariable(pCvar);
 	Cvar_RegisterVariable_Post(pCvar);
 }
-
+*/
 // Receive engine function table from engine.
 // This appears to be the _first_ DLL routine called by the engine, so we
 // do some setup operations here.
