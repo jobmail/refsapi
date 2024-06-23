@@ -38,7 +38,7 @@ void CAPI_Config::Init() {
 
 		cvar.name = REFSAPI_CVAR;
 		
-		cvar.flags = FCVAR_SERVER | FCVAR_SPONLY; //| FCVAR_UNLOGGED);
+		cvar.flags = (FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED);
 		
 		cvar.string = "1";
 
@@ -50,6 +50,8 @@ void CAPI_Config::Init() {
 
 			g_engfuncs.pfnCvar_DirectSet(pCvar, "1");
 	}
+
+	CVAR_SET_STRING("zzz1", "123.456");
 }
 
 void CAPI_Config::ServerDeactivate() const {
