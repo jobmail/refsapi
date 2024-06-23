@@ -85,6 +85,7 @@ int regfunc::current_cell = 1;
 
 #define ENG(h,...) { {}, {}, #h, "ReHLDS", [](){ return api_cfg.hasReHLDS(); }, ((!(RFH_##h & (MAX_REGION_RANGE - 1)) ? regfunc::current_cell = 1, true : false) || (RFH_##h & (MAX_REGION_RANGE - 1)) == regfunc::current_cell++) ? regfunc(h##__VA_ARGS__) : regfunc(#h#__VA_ARGS__), [](){ g_RehldsHookchains->h()->registerHook(&h); }, [](){ g_RehldsHookchains->h()->unregisterHook(&h); }, false}
 hook_t hooklist_engine[] = {
+	/*
 	ENG(SV_StartSound),
 	ENG(SV_DropClient),
 	ENG(SV_ActivateServer),
@@ -106,10 +107,12 @@ hook_t hooklist_engine[] = {
 	ENG(SV_ClientPrintf),
 	ENG(SV_AllowPhysent),
 	ENG(ExecuteServerStringCmd),
+	*/
 };
 
 #define DLL(h,...) { {}, {}, #h, "ReGameDLL", [](){ return api_cfg.hasReGameDLL(); }, ((!(RFG_##h & (MAX_REGION_RANGE - 1)) ? regfunc::current_cell = 1, true : false) || (RFG_##h & (MAX_REGION_RANGE - 1)) == regfunc::current_cell++) ? regfunc(h##__VA_ARGS__) : regfunc(#h#__VA_ARGS__), [](){ g_ReGameHookchains->h()->registerHook(&h); }, [](){ g_ReGameHookchains->h()->unregisterHook(&h); }, false}
 hook_t hooklist_gamedll[] = {
+	/*
 	DLL(GetForceCamera),
 	DLL(PlayerBlind),
 	DLL(RadiusFlash_TraceLine),
@@ -142,13 +145,17 @@ hook_t hooklist_gamedll[] = {
 	DLL(AddMultiDamage),
 	DLL(ApplyMultiDamage),
 	DLL(BuyItem),
+	*/
 };
 
 hook_t hooklist_animating[] = {
+	/*
 	DLL(CBaseAnimating_ResetSequenceInfo)
+	*/
 };
 
 hook_t hooklist_player[] = {
+	/*
 	DLL(CBasePlayer_Spawn),
 	DLL(CBasePlayer_Precache),
 	DLL(CBasePlayer_ObjectCaps),
@@ -209,9 +216,11 @@ hook_t hooklist_player[] = {
 
 	DLL(CBasePlayer_CheckTimeBasedDamage),
 	DLL(CBasePlayer_EntSelectSpawnPoint),
+	*/
 };
 
 hook_t hooklist_gamerules[] = {
+	/*
 	DLL(CSGameRules_FShouldSwitchWeapon),
 	DLL(CSGameRules_GetNextBestWeapon),
 	DLL(CSGameRules_FlPlayerFallDamage),
@@ -240,22 +249,28 @@ hook_t hooklist_gamerules[] = {
 	DLL(CSGameRules_TeamFull),
 	DLL(CSGameRules_TeamStacked),
 	DLL(CSGameRules_PlayerGotWeapon),
+	*/
 };
 
 hook_t hooklist_grenade[] = {
+	/*
 	DLL(CGrenade_DefuseBombStart),
 	DLL(CGrenade_DefuseBombEnd),
 	DLL(CGrenade_ExplodeHeGrenade),
 	DLL(CGrenade_ExplodeFlashbang),
 	DLL(CGrenade_ExplodeSmokeGrenade),
 	DLL(CGrenade_ExplodeBomb),
+	*/
 };
 
 hook_t hooklist_weaponbox[] = {
+	/*
 	DLL(CWeaponBox_SetModel),
+	*/
 };
 
 hook_t hooklist_weapon[] = {
+	/*
 	DLL(CBasePlayerWeapon_CanDeploy),
 	DLL(CBasePlayerWeapon_DefaultDeploy),
 	DLL(CBasePlayerWeapon_DefaultReload),
@@ -263,22 +278,29 @@ hook_t hooklist_weapon[] = {
 	DLL(CBasePlayerWeapon_ItemPostFrame),
 	DLL(CBasePlayerWeapon_KickBack),
 	DLL(CBasePlayerWeapon_SendWeaponAnim),
+	*/
 };
 
 hook_t hooklist_gib[] = {
+	/*
 	DLL(CGib_Spawn),
 	DLL(CGib_BounceGibTouch),
 	DLL(CGib_WaitTillLand),
+	*/
 };
 
 hook_t hooklist_cbaseentity[] = {
+	/*
 	DLL(CBaseEntity_FireBullets),
 	DLL(CBaseEntity_FireBuckshots),
 	DLL(CBaseEntity_FireBullets3),
+	*/
 };
 
 hook_t hooklist_botmanager[] = {
+	/*
 	DLL(CBotManager_OnEvent),
+	*/
 };
 
 
@@ -289,6 +311,7 @@ hook_t* hooklist_t::getHookSafe(size_t hook)
 	const auto table = hooks_tables_e(hook / MAX_REGION_RANGE);
 	const auto index = hook & (MAX_REGION_RANGE - 1);
 
+	/*
 	switch (table) {
 		CASE(engine)
 		CASE(gamedll)
@@ -302,14 +325,14 @@ hook_t* hooklist_t::getHookSafe(size_t hook)
 		CASE(cbaseentity)
 		CASE(botmanager)
 	}
-
+	*/
 	return nullptr;
 }
 
 void hooklist_t::clear()
 {
 	#define FOREACH_CLEAR(h) for (auto& h : hooklist_##h) h.clear();
-
+	/*
 	FOREACH_CLEAR(engine);
 	FOREACH_CLEAR(gamedll);
 	FOREACH_CLEAR(animating);
@@ -321,6 +344,7 @@ void hooklist_t::clear()
 	FOREACH_CLEAR(gib);
 	FOREACH_CLEAR(cbaseentity);
 	FOREACH_CLEAR(botmanager);
+	*/
 }
 
 void hook_t::clear()
