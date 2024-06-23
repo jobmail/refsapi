@@ -29,6 +29,7 @@ C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pengfuncsFromEngine, glob
 	//meta_Cvar_RegisterVariable = pengfuncsFromEngine->pfnCVarRegister;
 	//pengfuncsFromEngine->pfnCVarRegister = Cvar_RegisterVariable;
 	
-	meta_Cvar_RegisterVariable = ((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister; // pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
-	((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
+	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook %d!!!!!!!!\n", gpMetaGlobals->orig_ret);
+	//meta_Cvar_RegisterVariable = ((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister; // pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
+	//((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
 }
