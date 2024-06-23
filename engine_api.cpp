@@ -274,7 +274,7 @@ enginefuncs_t g_EngineFunctionsTable_Post =
 	NULL,		// pfnEndSection()
 	NULL,		// pfnCompareFileTime()
 	NULL,		// pfnGetGameDir()
-	Cvar_RegisterVariable_Post,		// pfnCvar_RegisterVariable() //
+	NULL,		// pfnCvar_RegisterVariable() //
 	NULL,		// pfnFadeClientVolume()
 	NULL,		// pfnSetClientMaxspeed()
 	NULL,		// pfnCreateFakeClient()

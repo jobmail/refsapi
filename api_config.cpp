@@ -52,8 +52,6 @@ void CAPI_Config::Init() {
 
 			g_engfuncs.pfnCvar_DirectSet(pCvar, "1");
 	}
-
-	CVAR_SET_STRING("zzz1", "123.456");
 }
 
 void CAPI_Config::ServerDeactivate() const {
