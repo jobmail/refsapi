@@ -6,8 +6,9 @@
 #include "enginecallbacks.h"
 #include "plinfo.h"             // plugin_info_t, etc
 #include "mutil.h"
-#include "engine_t.h"
 #include "sys_module.h"
+#include "engine_t.h"
+
 
 // Version consists of "major:minor", two separate integer numbers.
 // Version 1	original
