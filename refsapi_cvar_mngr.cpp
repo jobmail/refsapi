@@ -1,6 +1,5 @@
 #include "precompiled.h"
 
-
 void Cvar_RegisterVariable_Post(cvar_t *cvar)
 {
     UTIL_ServerPrint("[DEBUG] Cvar_RegisterVariable_Post(): cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);

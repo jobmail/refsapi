@@ -160,6 +160,7 @@ public:
     }
     void on_direct_set(cvar_t *cvar, std::string value)
     {
+        //UTIL_ServerPrint("[DEBUG] on_direct_set(): WARNIGN %d\n", g_engine.pl_funcs.pfnCVarRegister);
         cvar_list_it cvar_list = get(cvar);
         // Cvar not register? Samething went wrong...
         if (check_it_empty(cvar_list))
