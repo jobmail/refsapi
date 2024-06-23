@@ -1,12 +1,11 @@
 #include <string.h>
 #include <extdll.h>
-//#include "precompiled.h"
-//#include <meta_api.h>
+#include "precompiled.h"
+#include <meta_api.h>
 
 enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 
-/*
 void (*meta_Cvar_RegisterVariable)(cvar_t *pCvar) = nullptr;
 
 void Cvar_RegisterVariable(cvar_t *pCvar)
@@ -16,7 +15,7 @@ void Cvar_RegisterVariable(cvar_t *pCvar)
 		meta_Cvar_RegisterVariable(pCvar);
 	Cvar_RegisterVariable_Post(pCvar);
 }
-*/
+
 // Receive engine function table from engine.
 // This appears to be the _first_ DLL routine called by the engine, so we
 // do some setup operations here.
@@ -28,7 +27,7 @@ C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pengfuncsFromEngine, glob
 	// Hook Silent-style, thanks :-))
 	//meta_Cvar_RegisterVariable = pengfuncsFromEngine->pfnCVarRegister;
 	//pengfuncsFromEngine->pfnCVarRegister = Cvar_RegisterVariable;
-
-	//meta_Cvar_RegisterVariable = gpMetaGlobals->g_engine->pl_funcs.pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
-	//gpMetaGlobals->g_engine->pl_funcs.pfnCvar_RegisterVariable = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
+	
+	meta_Cvar_RegisterVariable = ((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
+	((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCvar_RegisterVariable = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
 }
