@@ -160,23 +160,15 @@ public:
     }
     void on_direct_set(cvar_t *cvar, std::string value)
     {
-        //UTIL_ServerPrint("[DEBUG] on_direct_set(): WARNIGN %d\n", g_engine.pl_funcs.pfnCVarRegister);
         cvar_list_it cvar_list = get(cvar);
-        // Cvar not register? Samething went wrong...
-        if (check_it_empty(cvar_list))
-        {
-            UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT REGISTERED! cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
-            // Register cvar
-            return;
-            cvar_list = add_exists(cvar);
-            return;/////////////////////////
-        }
+        check_it_empty_r(cvar_list);
+        // Get m_cvar
         m_cvar_t* m_cvar = &cvar_list->second;
         // Bind non-exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
         {
-            if (strcmp(cvar->name, "mp_timeleft") != 0)
-                UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
+            //if (strcmp(cvar->name, "mp_timeleft") != 0)
+            //    UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
             m_cvar->value = stows(value);
             return;
         }
@@ -290,10 +282,10 @@ public:
             AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: m_cvar is empty\n", __FUNCTION__);
             return cvar_list_it{};
         }
-        UTIL_ServerPrint("[DEBUG] add(): check cvar = %d\n", cvar_list->second.cvar);
+        //UTIL_ServerPrint("[DEBUG] add(): check cvar = %d\n", cvar_list->second.cvar);
         // Set m_cvar
         m_cvar_t* m_cvar = &cvar_list->second;
-        UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
+        //UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
         // Plugin cvars exist?
         plugin_cvar_it plugin_cvar;
         if ((plugin_cvar = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
@@ -305,44 +297,24 @@ public:
     }
     cvar_list_it get(std::wstring name)
     {
+        if (name.empty())
+            return cvar_list_it{};
         cvar_list_it cvar_list;
-        if (!name.empty())
-        {
-            // Fix caps in name
-            ws_convert_tolower(name);
-            // Cvar exist?
-            if ((cvar_list = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
-            {
-                return cvar_list;
-            }
-            // Check global cvar
-            else
-            {
-                //std::string p = wstos(name).data();
-                cvar_t *p_cvar = CVAR_GET_POINTER(wstos(name).data());//p.data()
-                // Cvar exist?
-                if (p_cvar != nullptr)
-                {
-                    return add_exists(p_cvar);
-                }
-            }
-        }
-        return cvar_list_it{};
+        // Fix caps in name
+        ws_convert_tolower(name);
+        // Cvar exist?
+        if ((cvar_list = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
+            return cvar_list;
+        // Check global cvar
+        cvar_t *p_cvar = CVAR_GET_POINTER(wstos(name).data());
+        // Cvar exist?
+        return p_cvar != nullptr ? add_exists(p_cvar) : cvar_list_it{};
     }
     cvar_list_it get(cvar_t *cvar)
     {
-        if (cvar != nullptr)
-        {
-            p_cvar_it p_cvar;
-            // Cvar exist?
-            if ((p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
-            {
-                return p_cvar->second;
-            }
-            else
-                return get(stows(cvar->name));
-        }
-        return cvar_list_it{};
+        p_cvar_it p_cvar;
+        // Cvar exists?
+        return cvar == nullptr ? cvar_list_it{} : (p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end() ? p_cvar->second : get(stows(cvar->name));
     }
     void set(std::wstring name, std::wstring value)
     {
