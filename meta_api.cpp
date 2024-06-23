@@ -18,6 +18,16 @@ plugin_info_t Plugin_info =
 	PT_NEVER,										// (when) unloadable
 };
 
+void (*meta_Cvar_RegisterVariable)(cvar_t *pCvar) = nullptr;
+
+void Cvar_RegisterVariable(cvar_t *pCvar)
+{
+	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook!!!!!!!!\nn");
+	if (meta_Cvar_RegisterVariable != nullptr)
+		meta_Cvar_RegisterVariable(pCvar);
+	Cvar_RegisterVariable_Post(pCvar);
+}
+
 C_DLLEXPORT int Meta_Query(char *interfaceVersion, plugin_info_t **plinfo, mutil_funcs_t *pMetaUtilFuncs)
 {
 	*plinfo = &Plugin_info;
@@ -49,6 +59,11 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	
 	GET_HOOK_TABLES(PLID, &g_pengfuncsTable, nullptr, nullptr);
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
+
+	///////////////
+	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook %d!!!!!!!!\n", gpMetaGlobals->orig_ret);
+	//meta_Cvar_RegisterVariable = ((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister; // pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
+	//((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
 	
 	return true;
 }
