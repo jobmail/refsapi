@@ -364,12 +364,12 @@ public:
             if (result.second)
             {
                 cvar_hook_list_it hook_it;
-                cvar_t* cvar = cvar_list->second.cvar;
-                if ((hook_it = cvars.cvar_hook_list.find(cvar)) != cvars.cvar_hook_list.end())
+                m_cvar_t* m_cvar = &cvar_list->second;
+                if ((hook_it = cvars.cvar_hook_list.find(m_cvar->cvar)) != cvars.cvar_hook_list.end())
                     hook_it->second.push_back(result.first);
                 else
-                    cvars.cvar_hook_list[cvar].push_back(result.first);
-                UTIL_ServerPrint("[DEBUG] create_hook(): fwd = %d, hook = %d, cvar = %d, enabled = %d\n", fwd, result.first, cvar, is_enable);
+                    cvars.cvar_hook_list[m_cvar->cvar].push_back(result.first);
+                UTIL_ServerPrint("[DEBUG] create_hook(): fwd = %d, hook = %d, cvar = %d, enabled = %d\n", fwd, result.first, m_cvar->cvar, is_enable);
                 return result.first;
             }
         }
