@@ -235,7 +235,7 @@ public:
             bind_it->second = bind_list;
         else
             cvars.bind_list[m_cvar->cvar] = bind_list;
-        UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, size);
+        UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, cvar = %d, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, m_cvar->cvar, size);
         // Set m_cvar type
         m_cvar->type = type;
         // Check range

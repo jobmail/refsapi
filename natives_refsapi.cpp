@@ -266,7 +266,7 @@ cell AMX_NATIVE_CALL rf_bind_pcvar(AMX *amx, cell *params)
     // Variable address is not inside global area?
     check_global_r(params[arg_var]);
     check_type_r(params[arg_type]);
-    g_cvar_mngr.bind(plugin, (CVAR_TYPES_t)params[arg_type], *(cvar_list_it)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    g_cvar_mngr.bind(plugin, (CVAR_TYPES_t)params[arg_type], *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
 
