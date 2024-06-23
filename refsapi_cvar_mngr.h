@@ -43,6 +43,12 @@ typedef struct ptr_bind_s
     size_t size;
 } ptr_bind_t;
 
+typedef struct cvar_hook_s
+{
+    int fwd;
+    bool is_enable;
+} cvar_hook_t;
+
 typedef std::map<std::wstring, m_cvar_t> cvar_list_t;
 typedef cvar_list_t::iterator cvar_list_it;
 
@@ -55,12 +61,20 @@ typedef p_cvar_t::iterator p_cvar_it;
 typedef std::map<cvar_t*, std::list<ptr_bind_t>> cvar_bind_t;
 typedef cvar_bind_t::iterator cvar_bind_it;
 
+typedef std::map<int, bool> cvar_hook_state_t;
+typedef cvar_hook_state_t::iterator cvar_hook_state_it;
+
+typedef std::map<cvar_list_it, std::list<cvar_hook_state_it>> cvar_hook_list_t;
+typedef cvar_hook_list_t::iterator cvar_hook_list_it;
+
 typedef struct cvar_mngr_s
 {
     cvar_list_t cvar_list;
     plugin_cvar_t plugin;    
     p_cvar_t p_cvar;
-    cvar_bind_t bind;
+    cvar_bind_t bind_list;
+    cvar_hook_state_t hook_state;
+    cvar_hook_list_t cvar_hook_list;
 } cvar_mngr_t;
 
 class cvar_mngr
@@ -193,7 +207,7 @@ public:
         ptr_bind_t ptr_bind;
         bool is_exist;
         // Bind exists?
-        if (is_exist = (bind_it = cvars.bind.find(m_cvar->cvar)) != cvars.bind.end())
+        if (is_exist = (bind_it = cvars.bind_list.find(m_cvar->cvar)) != cvars.bind_list.end())
             bind_list = bind_it->second;
         // Bind not empty?
         if (!bind_list.empty())
@@ -219,7 +233,7 @@ public:
         if (is_exist)
             bind_it->second = bind_list;
         else
-            cvars.bind[m_cvar->cvar] = bind_list;
+            cvars.bind_list[m_cvar->cvar] = bind_list;
         UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, size);
         // Set m_cvar type
         m_cvar->type = type;
@@ -232,7 +246,7 @@ public:
         m_cvar_t* m_cvar = &cvar_list->second;
         cvar_bind_it bind_it;
         // Bind exists?
-        if ((bind_it = cvars.bind.find(m_cvar->cvar)) != cvars.bind.end())
+        if ((bind_it = cvars.bind_list.find(m_cvar->cvar)) != cvars.bind_list.end())
         {
             UTIL_ServerPrint("[DEBUG] on_change(): name = <%s>, old_value = <%s>, new_value = <%s>\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), new_value.c_str());
             for (auto& bind : bind_it->second)
@@ -329,6 +343,22 @@ public:
         auto cvar = cvar_list->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }
+    cvar_hook_state_it create_hook(int fwd, cvar_list_it cvar_list, bool is_enable = true)
+    {
+        check_it_empty_r(cvar_list);
+        bool is_error = false;
+        auto result = cvars.hook_state.insert({ fwd, is_enable });
+        if (result.second)
+        {
+            cvar_hook_list_it hook_it;
+            if ((hook_it = cvars.cvar_hook_list.find(cvar_list)) != cvars.cvar_hook_list.end())
+                hook_it->second.push_back(result.first);
+            else
+                cvars.cvar_hook_list[cvar_list].push_back(result.first);
+            return result.first;
+        }
+        return cvar_hook_state_it{};
+    }
     void clear_plugin(CPluginMngr::CPlugin *plugin)
     {
         plugin_cvar_it plugin_cvar;
@@ -348,16 +378,26 @@ public:
     {
         cvars.p_cvar.clear();
     }
-    void clear_bind_all()
+    void clear_bind_list()
     {
-        cvars.bind.clear();
+        cvars.bind_list.clear();
+    }
+    void clear_hook_list()
+    {
+        cvars.cvar_hook_list.clear();
+    }
+    void clear_hook_state()
+    {
+        cvars.hook_state.clear();
     }
     void clear_all()
     {
         clear_plugin_all();
         clear_pcvar_all();
         clear_cvar_list();
-        clear_bind_all();
+        clear_bind_list();
+        clear_hook_list();
+        clear_hook_state();
     }
 };
 
