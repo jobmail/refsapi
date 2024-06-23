@@ -64,7 +64,7 @@ typedef cvar_bind_t::iterator cvar_bind_it;
 typedef std::map<int, bool> cvar_hook_state_t;
 typedef cvar_hook_state_t::iterator cvar_hook_state_it;
 
-typedef std::map<cvar_list_it, std::list<cvar_hook_state_it>> cvar_hook_list_t;
+typedef std::map<cvar_t*, std::list<cvar_hook_state_it>> cvar_hook_list_t;
 typedef cvar_hook_list_t::iterator cvar_hook_list_it;
 
 typedef struct cvar_mngr_s
@@ -351,10 +351,11 @@ public:
             if (result.second)
             {
                 cvar_hook_list_it hook_it;
-                if ((hook_it = cvars.cvar_hook_list.find(cvar_list)) != cvars.cvar_hook_list.end())
+                cvar_t* cvar = cvar_list->second.cvar;
+                if ((hook_it = cvars.cvar_hook_list.find(cvar)) != cvars.cvar_hook_list.end())
                     hook_it->second.push_back(result.first);
                 else
-                    cvars.cvar_hook_list[cvar_list].push_back(result.first);
+                    cvars.cvar_hook_list[cvar].push_back(result.first);
                 return result.first;
             }
         }
