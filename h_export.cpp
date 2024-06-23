@@ -1,21 +1,9 @@
 #include <string.h>
 #include <extdll.h>
-#include "precompiled.h"
-//#include <meta_api.h>
-//#include "sdk_util.cpp"
 
 enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 
-void (*meta_Cvar_RegisterVariable)(cvar_t *pCvar) = nullptr;
-
-void Cvar_RegisterVariable(cvar_t *pCvar)
-{
-	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook!!!!!!!!\nn");
-	if (meta_Cvar_RegisterVariable != nullptr)
-		meta_Cvar_RegisterVariable(pCvar);
-	Cvar_RegisterVariable_Post(pCvar);
-}
 
 // Receive engine function table from engine.
 // This appears to be the _first_ DLL routine called by the engine, so we
@@ -28,8 +16,4 @@ C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pengfuncsFromEngine, glob
 	// Hook Silent-style, thanks :-))
 	//meta_Cvar_RegisterVariable = pengfuncsFromEngine->pfnCVarRegister;
 	//pengfuncsFromEngine->pfnCVarRegister = Cvar_RegisterVariable;
-	
-	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook %d!!!!!!!!\n", gpMetaGlobals->orig_ret);
-	//meta_Cvar_RegisterVariable = ((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister; // pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
-	//((enginefuncs_t*)(gpMetaGlobals->orig_ret))->pfnCVarRegister = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
 }
