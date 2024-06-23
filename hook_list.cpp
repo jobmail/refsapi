@@ -106,7 +106,6 @@ hook_t hooklist_engine[] = {
 	ENG(SV_ClientPrintf),
 	ENG(SV_AllowPhysent),
 	ENG(ExecuteServerStringCmd),
-
 };
 
 #define DLL(h,...) { {}, {}, #h, "ReGameDLL", [](){ return api_cfg.hasReGameDLL(); }, ((!(RFG_##h & (MAX_REGION_RANGE - 1)) ? regfunc::current_cell = 1, true : false) || (RFG_##h & (MAX_REGION_RANGE - 1)) == regfunc::current_cell++) ? regfunc(h##__VA_ARGS__) : regfunc(#h#__VA_ARGS__), [](){ g_ReGameHookchains->h()->registerHook(&h); }, [](){ g_ReGameHookchains->h()->unregisterHook(&h); }, false}
