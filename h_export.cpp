@@ -5,6 +5,7 @@
 enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 
+/*
 enginefuncs_t* meta_hack;
 void (*meta_Cvar_RegisterVariable)(cvar_t *pCvar) = nullptr;
 void (*meta_CvarRegister)(cvar_t *pCvar) = nullptr;
@@ -24,6 +25,7 @@ void CvarRegister(cvar_t *pCvar)
 		meta_CvarRegister(pCvar);
 	Cvar_RegisterVariable_Post(pCvar);
 }
+*/
 
 // Receive engine function table from engine.
 // This appears to be the _first_ DLL routine called by the engine, so we
@@ -32,7 +34,7 @@ C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pengfuncsFromEngine, glob
 {
 	memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
 	gpGlobals = pGlobals;
-
+	/*
 	// Hook Silent-style, thanks :-))
 	//meta_Cvar_RegisterVariable = pengfuncsFromEngine->pfnCVarRegister;
 	//pengfuncsFromEngine->pfnCVarRegister = Cvar_RegisterVariable;
@@ -43,5 +45,5 @@ C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pengfuncsFromEngine, glob
 	meta_CvarRegister = meta_hack->pfnCVarRegister;
 	meta_hack->pfnCvar_RegisterVariable = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
 	meta_hack->pfnCVarRegister = CvarRegister;
-	//meta_hack->pfnCVarRegister = Cvar_RegisterVariable;
+	meta_hack->pfnCVarRegister = Cvar_RegisterVariable;*/
 }
