@@ -1,7 +1,7 @@
 #include <string.h>
 #include <extdll.h>
 #include "precompiled.h"
-#include <meta_api.h>
+//#include <meta_api.h>
 
 enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
