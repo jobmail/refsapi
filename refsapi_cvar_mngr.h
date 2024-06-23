@@ -165,10 +165,12 @@ public:
         if (check_it_empty(cvar_list))
         {
             UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT REGISTERED! cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
-            return;
+            // Register cvar
+            cvar_list = add_exists(cvar);
+            //return;
         }
         m_cvar_t* m_cvar = &cvar_list->second;
-        // Bind none-exists?
+        // Bind non-exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
         {
             //UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
@@ -313,7 +315,7 @@ public:
             // Check global cvar
             else
             {
-                std::string p = wstos(name);
+                std::string p = wstos(name).data();
                 cvar_t *p_cvar = CVAR_GET_POINTER(p.data());
                 // Cvar exist?
                 if (p_cvar != nullptr)
@@ -326,11 +328,16 @@ public:
     }
     cvar_list_it get(cvar_t *cvar)
     {
-        p_cvar_it p_cvar;
-        // Cvar exist?
-        if ((p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
+        if (cvar != nullptr)
         {
-            return p_cvar->second;
+            p_cvar_it p_cvar;
+            // Cvar exist?
+            if ((p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
+            {
+                return p_cvar->second;
+            }
+            else
+                return get(stows(cvar->name));
         }
         return cvar_list_it{};
     }

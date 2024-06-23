@@ -27,11 +27,16 @@ void CVarRegister_Post(cvar_t *cvar)
 void CVarSetFloat_Post(const char *name, float value)
 {
     UTIL_ServerPrint("[DEBUG] CVarSetFloat_Post(): cvar = <%s>, value = %f\n", name, value);
-    //cvar_t* cvar = CVAR_GET_POINTER(name);
-    //if (cvar != nullptr)
+    //g_cvar_mngr.on_direct_set(g_cvar_mngr.get(stows(name))->, std::to_string(value)); 
+    cvar_t* cvar = CVAR_GET_POINTER(name);
+    if (cvar != nullptr)
+        g_cvar_mngr.on_direct_set(cvar, std::to_string(value));
 }
 
 void CVarSetString_Post(const char *name, const char *value)
 {
     UTIL_ServerPrint("[DEBUG] CVarSetString_Post(): cvar = <%s>, value = <%s>\n", name, value);
+    cvar_t* cvar = CVAR_GET_POINTER(name);
+    if (cvar != nullptr)
+        g_cvar_mngr.on_direct_set(cvar, value);
 }
