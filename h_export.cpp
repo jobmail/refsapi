@@ -9,7 +9,7 @@ enginefuncs_t* meta_hack;
 void (*meta_Cvar_RegisterVariable)(cvar_t *pCvar) = nullptr;
 void Cvar_RegisterVariable(cvar_t *pCvar)
 {
-	UTIL_ServerPrint("\n[DEBUG] [ Cvar_RegisterVariable ]: meta hook!!!!!!!!\n\n");
+	UTIL_ServerPrint("\n[DEBUG] [***  Cvar_RegisterVariable ***]: meta hook !!!!!!!!\n\n");
 	if (meta_Cvar_RegisterVariable != nullptr)
 		meta_Cvar_RegisterVariable(pCvar);
 	Cvar_RegisterVariable_Post(pCvar);
