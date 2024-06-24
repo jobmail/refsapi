@@ -248,7 +248,7 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
     std::wstring desc = stows(getAmxString(amx, params[arg_desc], g_buff));
     auto result = g_cvar_mngr.add(plugin, name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val]));
     UTIL_ServerPrint("[DEBUG] rf_create_cvar(): RESULT = %d\n", result);
-    return check_it_empty(result) ? FALSE : (cell)((void*)(&result));//(cell)((void*)(&result));
+    return check_it_empty(result) ? FALSE : (cell)((void*)(result._M_node));//(cell)((void*)(&result));
 }
 
 // native rf_bind_pcvar(type, pcvar, any:var[], varlen = 0);
@@ -333,13 +333,14 @@ cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
     int fwd = g_amxxapi.RegisterSPForwardByName(plugin->getAMX(), wstos(name).c_str(), ET_IGNORE, FP_DONE);
     UTIL_ServerPrint("[DEBUG] rf_hook_cvar_change(): fwd = %d, name = <%s>\n", fwd, wstos(name).c_str());
     check_fwd_r(fwd);
-    auto result = g_cvar_mngr.create_hook(fwd, *((cvar_list_it*)((void*)params[arg_pcvar])));
+    cvar_list_it v;
+    v._M_node = (std::_Rb_tree_node_base*)((void*)&params[arg_pcvar]);
+    auto result = g_cvar_mngr.create_hook(fwd, v);
     return check_it_empty(result) ? FALSE : (cell)((void*)(&result));
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
-    {"rf_get_user_weapons", rf_get_user_weapons},
     {"rf_get_weaponname", rf_get_weaponname},
     {"rf_get_ent_by_class", rf_get_ent_by_class},
     {"rf_roundfloat", rf_roundfloat},
