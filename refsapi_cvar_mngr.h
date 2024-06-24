@@ -186,6 +186,7 @@ public:
         {
             //if (strcmp(cvar->name, "mp_timeleft") != 0)
             //    UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
+            // Save new value
             m_cvar->value = stows(value);
             return;
         }
@@ -195,6 +196,8 @@ public:
         UTIL_ServerPrint("[DEBUG] on_direct_set(): cvar_t = %d, cvar_list = %d <===\n", cvar, cvar_list->second.cvar);
         // Do event
         on_change(cvar_list, value);
+        // Save new value
+        m_cvar->value = stows(value);
     }
     void bind(CPluginMngr::CPlugin *plugin, CVAR_TYPES_t type, cvar_list_it cvar_list, cell *ptr, size_t size = 0)
     {
