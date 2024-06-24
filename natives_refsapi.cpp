@@ -303,7 +303,7 @@ cell AMX_NATIVE_CALL rf_cvar_hook_state(AMX *amx, cell *params)
     return g_cvar_mngr.cvar_hook_state(params[arg_fwd], params[arg_state]);
 }
 
-// native rf_get_pcvar(type, pcvar, any:value[], value_size = 0);
+// native rf_get_pcvar(type, pcvar, any:value[] = "", value_size = 0);
 cell AMX_NATIVE_CALL rf_get_pcvar(AMX *amx, cell *params)
 {
     enum args_e
@@ -315,7 +315,7 @@ cell AMX_NATIVE_CALL rf_get_pcvar(AMX *amx, cell *params)
         arg_var_size,
     };
     cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
-    
+    return g_cvar_mngr.get((CVAR_TYPES_t)params[arg_type], cvar, getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
 }
 
 
@@ -331,6 +331,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_bind_pcvar", rf_bind_pcvar},
     {"rf_hook_cvar_change", rf_hook_cvar_change},
     {"rf_cvar_hook_state", rf_cvar_hook_state},
+    {"rf_get_pcvar", rf_get_pcvar},
     {nullptr, nullptr}
 };
 
