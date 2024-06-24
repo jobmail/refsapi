@@ -216,7 +216,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
             }
             else
             {
-                file << L"TEST_CVAR = Тестовая строка\n";
+                //file << L"TEST_CVAR = Тестовая строка\n";
             }
             result = TRUE;
             file.close();
@@ -303,7 +303,7 @@ cell AMX_NATIVE_CALL rf_cvar_hook_state(AMX *amx, cell *params)
     return g_cvar_mngr.cvar_hook_state(params[arg_fwd], params[arg_state]);
 }
 
-// native rf_get_pcvar(type, pcvar, any:value[] = "", value_size = 0);
+// native rf_get_pcvar(type, pcvar, any:value[] = "", size = 0);
 cell AMX_NATIVE_CALL rf_get_pcvar(AMX *amx, cell *params)
 {
     enum args_e
@@ -318,7 +318,47 @@ cell AMX_NATIVE_CALL rf_get_pcvar(AMX *amx, cell *params)
     return g_cvar_mngr.get((CVAR_TYPES_t)params[arg_type], cvar, getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
 }
 
+// native rf_get_cvar(type, cvar[], any:value[] = "", size = 0);
+cell AMX_NATIVE_CALL rf_get_cvar(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_type,
+        arg_cvar,
+        arg_var,
+        arg_var_size,
+    };
+    std::wstring name = stows(getAmxString(amx, params[arg_cvar], g_buff));
+    return g_cvar_mngr.get((CVAR_TYPES_t)params[arg_type], name, getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+}
 
+// native rf_set_pcvar(type, pcvar, any:value[]);
+cell AMX_NATIVE_CALL rf_set_pcvar(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_type,
+        arg_pcvar,
+        arg_var,
+    };
+    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
+    cell* ptr;
+    switch (params[arg_type])
+    {
+        case CVAR_TYPE_NUM:
+        case CVAR_TYPE_FLT:
+            ptr = &params[arg_var];
+            UTIL_ServerPrint("[DEBUG] rf_set_pcvar(): value_int = %d, value_float = %f\n", *ptr, *ptr);
+            break;
+        case CVAR_TYPE_STR:
+            std::string s = getAmxString(amx, params[arg_var], g_buff);
+            ptr = (cell*)s.data();
+            UTIL_ServerPrint("[DEBUG] rf_set_pcvar(): value_str = %s\n", *ptr);
+    }
+    g_cvar_mngr.set((CVAR_TYPES_t)params[arg_type], cvar, ptr);
+}
 
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
@@ -332,6 +372,8 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_hook_cvar_change", rf_hook_cvar_change},
     {"rf_cvar_hook_state", rf_cvar_hook_state},
     {"rf_get_pcvar", rf_get_pcvar},
+    {"rf_get_cvar", rf_get_cvar},
+    {"rf_set_pcvar", rf_set_pcvar},
     {nullptr, nullptr}
 };
 

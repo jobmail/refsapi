@@ -398,6 +398,22 @@ public:
         auto cvar = cvar_list->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }
+    void set(CVAR_TYPES_t type, cvar_t* cvar, cell* ptr)
+    {
+        auto cvar_list = get(cvar);
+        check_it_empty_r(cvar_list);
+        switch (type)
+        {
+            case CVAR_TYPE_NUM:
+                cvar_direct_set(cvar, std::to_string((int)*ptr).c_str());
+                break;
+            case CVAR_TYPE_FLT:
+                CVAR_SET_FLOAT(cvar->name, (float)*ptr);
+                break;
+            case CVAR_TYPE_STR:
+                CVAR_SET_STRING(cvar->name, (char*)*ptr);
+        }
+    }
     cvar_hook_state_it create_hook(int fwd, cvar_list_it cvar_list, bool is_enable = true)
     {
         if (!check_it_empty(cvar_list))
