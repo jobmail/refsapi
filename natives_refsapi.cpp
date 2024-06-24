@@ -355,7 +355,7 @@ cell AMX_NATIVE_CALL rf_set_pcvar(AMX *amx, cell *params)
         case CVAR_TYPE_STR:
             std::string s = getAmxString(amx, params[arg_var], g_buff);
             ptr = (cell*)s.data();
-            UTIL_ServerPrint("[DEBUG] rf_set_pcvar(): value_str = %s\n", *ptr);
+            //UTIL_ServerPrint("[DEBUG] rf_set_pcvar(): value_str = %s\n", *ptr);
     }
     g_cvar_mngr.set((CVAR_TYPES_t)params[arg_type], cvar, ptr);
     return TRUE;
