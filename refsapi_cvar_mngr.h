@@ -377,6 +377,19 @@ public:
         }
         return cvar_hook_state_it{};
     }
+    bool cvar_hook_state(CPluginMngr::CPlugin *plugin, int fwd, bool is_enable)
+    {
+        cvar_hook_state_it hook_state_it;
+        // Hook exists?
+        if ((hook_state_it = cvars.hook_state.find(fwd)) != cvars.hook_state.end())
+        {
+            // Set hook state
+            hook_state_it->second = is_enable;
+            return true;
+        }
+        AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: hook handle %d not found\n", __FUNCTION__, fwd);
+        return false;
+    }
     void clear_plugin(CPluginMngr::CPlugin *plugin)
     {
         plugin_cvar_it plugin_cvar;
