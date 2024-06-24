@@ -247,8 +247,8 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
     std::wstring value = stows(getAmxString(amx, params[arg_value], g_buff));
     std::wstring desc = stows(getAmxString(amx, params[arg_desc], g_buff));
     auto result = g_cvar_mngr.add(plugin, name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val]));
-    UTIL_ServerPrint("[DEBUG] rf_create_cvar(): result = %d\n", result);
-    return check_it_empty(result) ? FALSE : (cell)((void*)(&result));
+    UTIL_ServerPrint("[DEBUG] rf_create_cvar(): RESULT = %d\n", result);
+    return check_it_empty(result) ? FALSE : (cell)((void*)(&result));//(cell)((void*)(&result));
 }
 
 // native rf_bind_pcvar(type, pcvar, any:var[], varlen = 0);
@@ -333,7 +333,7 @@ cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
     int fwd = g_amxxapi.RegisterSPForwardByName(plugin->getAMX(), wstos(name).c_str(), ET_IGNORE, FP_DONE);
     UTIL_ServerPrint("[DEBUG] rf_hook_cvar_change(): fwd = %d, name = <%s>\n", fwd, wstos(name).c_str());
     check_fwd_r(fwd);
-    auto result = g_cvar_mngr.create_hook(fwd, *((cvar_list_it*)((void*)params[arg_pcvar])));
+    auto result = g_cvar_mngr.create_hook(fwd, *((cvar_list_it*)((void*)&params[arg_pcvar])));
     return check_it_empty(result) ? FALSE : (cell)((void*)(&result));
 }
 

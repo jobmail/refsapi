@@ -361,7 +361,7 @@ public:
     {
         if (!check_it_empty(cvar_list))
         {
-            UTIL_ServerPrint("\n[DEBUG] create_hook(): fwd = %d, cvar = %d\n", fwd, cvar_list->second.cvar);
+            UTIL_ServerPrint("\n[DEBUG] create_hook(): fwd = %d, cvar = %d\n", fwd, cvar_list);
             auto result = cvars.hook_state.insert({ fwd, is_enable });
             if (result.second)
             {
