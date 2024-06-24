@@ -178,7 +178,7 @@ public:
         check_it_empty_r(cvar_list);
         // Get m_cvar
         m_cvar_t* m_cvar = &cvar_list->second;
-        // Value changed?
+        // Value not changed?
         if (m_cvar->value == stows(value))
             return;
         // Bind non-exists?
