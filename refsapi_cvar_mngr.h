@@ -408,7 +408,7 @@ public:
                 cvar_direct_set(cvar, std::to_string((int)*ptr).c_str());
                 break;
             case CVAR_TYPE_FLT:
-                CVAR_SET_FLOAT(cvar->name, (float)*ptr);
+                CVAR_SET_FLOAT(cvar->name, *(float*)(ptr));
                 break;
             case CVAR_TYPE_STR:
                 CVAR_SET_STRING(cvar->name, (char*)*ptr);
