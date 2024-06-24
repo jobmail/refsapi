@@ -367,7 +367,8 @@ public:
                     result = (int)m_cvar->cvar->value; //std::stof(cvar->string);
                     break;
                 case CVAR_TYPE_FLT:
-                    result = amx_ftoc(((float)std::stod(m_cvar->cvar->string))); //amx_ftoc(((float)std::stod(m_cvar->cvar->string))); //m_cvar->cvar->value
+                    m_cvar->cvar->value = std::stod(m_cvar->cvar->string);
+                    result = amx_ftoc(m_cvar->cvar->value); //amx_ftoc(((float)std::stod(m_cvar->cvar->string))); //m_cvar->cvar->value
                     break;
                 case CVAR_TYPE_STR:
                     std::string s = wstos(m_cvar->value);
