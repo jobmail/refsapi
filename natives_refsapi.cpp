@@ -315,7 +315,7 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     // Variable address is not inside global area?
     check_global_r(params[arg_var]);
-    g_cvar_mngr.bind(plugin, CVAR_TYPE_STR, *(cvar_list_it*)(void*)params[arg_pcvar], getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    g_cvar_mngr.bind(plugin, CVAR_TYPE_STR, *(cvar_list_it*)(void*)getAmxAddr(plugin->getAMX(), params[arg_pcvar]), getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
 
