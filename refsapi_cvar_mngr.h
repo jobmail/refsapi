@@ -373,7 +373,7 @@ public:
                     std::string s = wstos(m_cvar->value);
                     result = std::min(ptr_size, s.size());
                     //setAmxString(ptr, s.c_str(), result);
-                    Q_memcpy(ptr, m_cvar->value.c_str(), result << 4);
+                    Q_memcpy(ptr, m_cvar->value.c_str(), result << 2);
                     break;
             }
         }
