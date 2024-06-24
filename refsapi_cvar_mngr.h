@@ -179,7 +179,7 @@ public:
         // Get m_cvar
         m_cvar_t* m_cvar = &cvar_list->second;
         // Value not changed?
-        if (m_cvar->value == stows(value))
+        if (m_cvar->value.compare(stows(value)) == 0)
             return;
         // Bind non-exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
