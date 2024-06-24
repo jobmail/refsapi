@@ -248,7 +248,7 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
     std::wstring desc = stows(getAmxString(amx, params[arg_desc], g_buff));
     auto result = g_cvar_mngr.add(plugin, name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val]));
     UTIL_ServerPrint("[DEBUG] rf_create_cvar(): RESULT = %d\n", result->second.cvar);
-    return check_it_empty(result) ? FALSE : (cell)((void*)(result->second.cvar));//(cell)((void*)(&result));
+    return check_it_empty(result) ? FALSE : (cell)((void*)(result->second.cvar));
 }
 
 // native rf_bind_pcvar(type, pcvar, any:var[], varlen = 0);
@@ -271,59 +271,7 @@ cell AMX_NATIVE_CALL rf_bind_pcvar(AMX *amx, cell *params)
     return TRUE;
 }
 
-// native rf_bind_pcvar_n(pcvar, &any:var);
-cell AMX_NATIVE_CALL rf_bind_pcvar_n(AMX *amx, cell *params)
-{
-    enum args_e
-    {
-        arg_count,
-        arg_pcvar,
-        arg_var
-    };
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
-    // Variable address is not inside global area?
-    check_global_r(params[arg_var]);
-    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
-    g_cvar_mngr.bind(plugin, CVAR_TYPE_NUM, g_cvar_mngr.get(cvar), getAmxAddr(amx, params[arg_var]));//*((cvar_list_it*)((void*)params[arg_pcvar]))
-    return TRUE;
-}
-
-// native rf_bind_pcvar_f(pcvar, &Float:var);
-cell AMX_NATIVE_CALL rf_bind_pcvar_f(AMX *amx, cell *params)
-{
-    enum args_e
-    {
-        arg_count,
-        arg_pcvar,
-        arg_var
-    };
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
-    // Variable address is not inside global area?
-    check_global_r(params[arg_var]);
-    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
-    g_cvar_mngr.bind(plugin, CVAR_TYPE_FLT, g_cvar_mngr.get(cvar), getAmxAddr(amx, params[arg_var]));
-    return TRUE;
-}
-
-// native rf_bind_pcvar_s(pcvar, any:var[], varlen);
-cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
-{
-    enum args_e
-    {
-        arg_count,
-        arg_pcvar,
-        arg_var,
-        arg_var_size,
-    };
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
-    // Variable address is not inside global area?
-    check_global_r(params[arg_var]);
-    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
-    g_cvar_mngr.bind(plugin, CVAR_TYPE_STR, g_cvar_mngr.get(cvar), getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
-    return TRUE;
-}
-
-// native rf_hook_cvar_change(pcvar, const callback[]);
+// native rf_hook_cvar_change(pcvar, const callback[], bool:is_enable = true);
 cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
 {
     enum args_e
@@ -331,6 +279,7 @@ cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
         arg_count,
         arg_pcvar,
         arg_callback,
+        arg_state
     };
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     std::wstring name = stows(getAmxString(amx, params[arg_callback], g_buff));
@@ -338,8 +287,21 @@ cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
     check_fwd_r(fwd);
     cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
     UTIL_ServerPrint("[DEBUG] rf_hook_cvar_change(): fwd = %d, name = <%s>, cvar = %d\n", fwd, wstos(name).c_str(), cvar);
-    auto result = g_cvar_mngr.create_hook(fwd, g_cvar_mngr.get(cvar));
-    return check_it_empty(result) ? FALSE : (cell)((void*)(&result));
+    auto result = g_cvar_mngr.create_hook(fwd, g_cvar_mngr.get(cvar), params[arg_state]);
+    return check_it_empty(result) || fwd != result->first ? FALSE : (cell)result->first;
+}
+
+// native rf_cvar_hook_state(phook, bool:is_enbale);
+cell AMX_NATIVE_CALL rf_cvar_hook_state(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_fwd,
+        arg_state,
+    };
+    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    return g_cvar_mngr.cvar_hook_state(plugin, params[arg_fwd], params[arg_state]);
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
@@ -351,14 +313,13 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_config", rf_config},
     {"rf_create_cvar", rf_create_cvar},
     {"rf_bind_pcvar", rf_bind_pcvar},
-    {"rf_bind_pcvar_n", rf_bind_pcvar_n},
-    {"rf_bind_pcvar_f", rf_bind_pcvar_f},
-    {"rf_bind_pcvar_s", rf_bind_pcvar_s},
     {"rf_hook_cvar_change", rf_hook_cvar_change},
+    {"rf_cvar_hook_state", rf_cvar_hook_state},
     {nullptr, nullptr}
 };
 
 void RegisterNatives_Misc()
 {
     g_amxxapi.AddNatives(Misc_Natives);
+    //g_amxxapi.OverrideNatives()
 }
