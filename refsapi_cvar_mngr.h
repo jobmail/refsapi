@@ -122,7 +122,7 @@ private:
         switch (bind->type)
         {
             case CVAR_TYPE_NUM:
-                *bind->ptr = (int)roundd(std::stod(cvar->string), 0);
+                *bind->ptr = (int)std::stof(cvar->string);
                 break;
             case CVAR_TYPE_FLT:
                 *bind->ptr = amx_ftoc(cvar->value);
@@ -206,7 +206,7 @@ public:
         // Check previos type of m_cvar
         if (m_cvar->type != CVAR_TYPE_NONE && m_cvar->type != type)
         {
-            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded with type = %d, tried to set type = %d\n", __FUNCTION__, wstos(cvar_list->first).c_str(), m_cvar->type, type);
+            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: cvar <%s> is already binded with type = %d\n", __FUNCTION__, wstos(cvar_list->first).c_str(), m_cvar->type);
             return;
         }
         std::list<ptr_bind_t> bind_list;
@@ -275,80 +275,115 @@ public:
     }
     cvar_list_it add_exists(cvar_t *cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
-        if (cvar == nullptr)
-            return cvar_list_it{};
-        // Cvar already exists?
-        p_cvar_it p_cvar;
-        if ((p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
-            return p_cvar->second;
-        // Fill cvar
-        m_cvar_t m_cvar;
-        m_cvar.cvar = cvar;
-        m_cvar.name = stows(cvar->name);
-        m_cvar.value = stows(cvar->string);
-        m_cvar.type = CVAR_TYPE_NONE;
-        m_cvar.desc = desc;
-        m_cvar.flags = cvar->flags;
-        //m_cvar.plugin = plugin;
-        m_cvar.has_min = has_min;
-        m_cvar.min_val = min_val;
-        m_cvar.has_max = has_max;
-        m_cvar.max_val = max_val;
-        // Save cvars list
-        auto result = cvars.cvar_list.insert({ m_cvar.name, m_cvar });
-        if (result.second)
+        // Cvar not empty?
+        if (cvar != nullptr)
         {
-            UTIL_ServerPrint("[DEBUG] add_exists(): cvar = %d, name = <%s>, value = <%s>\n", m_cvar.cvar, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str());
-            cvars.p_cvar.insert({ m_cvar.cvar, result.first });
-            return result.first;
+            // Cvar already exists?
+            p_cvar_it p_cvar;
+            if ((p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end())
+                return p_cvar->second;
+            // Fill cvar
+            m_cvar_t m_cvar;
+            m_cvar.cvar = cvar;
+            m_cvar.name = stows(cvar->name);
+            m_cvar.value = stows(cvar->string);
+            m_cvar.type = CVAR_TYPE_NONE;
+            m_cvar.desc = desc;
+            m_cvar.flags = cvar->flags;
+            //m_cvar.plugin = plugin;
+            m_cvar.has_min = has_min;
+            m_cvar.min_val = min_val;
+            m_cvar.has_max = has_max;
+            m_cvar.max_val = max_val;
+            // Save cvars list
+            auto result = cvars.cvar_list.insert({ m_cvar.name, m_cvar });
+            if (result.second)
+            {
+                UTIL_ServerPrint("[DEBUG] add_exists(): cvar = %d, name = <%s>, value = <%s>\n", m_cvar.cvar, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str());
+                cvars.p_cvar.insert({ m_cvar.cvar, result.first });
+                return result.first;
+            }
         }
         return cvar_list_it{};
     }
     cvar_list_it add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
-        if (name.empty() || value.empty() || plugin == nullptr)
-            return cvar_list_it{};
-        cvar_t *cvar = create_cvar(name, value, flags);
-        UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
-        cvar_list_it cvar_list = add_exists(cvar, desc, has_min, min_val, has_max, max_val);
-        if (check_it_empty(cvar_list))
+        if (!(name.empty() || value.empty()))
         {
-            AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: m_cvar is empty\n", __FUNCTION__);
-            return cvar_list_it{};
+            cvar_t *cvar = create_cvar(name, value, flags);
+            UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
+            cvar_list_it cvar_list = add_exists(cvar, desc, has_min, min_val, has_max, max_val);
+            if (!check_it_empty(cvar_list))
+            {
+                // Set m_cvar
+                m_cvar_t* m_cvar = &cvar_list->second;
+                //UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
+                plugin_cvar_it plugin_cvar;
+                // Plugin cvars exist?
+                if ((plugin_cvar = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
+                    plugin_cvar->second.push_back(cvar_list);
+                // Create plugin cvars
+                else
+                    cvars.plugin[plugin->getId()].push_back(cvar_list);
+                return cvar_list;
+            }
         }
-        //UTIL_ServerPrint("[DEBUG] add(): check cvar = %d\n", cvar_list->second.cvar);
-        // Set m_cvar
-        m_cvar_t* m_cvar = &cvar_list->second;
-        //UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
-        // Plugin cvars exist?
-        plugin_cvar_it plugin_cvar;
-        if ((plugin_cvar = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
-            plugin_cvar->second.push_back(cvar_list);
-        // Create plugin cvars
-        else
-            cvars.plugin[plugin->getId()].push_back(cvar_list);
-        return cvar_list;
+        return cvar_list_it{};
     }
     cvar_list_it get(std::wstring name)
     {
-        if (name.empty())
-            return cvar_list_it{};
-        cvar_list_it cvar_list;
-        // Fix caps in name
-        ws_convert_tolower(name);
-        // Cvar exist?
-        if ((cvar_list = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
-            return cvar_list;
-        // Check global cvar
-        cvar_t *p_cvar = CVAR_GET_POINTER(wstos(name).data());
-        // Cvar exist?
-        return p_cvar != nullptr ? add_exists(p_cvar) : cvar_list_it{};
+        if (!name.empty())
+        {
+            cvar_list_it cvar_list;
+            // Fix caps in name
+            ws_convert_tolower(name);
+            // Cvar exist?
+            if ((cvar_list = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
+                return cvar_list;
+            // Check global cvar
+            cvar_t *p_cvar = CVAR_GET_POINTER(wstos(name).data());
+            // Cvar exist?
+            if (p_cvar != nullptr)
+                return add_exists(p_cvar);
+        }
+        return cvar_list_it{};
     }
     cvar_list_it get(cvar_t *cvar)
     {
         p_cvar_it p_cvar;
         // Cvar exists?
         return cvar == nullptr ? cvar_list_it{} : (p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end() ? p_cvar->second : get(stows(cvar->name));
+    }
+    cell get(CVAR_TYPES_t type, cvar_list_it cvar_list, void* ptr, size_t ptr_size)
+    {
+        cell result = FALSE;
+        // Cvar exists?
+        if (!check_it_empty(cvar_list))
+        {   
+            m_cvar_t* m_cvar = &cvar_list->second;
+            switch (type)
+            {
+                case CVAR_TYPE_NUM:
+                    result = (int)m_cvar->cvar->value; //std::stof(cvar->string);
+                    break;
+                case CVAR_TYPE_FLT:
+                    result = amx_ftoc(m_cvar->cvar->value);
+                    break;
+                case CVAR_TYPE_STR:
+                    result = std::min(ptr_size, m_cvar->value.size());
+                    Q_memcpy(ptr, m_cvar->value.data(), result << 2);
+                    break;
+            }
+        }
+        return result;
+    }
+    cell get(CVAR_TYPES_t type, cvar_t* cvar, void* ptr, size_t ptr_size)
+    {
+        return get(type, get(cvar), ptr, ptr_size);
+    }
+    cell get(CVAR_TYPES_t type, std::wstring name, void* ptr, size_t ptr_size)
+    {
+        return get(type, name, ptr, ptr_size);
     }
     void set(std::wstring name, std::wstring value)
     {
@@ -383,18 +418,14 @@ public:
         }
         return cvar_hook_state_it{};
     }
-    bool cvar_hook_state(CPluginMngr::CPlugin *plugin, int fwd, bool is_enable)
+    bool cvar_hook_state(int fwd, bool is_enable)
     {
+        bool result;
         cvar_hook_state_it hook_state_it;
         // Hook exists?
-        if ((hook_state_it = cvars.hook_state.find(fwd)) != cvars.hook_state.end())
-        {
-            // Set hook state
+        if (result = (hook_state_it = cvars.hook_state.find(fwd)) != cvars.hook_state.end())
             hook_state_it->second = is_enable;
-            return true;
-        }
-        AMXX_LogError(plugin->getAMX(), AMX_ERR_NATIVE, "%s: hook handle %d not found\n", __FUNCTION__, fwd);
-        return false;
+        return result;
     }
     void clear_plugin(CPluginMngr::CPlugin *plugin)
     {

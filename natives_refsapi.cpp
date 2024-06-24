@@ -300,9 +300,25 @@ cell AMX_NATIVE_CALL rf_cvar_hook_state(AMX *amx, cell *params)
         arg_fwd,
         arg_state,
     };
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
-    return g_cvar_mngr.cvar_hook_state(plugin, params[arg_fwd], params[arg_state]);
+    return g_cvar_mngr.cvar_hook_state(params[arg_fwd], params[arg_state]);
 }
+
+// native rf_get_pcvar(type, pcvar, any:value[], value_size = 0);
+cell AMX_NATIVE_CALL rf_get_pcvar(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_type,
+        arg_pcvar,
+        arg_var,
+        arg_var_size,
+    };
+    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
+    
+}
+
+
 
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
