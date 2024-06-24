@@ -372,8 +372,8 @@ public:
                 case CVAR_TYPE_STR:
                     std::string s = wstos(m_cvar->value);
                     result = std::min(ptr_size, s.size());
-                    //setAmxString(ptr, s.c_str(), result);
-                    Q_memcpy(ptr, s.c_str(), result << 2);
+                    setAmxString(ptr, s.c_str(), result << 2);
+                    //Q_memcpy(ptr, s.c_str(), result << 2);
                     break;
             }
         }
