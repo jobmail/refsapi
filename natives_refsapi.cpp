@@ -332,7 +332,7 @@ cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
     std::wstring name = stows(getAmxString(amx, params[arg_callback], g_buff));
     int fwd = g_amxxapi.RegisterSPForwardByName(plugin->getAMX(), wstos(name).c_str(), ET_IGNORE, FP_DONE);
     check_fwd_r(fwd);
-    cvar_t* cvar = (cvar_t*)((void*)&params[arg_pcvar]);
+    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
     UTIL_ServerPrint("[DEBUG] rf_hook_cvar_change(): fwd = %d, name = <%s>, cvar = %d\n", fwd, wstos(name).c_str(), cvar);
     auto result = g_cvar_mngr.create_hook(fwd, g_cvar_mngr.get(cvar));
     return check_it_empty(result) ? FALSE : (cell)((void*)(&result));
