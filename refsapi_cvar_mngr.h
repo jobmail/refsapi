@@ -371,7 +371,7 @@ public:
                     break;
                 case CVAR_TYPE_STR:
                     result = std::min(ptr_size, m_cvar->value.size());
-                    Q_memcpy(ptr, m_cvar->value.data(), result << 2);
+                    Q_memcpy(ptr, wstos(m_cvar->value).c_str(), result << 2);
                     break;
             }
         }
