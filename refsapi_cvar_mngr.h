@@ -354,7 +354,7 @@ public:
         // Cvar exists?
         return cvar == nullptr ? cvar_list_it{} : (p_cvar = cvars.p_cvar.find(cvar)) != cvars.p_cvar.end() ? p_cvar->second : get(stows(cvar->name));
     }
-    cell get(CVAR_TYPES_t type, cvar_list_it cvar_list, void* ptr, size_t ptr_size)
+    cell get(CVAR_TYPES_t type, cvar_list_it cvar_list, cell* ptr, size_t ptr_size)
     {
         cell result = FALSE;
         // Cvar exists?
@@ -371,18 +371,19 @@ public:
                     break;
                 case CVAR_TYPE_STR:
                     //std::string s = wstos(m_cvar->value);
-                    result = std::min(ptr_size, m_cvar->value.size() << 2);
-                    Q_memcpy(ptr, m_cvar->value.c_str(), result);
+                    result = std::min(ptr_size, m_cvar->value.size());
+                    setAmxString(ptr, wstos(m_cvar->value).c_str(), result);
+                    //Q_memcpy(ptr, m_cvar->value.c_str(), result);
                     break;
             }
         }
         return result;
     }
-    cell get(CVAR_TYPES_t type, cvar_t* cvar, void* ptr, size_t ptr_size)
+    cell get(CVAR_TYPES_t type, cvar_t* cvar, cell* ptr, size_t ptr_size)
     {
         return get(type, get(cvar), ptr, ptr_size);
     }
-    cell get(CVAR_TYPES_t type, std::wstring name, void* ptr, size_t ptr_size)
+    cell get(CVAR_TYPES_t type, std::wstring name, cell* ptr, size_t ptr_size)
     {
         return get(type, name, ptr, ptr_size);
     }
