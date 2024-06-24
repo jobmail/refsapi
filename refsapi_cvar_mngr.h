@@ -370,10 +370,10 @@ public:
                     result = amx_ftoc(m_cvar->cvar->value);
                     break;
                 case CVAR_TYPE_STR:
-                    std::string s = wstos(m_cvar->value);
-                    result = std::min(ptr_size, s.size());
+                    //std::string s = wstos(m_cvar->value);
+                    result = std::min(ptr_size, m_cvar->value.size());
                     //setAmxString(ptr, s.c_str(), result);
-                    Q_memcpy(ptr, m_cvar->value.c_str(), result << 2);
+                    Q_memcpy(ptr, m_cvar->value.data(), result << 2);
                     break;
             }
         }
