@@ -357,7 +357,7 @@ public:
         auto cvar = cvar_list->second.cvar;
         cvar_direct_set(cvar, wstos(value).c_str());
     }
-    cvar_hook_state_it create_hook(int fwd, cvar_list_it &cvar_list, bool is_enable = true)
+    cvar_hook_state_it create_hook(int fwd, cvar_list_it cvar_list, bool is_enable = true)
     {
         if (!check_it_empty(cvar_list))
         {
