@@ -371,7 +371,7 @@ public:
                     hook_it->second.push_back(result.first);
                 else
                     cvars.cvar_hook_list[m_cvar->cvar].push_back(result.first);
-                UTIL_ServerPrint("\n[DEBUG] create_hook(): fwd = %d, hook = %d, cvar = %d, name = <%s>, value = <%s>, enabled = %d\n\n", fwd, result.first, cvar_list->second.cvar, cvar_list->second.cvar->name, cvar_list->second.cvar->string, is_enable);
+                //UTIL_ServerPrint("\n[DEBUG] create_hook(): fwd = %d, hook = %d, cvar = %d, name = <%s>, value = <%s>, enabled = %d\n\n", fwd, result.first, cvar_list->second.cvar, cvar_list->second.cvar->name, cvar_list->second.cvar->string, is_enable);
                 return result.first;
             }
         }
