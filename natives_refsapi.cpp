@@ -266,7 +266,8 @@ cell AMX_NATIVE_CALL rf_bind_pcvar(AMX *amx, cell *params)
     // Variable address is not inside global area?
     check_global_r(params[arg_var]);
     check_type_r(params[arg_type]);
-    g_cvar_mngr.bind(plugin, (CVAR_TYPES_t)params[arg_type], *((cvar_list_it*)((void*)params[arg_pcvar])), getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
+    g_cvar_mngr.bind(plugin, (CVAR_TYPES_t)params[arg_type], g_cvar_mngr.get(cvar), getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
 
@@ -282,7 +283,8 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_n(AMX *amx, cell *params)
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     // Variable address is not inside global area?
     check_global_r(params[arg_var]);
-    g_cvar_mngr.bind(plugin, CVAR_TYPE_NUM, *((cvar_list_it*)((void*)params[arg_pcvar])), getAmxAddr(amx, params[arg_var]));
+    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
+    g_cvar_mngr.bind(plugin, CVAR_TYPE_NUM, g_cvar_mngr.get(cvar), getAmxAddr(amx, params[arg_var]));//*((cvar_list_it*)((void*)params[arg_pcvar]))
     return TRUE;
 }
 
@@ -298,7 +300,8 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_f(AMX *amx, cell *params)
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     // Variable address is not inside global area?
     check_global_r(params[arg_var]);
-    g_cvar_mngr.bind(plugin, CVAR_TYPE_FLT, *((cvar_list_it*)((void*)params[arg_pcvar])), getAmxAddr(amx, params[arg_var]));
+    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
+    g_cvar_mngr.bind(plugin, CVAR_TYPE_FLT, g_cvar_mngr.get(cvar), getAmxAddr(amx, params[arg_var]));
     return TRUE;
 }
 
@@ -315,7 +318,8 @@ cell AMX_NATIVE_CALL rf_bind_pcvar_s(AMX *amx, cell *params)
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     // Variable address is not inside global area?
     check_global_r(params[arg_var]);
-    g_cvar_mngr.bind(plugin, CVAR_TYPE_STR, *((cvar_list_it*)((void*)params[arg_pcvar])), getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
+    g_cvar_mngr.bind(plugin, CVAR_TYPE_STR, g_cvar_mngr.get(cvar), getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
 
