@@ -257,7 +257,7 @@ public:
         cvar_hook_list_it hook_it;
         if ((hook_it = cvars.cvar_hook_list.find(m_cvar->cvar)) != cvars.cvar_hook_list.end())
         {
-            UTIL_ServerPrint("[DEBUG] on_change(): hooook!!!!!!!!!!!!!");
+            UTIL_ServerPrint("[DEBUG] on_change(): hooook!!!!!!!!!!!!!\n");
             for (auto& h : hook_it->second)
             {
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
