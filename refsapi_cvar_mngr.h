@@ -383,7 +383,7 @@ public:
     }
     cell get(CVAR_TYPES_t type, std::wstring name, cell* ptr, size_t ptr_size)
     {
-        return get(type, name, ptr, ptr_size);
+        return get(type, get(name), ptr, ptr_size);
     }
     void set(std::wstring name, std::wstring value)
     {
