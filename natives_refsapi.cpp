@@ -206,6 +206,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 }
             }
             UTIL_ServerPrint("[DEBUG] rf_config(): read cvars: %d\n", load_cvars.size());
+
+            return FALSE;
+
             auto plugin_cvars = g_cvar_mngr.get(plugin->getId());
             if (!check_it_empty(plugin_cvars))
             {
