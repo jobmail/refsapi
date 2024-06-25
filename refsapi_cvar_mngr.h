@@ -272,8 +272,8 @@ public:
                     g_amxxapi.ExecuteForward(
                         h->first,
                         (cell)((void*)(m_cvar->cvar)),
-                        g_amxxapi.PrepareCellArrayA((cell*)s.data(), s.size(), false),
-                        g_amxxapi.PrepareCellArrayA((cell*)new_value.data(), new_value.size(), false)
+                        g_amxxapi.PrepareCharArrayA((char*)s.data(), s.size(), false),
+                        g_amxxapi.PrepareCharArrayA((char*)new_value.data(), new_value.size(), false)
                     );
                 }
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook done!");
