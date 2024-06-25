@@ -49,6 +49,8 @@ typedef struct cvar_hook_s
     bool is_enable;
 } cvar_hook_t;
 
+typedef std::map<std::wstring, std::wstring> load_cvars_t;
+
 typedef std::map<std::wstring, m_cvar_t> cvar_list_t;
 typedef cvar_list_t::iterator cvar_list_it;
 
@@ -133,11 +135,6 @@ private:
                 break;
         }
     }
-    void cvar_direct_set(cvar_t *cvar, const char *value)
-    {
-        if (cvar != nullptr)
-            g_engfuncs.pfnCvar_DirectSet(cvar, value);
-    }
     cvar_t* create_cvar(std::wstring name, std::wstring value, int flags = 0)
     {   
         enum { _name, _value, _count };
@@ -165,6 +162,20 @@ private:
     }
 
 public:
+    bool need_update(load_cvars_t &load_cvars, plugin_cvar_it plugin_cvars)
+    {
+        for (auto& cvar_it : plugin_cvars->second)
+        {
+            if (load_cvars.find(cvar_it->first) == load_cvars.end())
+                return true;
+        }
+        return plugin_cvars->second.size() == 0;
+    }
+    void direct_set(cvar_t *cvar, const char *value)
+    {
+        if (cvar != nullptr)
+            g_engfuncs.pfnCvar_DirectSet(cvar, value);
+    }
     void on_register(cvar_t *cvar)
     {
         cvar_list_it cvar_list = get(cvar);
@@ -395,13 +406,13 @@ public:
         auto cvar_list = get(name);
         check_it_empty_r(cvar_list);
         auto cvar = cvar_list->second.cvar;
-        cvar_direct_set(cvar, wstos(value).c_str());
+        direct_set(cvar, wstos(value).c_str());
     }
     void set(cvar_list_it cvar_list, std::wstring value)
     {
         check_it_empty_r(cvar_list);
         auto cvar = cvar_list->second.cvar;
-        cvar_direct_set(cvar, wstos(value).c_str());
+        direct_set(cvar, wstos(value).c_str());
     }
     void set(CVAR_TYPES_t type, cvar_t* cvar, cell* ptr)
     {
@@ -410,7 +421,7 @@ public:
         switch (type)
         {
             case CVAR_TYPE_NUM:
-                cvar_direct_set(cvar, std::to_string((int)*ptr).c_str());
+                direct_set(cvar, std::to_string((int)*ptr).c_str());
                 break;
             case CVAR_TYPE_FLT:
                 CVAR_SET_FLOAT(cvar->name, *(float*)ptr);
