@@ -195,7 +195,7 @@ public:
             return;
         UTIL_ServerPrint("[DEBUG] on_direct_set(): cvar_t = %d, cvar_list = %d <===\n", cvar, cvar_list->second.cvar);
         // Do event
-        on_change(cvar_list, wstos(m_cvar->value).c_str(), value);
+        on_change(cvar_list, value);
         // Save new value
         m_cvar->value = stows(value);
     }
@@ -247,7 +247,7 @@ public:
         // Check range
         check_range(m_cvar);
     }
-    void on_change(cvar_list_it cvar_list, std::string old_value, std::string &new_value)
+    void on_change(cvar_list_it cvar_list, std::string &new_value)
     {
         check_it_empty_r(cvar_list);
         m_cvar_t* m_cvar = &cvar_list->second;
@@ -273,7 +273,8 @@ public:
                     g_amxxapi.ExecuteForward(
                         h->first,
                         (cell)((void*)(m_cvar->cvar)),
-                        old_value.data(),
+                        g_amxxapi.PrepareCharArray((char*)s.c_str(), s.size()),
+                        //old_value.data(),
                         new_value.data()
                         //g_amxxapi.PrepareCharArray() CellArrayA((cell*)s.c_str(), s.size(), false),
                         //g_amxxapi.PrepareCellArrayA((cell*)new_value.c_str(), new_value.size(), false)
