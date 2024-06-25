@@ -270,15 +270,7 @@ public:
                 {
                     std::string s = wstos(m_cvar->value);
                     UTIL_ServerPrint("[DEBUG] on_change(): old_value = <%s>!\n", s.c_str());
-                    g_amxxapi.ExecuteForward(
-                        h->first,
-                        (cell)((void*)(m_cvar->cvar)),
-                        g_amxxapi.PrepareCellArrayA((cell*)s.c_str(), s.size(), false),
-                        g_amxxapi.PrepareCellArrayA((cell*)new_value.c_str(), new_value.size(), false)
-                        //new_value.data()
-                        //g_amxxapi.PrepareCharArray() CellArrayA((cell*)s.c_str(), s.size(), false),
-                        //g_amxxapi.PrepareCellArrayA((cell*)new_value.c_str(), new_value.size(), false)
-                    );
+                    g_amxxapi.ExecuteForward(h->first, (cell)((void*)(m_cvar->cvar)), s.c_str(), new_value.c_str());
                 }
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook done!\n");
             }
