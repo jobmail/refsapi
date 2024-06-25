@@ -273,8 +273,8 @@ public:
                     g_amxxapi.ExecuteForward(
                         h->first,
                         (cell)((void*)(m_cvar->cvar)),
-                        g_amxxapi.PrepareCellArray((cell*)s.c_str(), s.size()),
-                        g_amxxapi.PrepareCellArray((cell*)new_value.c_str(), new_value.size())
+                        g_amxxapi.PrepareCellArrayA((cell*)s.c_str(), s.size(), false),
+                        g_amxxapi.PrepareCellArrayA((cell*)new_value.c_str(), new_value.size(), false)
                         //new_value.data()
                         //g_amxxapi.PrepareCharArray() CellArrayA((cell*)s.c_str(), s.size(), false),
                         //g_amxxapi.PrepareCellArrayA((cell*)new_value.c_str(), new_value.size(), false)
