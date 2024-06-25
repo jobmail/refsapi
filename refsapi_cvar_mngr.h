@@ -272,13 +272,13 @@ public:
                     g_amxxapi.ExecuteForward(
                         h->first,
                         (cell)((void*)(m_cvar->cvar)),
-                        s.data(),
-                        new_value.data()
+                        s.c_str(),
+                        new_value.c_str()
                         //g_amxxapi.PrepareCharArrayA((char*)s.data(), s.size(), false),
                         //g_amxxapi.PrepareCharArrayA((char*)new_value.data(), new_value.size(), false)
                     );
                 }
-                UTIL_ServerPrint("[DEBUG] on_change(): exec hook done!");
+                UTIL_ServerPrint("[DEBUG] on_change(): exec hook done!\n");
             }
         } else
             UTIL_ServerPrint("[DEBUG] on_change(): hook for cvar <%d> not found !!!\n", m_cvar->cvar);
