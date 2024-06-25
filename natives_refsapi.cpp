@@ -359,7 +359,7 @@ cell AMX_NATIVE_CALL rf_set_pcvar(AMX *amx, cell *params)
     return TRUE;
 }
 
-// native rf_set_cvar(type, pcvar, any:value[]);
+// native rf_set_cvar(type, cvar[], any:value[]);
 cell AMX_NATIVE_CALL rf_set_cvar(AMX *amx, cell *params)
 {
     enum args_e
@@ -399,6 +399,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_pcvar", rf_get_pcvar},
     {"rf_get_cvar", rf_get_cvar},
     {"rf_set_pcvar", rf_set_pcvar},
+    {"rf_set_cvar", rf_set_cvar},
     {nullptr, nullptr}
 };
 
