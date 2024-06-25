@@ -241,7 +241,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                             file << L"// Maximum: \"" << m_cvar->max_val << "\"";
                         file << m_cvar->name << " = \"" << m_cvar->value << "\""; 
                     }
-                }
+                } else
+                    UTIL_ServerPrint("[DEBUG] rf_config(): empty cvar list\n");
             }
             result = TRUE;
             file.close();
