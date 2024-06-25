@@ -251,6 +251,7 @@ public:
     {
         check_it_empty_r(cvar_list);
         m_cvar_t* m_cvar = &cvar_list->second;
+        std::string s = wstos(m_cvar->value);
         cvar_bind_it bind_it;
         // Bind exists?
         if ((bind_it = cvars.bind_list.find(m_cvar->cvar)) != cvars.bind_list.end())
@@ -268,15 +269,15 @@ public:
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
                 if (h->second)
                 {
-                    std::string s = wstos(m_cvar->value);
+                    
                     UTIL_ServerPrint("[DEBUG] on_change(): old_value = <%s>!\n", s.c_str());
                     g_amxxapi.ExecuteForward(
                         h->first,
                         (cell)((void*)(m_cvar->cvar)),
-                        //wstos(m_cvar->value).c_str(),
-                        //new_value.c_str()
-                        g_amxxapi.PrepareCharArrayA((char*)s.c_str(), s.size(), false),
-                        g_amxxapi.PrepareCharArrayA((char*)new_value.c_str(), new_value.size(), false)
+                        s.c_str(),
+                        new_value.c_str()
+                        //g_amxxapi.PrepareCharArray() CellArrayA((cell*)s.c_str(), s.size(), false),
+                        //g_amxxapi.PrepareCellArrayA((cell*)new_value.c_str(), new_value.size(), false)
                     );
                 }
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook done!\n");
