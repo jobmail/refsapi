@@ -272,8 +272,8 @@ public:
                     g_amxxapi.ExecuteForward(
                         h->first,
                         (cell)((void*)(m_cvar->cvar)),
-                        g_amxxapi.PrepareCharArray((char*)s.c_str(), s.size()),
-                        g_amxxapi.PrepareCharArray((char*)new_value.c_str(), new_value.size())
+                        g_amxxapi.PrepareCellArray((cell*)s.c_str(), s.size()),
+                        g_amxxapi.PrepareCellArray((cell*)new_value.c_str(), new_value.size())
                     );
                 }
             }
