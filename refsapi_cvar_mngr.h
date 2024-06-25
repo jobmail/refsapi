@@ -169,7 +169,7 @@ public:
             if (load_cvars.find(cvar_it->first) == load_cvars.end())
                 return true;
         }
-        return plugin_cvars->second.size() == 0;
+        return plugin_cvars->second.size() == 0 || plugin_cvars->second.size() != load_cvars.size();
     }
     void direct_set(cvar_t *cvar, const char *value)
     {
