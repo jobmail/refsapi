@@ -226,7 +226,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     for (auto& cvar_it : plugin_cvars->second)
                     {
                         m_cvar_t* m_cvar = &cvar_it->second;
-                        file << L"\n//\n";
+                        file << L"\n//\n// ";
                         for (auto& ch : m_cvar->desc)
                         {
                             file << ch;
