@@ -329,6 +329,12 @@ public:
         }
         return cvar_list_it{};
     }
+    plugin_cvar_it get(int plugin_id)
+    {
+        plugin_cvar_it plugin_cvars;
+        // Plugin cvars exist?
+        return (plugin_cvars = cvars.plugin.find(plugin_id)) != cvars.plugin.end() ? plugin_cvars : plugin_cvar_it{};
+    }
     cvar_list_it get(std::wstring name)
     {
         if (!name.empty())
