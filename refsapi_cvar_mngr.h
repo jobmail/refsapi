@@ -400,8 +400,8 @@ public:
     }
     void set(CVAR_TYPES_t type, cvar_t* cvar, cell* ptr)
     {
-        auto cvar_list = get(cvar);
-        check_it_empty_r(cvar_list);
+        if (cvar == nullptr)
+            return;
         switch (type)
         {
             case CVAR_TYPE_NUM:
@@ -413,6 +413,12 @@ public:
             case CVAR_TYPE_STR:
                 CVAR_SET_STRING(cvar->name, (char*)ptr);
         }
+    }
+    void set(CVAR_TYPES_t type, std::wstring name, cell* ptr)
+    {
+        cvar_list_it cvar_list = get(name);
+        check_it_empty_r(cvar_list);
+        set(type, cvar_list->second.cvar, ptr);
     }
     cvar_hook_state_it create_hook(int fwd, cvar_list_it cvar_list, bool is_enable = true)
     {
