@@ -273,7 +273,7 @@ public:
                     g_amxxapi.ExecuteForward(
                         h->first,
                         (cell)((void*)(m_cvar->cvar)),
-                        g_amxxapi.PrepareCharArrayA((char*)s.c_str(), s.size(), true),
+                        s.data(),//g_amxxapi.PrepareCharArrayA((char*)s.data(), s.size(), true),
                         //old_value.data(),
                         new_value.data()
                         //g_amxxapi.PrepareCharArray() CellArrayA((cell*)s.c_str(), s.size(), false),
