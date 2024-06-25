@@ -172,14 +172,14 @@ public:
         if (check_it_empty(cvar_list))
             add_exists(cvar);
     }
-    void on_direct_set(cvar_t *cvar, std::string value)
+    void on_direct_set(cvar_t *cvar, std::wstring value)
     {
         cvar_list_it cvar_list = get(cvar);
         check_it_empty_r(cvar_list);
         // Get m_cvar
         m_cvar_t* m_cvar = &cvar_list->second;
         // Value not changed?
-        if (m_cvar->value.compare(stows(value)) == 0)
+        if (m_cvar->value.compare(value) == 0)
             return;
         // Bind non-exists?
         if (m_cvar->type == CVAR_TYPE_NONE)
@@ -187,7 +187,7 @@ public:
             //if (strcmp(cvar->name, "mp_timeleft") != 0)
             //    UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
             // Save new value
-            m_cvar->value = stows(value);
+            m_cvar->value = value;
             return;
         }
         // Check range
@@ -197,7 +197,7 @@ public:
         // Do event
         on_change(cvar_list, value);
         // Save new value
-        m_cvar->value = stows(value);
+        m_cvar->value = value;
     }
     void bind(CPluginMngr::CPlugin *plugin, CVAR_TYPES_t type, cvar_list_it cvar_list, cell *ptr, size_t size = 0)
     {
@@ -247,7 +247,7 @@ public:
         // Check range
         check_range(m_cvar);
     }
-    void on_change(cvar_list_it cvar_list, std::string &new_value)
+    void on_change(cvar_list_it cvar_list, std::wstring &new_value)
     {
         check_it_empty_r(cvar_list);
         m_cvar_t* m_cvar = &cvar_list->second;
@@ -255,7 +255,7 @@ public:
         // Bind exists?
         if ((bind_it = cvars.bind_list.find(m_cvar->cvar)) != cvars.bind_list.end())
         {
-            UTIL_ServerPrint("[DEBUG] on_change(): name = <%s>, old_value = <%s>, new_value = <%s>\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), new_value.c_str());
+            UTIL_ServerPrint("[DEBUG] on_change(): name = <%s>, old_value = <%s>, new_value = <%s>\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), wstos(new_value).c_str());
             for (auto& bind : bind_it->second)
                 copy_bind(&bind, m_cvar->cvar);
         }
@@ -267,7 +267,7 @@ public:
             {
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
                 if (h->second)
-                    g_amxxapi.ExecuteForward(h->first, (cell)((void*)(m_cvar->cvar)), wstos(m_cvar->value).c_str(), new_value.c_str());
+                    g_amxxapi.ExecuteForward(h->first, (cell)((void*)(m_cvar->cvar)), wstos(m_cvar->value).c_str(), wstos(new_value).c_str());
             }
         } else
             UTIL_ServerPrint("[DEBUG] on_change(): hook for cvar <%d> not found !!!\n", m_cvar->cvar);
