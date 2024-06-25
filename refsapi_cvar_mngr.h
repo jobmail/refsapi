@@ -276,6 +276,7 @@ public:
                         g_amxxapi.PrepareCellArray((cell*)new_value.c_str(), new_value.size())
                     );
                 }
+                UTIL_ServerPrint("[DEBUG] on_change(): exec hook done!");
             }
         } else
             UTIL_ServerPrint("[DEBUG] on_change(): hook for cvar <%d> not found !!!\n", m_cvar->cvar);
