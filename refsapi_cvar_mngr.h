@@ -251,7 +251,6 @@ public:
     {
         check_it_empty_r(cvar_list);
         m_cvar_t* m_cvar = &cvar_list->second;
-        std::string s = wstos(m_cvar->value);
         cvar_bind_it bind_it;
         // Bind exists?
         if ((bind_it = cvars.bind_list.find(m_cvar->cvar)) != cvars.bind_list.end())
@@ -269,7 +268,7 @@ public:
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
                 if (h->second)
                 {
-                    
+                    std::string s = wstos(m_cvar->value);
                     UTIL_ServerPrint("[DEBUG] on_change(): old_value = <%s>!\n", s.c_str());
                     g_amxxapi.ExecuteForward(
                         h->first,
