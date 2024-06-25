@@ -240,7 +240,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                         file << m_cvar->name << " = \"" << (need_replace ? load_cvars_it->second : m_cvar->value) << "\"\n";
                         if (need_replace)
                         {
+                            // Direct set
                             g_cvar_mngr.direct_set(m_cvar->cvar, wstos(load_cvars_it->second).c_str());
+                            // Remove from list
                             load_cvars.erase(load_cvars_it);
                         }
                     }
