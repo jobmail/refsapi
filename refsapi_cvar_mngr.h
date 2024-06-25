@@ -263,12 +263,19 @@ public:
         cvar_hook_list_it hook_it;
         if ((hook_it = cvars.cvar_hook_list.find(m_cvar->cvar)) != cvars.cvar_hook_list.end())
         {
-            UTIL_ServerPrint("[DEBUG] on_change(): hooook!!!!!!!!!!!!!\n");
             for (auto& h : hook_it->second)
             {
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
                 if (h->second)
-                    g_amxxapi.ExecuteForward(h->first);
+                {
+                    std::string s = wstos(m_cvar->value);
+                    g_amxxapi.ExecuteForward(
+                        h->first,
+                        (cell)((void*)(m_cvar->cvar),
+                        g_amxxapi.PrepareCharArray((char*)s.c_str(), s.size()),
+                        g_amxxapi.PrepareCharArray((char*)new_value.c_str(), new_value.size())
+                    );
+                }
             }
         } else
             UTIL_ServerPrint("[DEBUG] on_change(): hook for cvar <%d> not found !!!\n", m_cvar->cvar);
