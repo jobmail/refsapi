@@ -14,7 +14,7 @@ void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *cvar, const ch
 {
     chain->callNext(cvar, value);
     //UTIL_ServerPrint("[DEBUG] Cvar_DirectSet_RH(): cvar = <%s>, string = <%s>, value = %f\n", cvar->name, cvar->string, cvar->value);
-    g_cvar_mngr.on_direct_set(cvar, value);
+    g_cvar_mngr.on_direct_set(cvar, stows(value));
 }
 
 void CVarRegister_Post(cvar_t *cvar)
@@ -31,7 +31,7 @@ void CVarSetFloat_Post(const char *name, float value)
     if (cvar != nullptr)
     {
         UTIL_ServerPrint("[DEBUG] CVarSetFloat_Post(): VALUE = %f\n", cvar->value);
-        g_cvar_mngr.on_direct_set(cvar, std::to_string(value));
+        g_cvar_mngr.on_direct_set(cvar, std::to_wstring(value));
     }
         
 }
@@ -43,6 +43,6 @@ void CVarSetString_Post(const char *name, const char *value)
     if (cvar != nullptr)
     {
         UTIL_ServerPrint("[DEBUG] CVarSetString_Post(): VALUE = %f\n", cvar->value);
-        g_cvar_mngr.on_direct_set(cvar, value);
+        g_cvar_mngr.on_direct_set(cvar, stows(value));
     }
 }
