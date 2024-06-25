@@ -271,7 +271,7 @@ public:
                     std::string s = wstos(m_cvar->value);
                     g_amxxapi.ExecuteForward(
                         h->first,
-                        (cell)((void*)(m_cvar->cvar),
+                        (cell)((void*)(m_cvar->cvar)),
                         g_amxxapi.PrepareCharArray((char*)s.c_str(), s.size()),
                         g_amxxapi.PrepareCharArray((char*)new_value.c_str(), new_value.size())
                     );
