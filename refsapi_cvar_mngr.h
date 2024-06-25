@@ -269,6 +269,7 @@ public:
                 if (h->second)
                 {
                     std::string s = wstos(m_cvar->value);
+                    UTIL_ServerPrint("[DEBUG] on_change(): old_value = <%s>!\n", s.c_str());
                     g_amxxapi.ExecuteForward(
                         h->first,
                         (cell)((void*)(m_cvar->cvar)),
