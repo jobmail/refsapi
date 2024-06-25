@@ -188,6 +188,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 size_t pos;
                 size_t count = 0;
                 std::wstring line;
+                std::wstring var_name;
+                std::wstring var_value;
                 while (std::getline(file, line, L'\n'))
                 {
                     UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", wstos(line).c_str());
@@ -195,8 +197,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L"=")) == std::string::npos)
                         continue;
                     // Split var
-                    std::wstring var_name = trim_c(line.substr(0, pos++));
-                    std::wstring var_value = trim_c(line.substr(pos, line.size() - pos));
+                    var_name = trim_c(line.substr(0, pos++));
+                    var_value = trim_c(line.substr(pos, line.size() - pos));
                     if (rm_quote(var_value) == -1)
                         AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: the parameter <%s> has a value <%s> with a wrong quotation mark", __FUNCTION__, wstos(var_name).c_str(), wstos(var_value).c_str());
                     else
