@@ -239,6 +239,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                             file << L"// Minimum: \"" << m_cvar->min_val << "\"\n";
                         if (m_cvar->has_max)
                             file << L"// Maximum: \"" << m_cvar->max_val << "\"\n";
+                        file << L"\n";
                         file << m_cvar->name << " = \"" << m_cvar->value << "\"\n"; 
                     }
                 } else
