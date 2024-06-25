@@ -268,9 +268,8 @@ public:
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
                 if (h->second)
                 {
-                    std::string s = wstos(m_cvar->value);
                     UTIL_ServerPrint("[DEBUG] on_change(): old_value = <%s>!\n", s.c_str());
-                    g_amxxapi.ExecuteForward(h->first, (cell)((void*)(m_cvar->cvar)), s.c_str(), new_value.c_str());
+                    g_amxxapi.ExecuteForward(h->first, (cell)((void*)(m_cvar->cvar)), wstos(m_cvar->value).c_str(), new_value.c_str());
                 }
                 UTIL_ServerPrint("[DEBUG] on_change(): exec hook done!\n");
             }
