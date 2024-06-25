@@ -207,10 +207,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     load_cvars.insert({ var_name, var_value });
                 }
             }
-            UTIL_ServerPrint("[DEBUG] rf_config(): read cvars: %d\n", load_cvars.size());
-
-            //return FALSE;
-
+            UTIL_ServerPrint("[DEBUG] rf_config(): cvars read %d\n", load_cvars.size());
             auto plugin_cvars = g_cvar_mngr.get(plugin->getId());
             if (!check_it_empty(plugin_cvars))
             {
@@ -259,7 +256,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                         load_cvars.erase(load_cvars_it);
                     }
                 }
-                UTIL_ServerPrint("[DEBUG] rf_config(): left cvars: %d\n", load_cvars.size());
+                UTIL_ServerPrint("[DEBUG] rf_config(): cvars left %d\n", load_cvars.size());
                 // Left old cvars?
                 if (need_update && load_cvars.size() > 0)
                 {
