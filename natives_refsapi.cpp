@@ -447,6 +447,21 @@ cell AMX_NATIVE_CALL rf_set_cvar(AMX *amx, cell *params)
     return TRUE;
 }
 
+// native rf_get_cvar_ptr(type, cvar[]);
+cell AMX_NATIVE_CALL rf_get_cvar_ptr(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_cvar,
+    };
+    UTIL_ServerPrint("[DEBUG] rf_get_cvar_ptr(): start\n");
+    std::wstring name = stows(getAmxString(amx, params[arg_cvar], g_buff));
+    auto result = g_cvar_mngr.get(name);
+    UTIL_ServerPrint("[DEBUG] rf_get_cvar_ptr(): RESULT = %d\n", result->second.cvar);
+    return check_it_empty(result) ? FALSE : (cell)((void*)(result->second.cvar));   
+}
+
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
     {"rf_get_weaponname", rf_get_weaponname},
@@ -462,6 +477,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_cvar", rf_get_cvar},
     {"rf_set_pcvar", rf_set_pcvar},
     {"rf_set_cvar", rf_set_cvar},
+    {"rf_get_cvar_ptr", rf_get_cvar_ptr},
     {nullptr, nullptr}
 };
 
