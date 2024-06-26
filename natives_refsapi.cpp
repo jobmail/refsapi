@@ -412,7 +412,7 @@ cell AMX_NATIVE_CALL rf_set_pcvar(AMX *amx, cell *params)
         case CVAR_TYPE_NUM:
         case CVAR_TYPE_FLT:
             ptr = getAmxAddr(amx, params[arg_var]);
-            UTIL_ServerPrint("[DEBUG] rf_set_pcvar(): value_int = %d, value_float = %f\n", *ptr, *ptr);
+            //UTIL_ServerPrint("[DEBUG] rf_set_pcvar(): value_int = %d, value_float = %f\n", *ptr, *ptr);
             break;
         case CVAR_TYPE_STR:
             ptr = (cell*)getAmxString(amx, params[arg_var], g_buff);
