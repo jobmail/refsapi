@@ -318,7 +318,7 @@ public:
     }
     cvar_list_it add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
-        if (!(name.empty() || value.empty()))
+        if (!name.empty())
         {
             cvar_t *cvar = create_cvar(name, value, flags);
             UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
