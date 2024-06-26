@@ -172,10 +172,10 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     });
     //g_cvar_mngr.sort(plugin_cvars);
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
+    std::wstring path = stows(getAmxString(amx, params[arg_folder], g_buff));
     if (name.empty())
         name = stows(plugin->getName());
     name.replace(name.find(L".amxx"), sizeof(L".amxx") - 1, L"");
-    std::wstring path = stows(getAmxString(amx, params[arg_folder], g_buff));
     getcwd(g_buff, sizeof(g_buff));
     std::wstring root = stows(g_buff);
     path = wfmt(L"%s/%s/%s/plugins/%s", root, g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? L"" : path).c_str();
