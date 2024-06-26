@@ -28,6 +28,30 @@ public:
     }
 };
 
+class wfmt
+{
+    const size_t size = 1024;
+    wchar_t *buff;
+
+public:
+    wfmt(wchar_t *fmt, ...)
+    {
+        buff = new wchar_t[size];
+        va_list arg_ptr;
+        va_start(arg_ptr, fmt);
+        std::vswprintf(buff, size - 1, fmt, arg_ptr);
+        va_end(arg_ptr);
+    }
+    ~wfmt()
+    {
+        delete buff;
+    }
+    wchar_t *c_str()
+    {
+        return buff;
+    }
+};
+
 inline bool is_valid_index(const size_t index)
 {
     return index > 0 && index <= gpGlobals->maxClients;
@@ -308,28 +332,3 @@ inline void ws_convert_tolower(std::wstring &s)
 {
     std::transform(s.begin(), s.end(), s.begin(), std::bind(std::tolower<wchar_t>, std::placeholders::_1, _LOCALE));
 }
-
-class wfmt
-{
-    const size_t size = 1024;
-    wchar_t *buff;
-
-public:
-    wfmt(wchar_t *fmt, ...)
-    {
-        buff = new wchar_t[size];
-        va_list arg_ptr;
-        va_start(arg_ptr, fmt);
-        std::vswprintf(buff, size - 1, fmt, arg_ptr);
-        va_end(arg_ptr);
-        UTIL_ServerPrint("[DEBUG] wfmt(): buff = %s\n", wstos(buff).c_str());
-    }
-    ~wfmt()
-    {
-        delete buff;
-    }
-    wchar_t *c_str()
-    {
-        return buff;
-    }
-};
