@@ -88,6 +88,7 @@ void ServerDeactivate_Post()
 	EntityCallbackDispatcher().DeleteAllCallbacks();
 	g_cvar_mngr.clear_hook_list();
 	g_cvar_mngr.clear_bind_list();
+	g_cvar_mngr.clear_plugin_all();
 
 	g_pFunctionTable->pfnSpawn = DispatchSpawn;
 	g_pFunctionTable->pfnKeyValue = KeyValue;
