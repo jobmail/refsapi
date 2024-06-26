@@ -496,14 +496,21 @@ public:
     {
         cvars.hook_state.clear();
     }
-    void clear_all()
+    void clear()
     {
-        clear_plugin_all();
-        clear_pcvar_all();
-        clear_cvar_list();
-        clear_bind_list();
         clear_hook_list();
         clear_hook_state();
+        clear_bind_list();
+        clear_plugin_all();
+    }
+    void clear_all()
+    {
+        clear_hook_list();
+        clear_hook_state();
+        clear_bind_list();
+        clear_plugin_all();
+        clear_cvar_list();
+        clear_pcvar_all();
     }
 };
 
