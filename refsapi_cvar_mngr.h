@@ -465,6 +465,14 @@ public:
             hook_state_it->second = is_enable;
         return result;
     }
+    void sort(plugin_cvar_it plugin_cvars)
+    {
+        auto list = plugin_cvars->second;
+        std::sort(list.begin(), list.end(), [](cvar_list_it p1, cvar_list_it p2)
+        {
+            return p1->first.compare(p2->first);
+        });
+    }
     void clear_plugin(CPluginMngr::CPlugin *plugin)
     {
         plugin_cvar_it plugin_cvar;
