@@ -181,7 +181,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     std::wstring root = stows(g_buff);
     path = wfmt(L"%s/%s/%s/plugins/%s", wstos(root).c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? "" : wstos(path).c_str()).c_str();
     //UTIL_ServerPrint("[DEBUG] rf_config(): root = %s, dirs = %s\n", wstos(root).c_str(), wstos(path).c_str());
-    if (path.back() != (wchar_t)L"/")
+    if (path.back() != L'/')
     {
         UTIL_ServerPrint("[DEBUG] rf_config(): create dirs = %s\n", wstos(path).c_str());
         std::filesystem::create_directories(wstos(path).c_str());
