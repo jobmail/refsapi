@@ -189,7 +189,6 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
             if (is_exist)
             {
                 size_t pos;
-                size_t count = 0;
                 std::wstring line;
                 std::wstring var_name;
                 std::wstring var_value;
@@ -264,7 +263,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 }
             }
             UTIL_ServerPrint("[DEBUG] rf_config(): cvars left %d\n", load_cvars.size());
-            // Left old cvars?
+            // Unknown cvars left?
             if (need_update && load_cvars.size() > 0)
             {
                 file << L"\n// - DISABLED\n";
