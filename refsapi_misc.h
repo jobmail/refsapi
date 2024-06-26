@@ -41,6 +41,7 @@ public:
         va_start(arg_ptr, fmt);
         std::vswprintf(buff, size - 1, fmt, arg_ptr);
         va_end(arg_ptr);
+        UTIL_ServerPrint("[DEBUG] wfmt(): buff = %s\n", wstos(buff).c_str());
     }
     ~wfmt()
     {
