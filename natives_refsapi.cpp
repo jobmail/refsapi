@@ -173,6 +173,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     //g_cvar_mngr.sort(plugin_cvars);
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
     std::wstring path = stows(getAmxString(amx, params[arg_folder], g_buff));
+    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s\n", wstos(path).c_str());
     if (name.empty())
         name = stows(plugin->getName());
     name.replace(name.find(L".amxx"), sizeof(L".amxx") - 1, L"");
