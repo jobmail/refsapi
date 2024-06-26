@@ -179,7 +179,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     name.replace(name.find(L".amxx"), sizeof(L".amxx") - 1, L"");
     getcwd(g_buff, sizeof(g_buff));
     std::wstring root = stows(g_buff);
-    std::wstring path = wfmt(L"%s/%s/%s/plugins/%s", wstos(root).c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? "" : wstos(path).c_str()).c_str();
+    path = wfmt(L"%s/%s/%s/plugins/%s", wstos(root).c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? "" : wstos(path).c_str()).c_str();
     UTIL_ServerPrint("[DEBUG] rf_config(): root = %s, dirs = %s\n", wstos(root).c_str(), wstos(path).c_str());
     return FALSE;
     if (path.back() != (wchar_t)L"/")
