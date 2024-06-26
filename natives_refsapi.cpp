@@ -179,9 +179,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     getcwd(g_buff, sizeof(g_buff));
     std::wstring root = stows(g_buff);
     path = wfmt(L"%s/%s/%s/plugins/%s", root, g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? L"" : path).c_str();
+    UTIL_ServerPrint("[DEBUG] rf_config(): dirs = %s\n", wstos(path).c_str());
     if (path.back() != (wchar_t)L"/")
     {
-        UTIL_ServerPrint("[DEBUG] rf_config(): dirs = %s\n", wstos(path).c_str());
         std::filesystem::create_directories(wstos(path).c_str());
         path += L"/";
     }
