@@ -185,7 +185,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     {
         UTIL_ServerPrint("[DEBUG] rf_config(): create dirs = %s\n", wstos(path).c_str());
         std::filesystem::create_directories(wstos(path).c_str());
-        path += L"/";
+        path += L'/';
     }
     path += name + L".cfg";
     UTIL_ServerPrint("[DEBUG] rf_config(): auto_create = %d, path = %s\n", params[arg_auto_create], wstos(path).c_str());
