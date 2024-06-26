@@ -168,7 +168,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     // Sort list
     plugin_cvars->second.sort([](cvar_list_it p1, cvar_list_it p2)
     {
-        return p1->first.compare(p2->first);
+        return p1->first < p2->first;
     });
     //g_cvar_mngr.sort(plugin_cvars);
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
