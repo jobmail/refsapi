@@ -165,7 +165,12 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     auto plugin_cvars = g_cvar_mngr.get(plugin->getId());
     if (check_it_empty(plugin_cvars))
         return FALSE;
-    g_cvar_mngr.sort(plugin_cvars);
+    // Sort list
+    plugin_cvars->second.sort([](cvar_list_it p1, cvar_list_it p2)
+    {
+        return p1->first.compare(p2->first);
+    });
+    //g_cvar_mngr.sort(plugin_cvars);
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
     if (name.empty())
         name = stows(plugin->getName());

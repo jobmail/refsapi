@@ -472,11 +472,6 @@ public:
         {
             return p1->first.compare(p2->first);
         });
-
-        //std::sort(list.begin(), list.end(), [](cvar_list_it p1, cvar_list_it p2)
-        //{
-        //    return p1->first.compare(p2->first);
-        //});
     }
     void clear_plugin(CPluginMngr::CPlugin *plugin)
     {
