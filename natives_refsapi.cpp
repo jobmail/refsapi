@@ -178,9 +178,14 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     std::wstring path = stows(getAmxString(amx, params[arg_folder], g_buff));
     getcwd(g_buff, sizeof(g_buff));
     std::wstring root = stows(g_buff);
-    path = wfmt(L"%s/%s/%s/plugins/%s", root, g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? L"" : path + L"/").c_str();
-    std::filesystem::create_directories(path);
-    UTIL_ServerPrint("[DEBUG] rf_config(): auto_create = %d, name = %s, path = %s\n", params[arg_auto_create], wstos(name).c_str(), wstos(path).c_str());
+    path = wfmt(L"%s/%s/%s/plugins/%s", root, g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? L"" : path).c_str();
+    if (path.back() != (wchar_t)L"/")
+    {
+        std::filesystem::create_directories(path);
+        path += L"/";
+    }
+    path += name + L".cfg";
+    UTIL_ServerPrint("[DEBUG] rf_config(): auto_create = %d, path = %s\n", params[arg_auto_create], wstos(path).c_str());
     bool is_exist;
     if ((is_exist = file_exists(path)) || params[arg_auto_create])
     {
