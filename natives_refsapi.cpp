@@ -176,7 +176,10 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     UTIL_ServerPrint("[DEBUG] rf_config(): path = %s\n", wstos(path).c_str());
     if (name.empty())
         name = stows(plugin->getName());
-    name.replace(name.find(L".amxx"), sizeof(L".amxx") - 1, L"");
+    size_t pos = name.find(L".amxx");
+    UTIL_ServerPrint("[DEBUG] rf_config(): find pos = %d\n", pos);
+    if (pos != -1)
+        name.replace(pos, sizeof(L".amxx") - 1, L"");
     getcwd(g_buff, sizeof(g_buff));
     std::wstring root = stows(g_buff);
     path = wfmt(L"%s/%s/%s/plugins/%s", wstos(root).c_str(), g_amxxapi.GetModname(), LOCALINFO("amxx_configsdir"), path.empty() ? "" : wstos(path).c_str()).c_str();
