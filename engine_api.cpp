@@ -233,8 +233,8 @@ enginefuncs_t g_EngineFunctionsTable_Post =
 	NULL,		// pfnCVarRegister() //CVarRegister_Post
 	NULL,		// pfnCVarGetFloat()
 	NULL,		// pfnCVarGetString()
-	&CVarSetFloat_Post,		// pfnCVarSetFloat()
-	&CVarSetString_Post,	// pfnCVarSetString()
+	NULL,		// pfnCVarSetFloat()
+	NULL,	// pfnCVarSetString()
 	NULL,		// pfnAlertMessage()
 	NULL,		// pfnEngineFprintf()
 	NULL,		// pfnPvAllocEntPrivateData()
