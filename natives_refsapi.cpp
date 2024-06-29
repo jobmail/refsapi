@@ -260,9 +260,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     file << L"\n// -\n";
                     file << L"// Default: \"" << cvar_it->second.value << L"\"\n";
                     if (m_cvar->has_min)
-                        file << L"// Minimum: \"" << m_cvar->min_val << "\"\n";
+                        file << L"// Minimum: \"" << std::to_wstring(m_cvar->min_val) << "\"\n";
                     if (m_cvar->has_max)
-                        file << L"// Maximum: \"" << m_cvar->max_val << "\"\n";
+                        file << L"// Maximum: \"" << std::to_wstring(m_cvar->max_val) << "\"\n";
                 }
                 // Is loaded cvar value?
                 need_replace = (load_cvars_it = load_cvars.find(m_cvar->name)) != load_cvars.end();
