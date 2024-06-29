@@ -462,7 +462,6 @@ cell AMX_NATIVE_CALL rf_get_cvar_ptr(AMX *amx, cell *params)
     UTIL_ServerPrint("[DEBUG] rf_get_cvar_ptr(): start\n");
     std::wstring name = stows(getAmxString(amx, params[arg_cvar], g_buff));
     auto result = g_cvar_mngr.get(name);
-    UTIL_ServerPrint("[DEBUG] rf_get_cvar_ptr(): RESULT = %d\n", result->second.cvar);
     return check_it_empty(result) ? FALSE : (cell)((void*)(result->second.cvar));   
 }
 
