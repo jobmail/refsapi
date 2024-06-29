@@ -12,7 +12,7 @@ bool is_number(std::string &s) {
     bool dp_not_last = false;
     while (it != s.end())
     {
-        if (!std::isdigit(*it))
+        if (!(std::isdigit(*it) || *it == ' '))
         {
             // Check for decimal point and need to have one more digit after
             if (!dp_found && *it == DECIMAL_POINT && (it + 1) != s.end())
