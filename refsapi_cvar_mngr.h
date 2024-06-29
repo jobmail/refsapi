@@ -86,7 +86,7 @@ class cvar_mngr
 private:
     bool check_range(m_cvar_t *m_cvar)
     {
-        UTIL_ServerPrint("[DEBUG] check_range(): type = %d, name = <%s>, value = <%s>\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string);
+        //UTIL_ServerPrint("[DEBUG] check_range(): type = %d, name = <%s>, value = <%s>\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string);
         if (m_cvar->type == CVAR_TYPE_NONE || m_cvar->type == CVAR_TYPE_STR)
             return true;
         // Is number?
@@ -95,7 +95,7 @@ private:
         if (!is_num)
         {
             // Fix wrong value for bind
-            UTIL_ServerPrint("[DEBUG] check_range(): wrong non-number value <%s>\n", s.c_str());
+            //UTIL_ServerPrint("[DEBUG] check_range(): wrong non-number value <%s>\n", s.c_str());
             CVAR_SET_STRING(m_cvar->cvar->name, "0");
             return false;
         }
@@ -104,8 +104,8 @@ private:
         // Check bind type and conver
         if (m_cvar->type == CVAR_TYPE_NUM)
             result = result >= 0.0 ? (int)result : -(int)(-result);
-        UTIL_ServerPrint("[DEBUG] check_range(): in = %s, out = %f\n", s.c_str(), result);
-        UTIL_ServerPrint("[DEBUG] check_range(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
+        //UTIL_ServerPrint("[DEBUG] check_range(): in = %s, out = %f\n", s.c_str(), result);
+        //UTIL_ServerPrint("[DEBUG] check_range(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
         // Check override
         if (is_override |= m_cvar->has_min && result < m_cvar->min_val)
             result = m_cvar->min_val;
@@ -114,7 +114,7 @@ private:
         // Fix overriden
         if (is_override)
         {
-            UTIL_ServerPrint("[DEBUG] check_range(): override = %s, new_string = %f\n", s.c_str(), result);
+            //UTIL_ServerPrint("[DEBUG] check_range(): override = %s, new_string = %f\n", s.c_str(), result);
             CVAR_SET_FLOAT(wstos(m_cvar->name).c_str(), result);
         }
         return !is_override;
@@ -130,7 +130,7 @@ private:
                 *bind->ptr = amx_ftoc(cvar->value);
                 break;
             case CVAR_TYPE_STR:
-                UTIL_ServerPrint("[DEBUG] copy_bind(): from = %s, size = %d\n", cvar->string, bind->size);
+                //UTIL_ServerPrint("[DEBUG] copy_bind(): from = %s, size = %d\n", cvar->string, bind->size);
                 setAmxString(bind->ptr, cvar->string, bind->size);
                 break;
         }
@@ -153,10 +153,10 @@ private:
             cvar.value = 0.0f;
             cvar.flags = flags;
             cvar.next = nullptr;
-            UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
+            //UTIL_ServerPrint("[DEBUG] create_cvar(): name = <%s>, value = <%s>\n", cvar.name, cvar.string);
             CVAR_REGISTER(&cvar);
             p_cvar = CVAR_GET_POINTER(p_name);
-            UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d\n", p_cvar != nullptr);
+            //UTIL_ServerPrint("[DEBUG] create_cvar(): is_created = %d\n", p_cvar != nullptr);
         }
         return p_cvar;
     }
@@ -204,7 +204,7 @@ public:
         // Check range
         if (!check_range(m_cvar))
             return;
-        UTIL_ServerPrint("[DEBUG] on_direct_set(): cvar_t = %d, cvar_list = %d <===\n", cvar, cvar_list->second.cvar);
+        //UTIL_ServerPrint("[DEBUG] on_direct_set(): cvar_t = %d, cvar_list = %d <===\n", cvar, cvar_list->second.cvar);
         // Do event
         on_change(cvar_list, value);
         // Save new value
@@ -252,7 +252,7 @@ public:
             bind_it->second = bind_list;
         else
             cvars.bind_list[m_cvar->cvar] = bind_list;
-        UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, cvar = %d, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, m_cvar->cvar, size);
+        //UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, cvar = %d, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, m_cvar->cvar, size);
         // Set m_cvar type
         m_cvar->type = type;
         // Check range
@@ -266,7 +266,7 @@ public:
         // Bind exists?
         if ((bind_it = cvars.bind_list.find(m_cvar->cvar)) != cvars.bind_list.end())
         {
-            UTIL_ServerPrint("[DEBUG] on_change(): name = <%s>, old_value = <%s>, new_value = <%s>\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), wstos(new_value).c_str());
+            //UTIL_ServerPrint("[DEBUG] on_change(): name = <%s>, old_value = <%s>, new_value = <%s>\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), wstos(new_value).c_str());
             for (auto& bind : bind_it->second)
                 copy_bind(&bind, m_cvar->cvar);
         }
@@ -276,12 +276,12 @@ public:
         {
             for (auto& h : hook_it->second)
             {
-                UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
+                //UTIL_ServerPrint("[DEBUG] on_change(): exec hook = %d, enabled = %d\n", h->first, h->second);
                 if (h->second)
                     g_amxxapi.ExecuteForward(h->first, (cell)((void*)(m_cvar->cvar)), wstos(m_cvar->value).c_str(), wstos(new_value).c_str());
             }
-        } else
-            UTIL_ServerPrint("[DEBUG] on_change(): hook for cvar <%d> not found !!!\n", m_cvar->cvar);
+        }// else
+            //UTIL_ServerPrint("[DEBUG] on_change(): hook for cvar <%d> not found !!!\n", m_cvar->cvar);
     }
     cvar_list_it add_exists(cvar_t *cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
@@ -309,7 +309,7 @@ public:
             auto result = cvars.cvar_list.insert({ m_cvar.name, m_cvar });
             if (result.second)
             {
-                UTIL_ServerPrint("[DEBUG] add_exists(): cvar = %d, name = <%s>, value = <%s>\n", m_cvar.cvar, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str());
+                //UTIL_ServerPrint("[DEBUG] add_exists(): cvar = %d, name = <%s>, value = <%s>\n", m_cvar.cvar, wstos(m_cvar.name).c_str(), wstos(m_cvar.value).c_str());
                 cvars.p_cvar.insert({ m_cvar.cvar, result.first });
                 return result.first;
             }
@@ -321,7 +321,7 @@ public:
         if (!name.empty())
         {
             cvar_t *cvar = create_cvar(name, value, flags);
-            UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
+            //UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
             cvar_list_it cvar_list = add_exists(cvar, desc, has_min, min_val, has_max, max_val);
             if (!check_it_empty(cvar_list))
             {
@@ -440,7 +440,7 @@ public:
     {
         if (!check_it_empty(cvar_list))
         {
-            UTIL_ServerPrint("[DEBUG] create_hook(): fwd = %d, cvar = %d\n", fwd, cvar_list->second.cvar);
+            //UTIL_ServerPrint("[DEBUG] create_hook(): fwd = %d, cvar = %d\n", fwd, cvar_list->second.cvar);
             auto result = cvars.hook_state.insert({ fwd, is_enable });
             if (result.second)
             {

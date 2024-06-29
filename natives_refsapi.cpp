@@ -160,7 +160,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
         arg_folder
     };
     bool result = FALSE;
-    UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
+    //UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     auto plugin_cvars = g_cvar_mngr.get(plugin->getId());
     if (check_it_empty(plugin_cvars))
@@ -173,11 +173,11 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     //g_cvar_mngr.sort(plugin_cvars);
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
     std::wstring path = stows(getAmxString(amx, params[arg_folder], g_buff));
-    UTIL_ServerPrint("[DEBUG] rf_config(): path = %s\n", wstos(path).c_str());
+    //UTIL_ServerPrint("[DEBUG] rf_config(): path = %s\n", wstos(path).c_str());
     if (name.empty())
         name = stows(plugin->getName());
     size_t pos = name.find(L".amxx");
-    UTIL_ServerPrint("[DEBUG] rf_config(): find pos = %d\n", pos);
+    //UTIL_ServerPrint("[DEBUG] rf_config(): find pos = %d\n", pos);
     if (pos != -1)
         name.replace(pos, sizeof(L".amxx") - 1, L"");
     getcwd(g_buff, sizeof(g_buff));
@@ -186,19 +186,19 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     //UTIL_ServerPrint("[DEBUG] rf_config(): root = %s, dirs = %s\n", wstos(root).c_str(), wstos(path).c_str());
     if (path.back() != L'/')
     {
-        UTIL_ServerPrint("[DEBUG] rf_config(): create dirs = %s\n", wstos(path).c_str());
+        //UTIL_ServerPrint("[DEBUG] rf_config(): create dirs = %s\n", wstos(path).c_str());
         std::filesystem::create_directories(wstos(path).c_str());
         path += L'/';
     }
     path += name + L".cfg";
-    UTIL_ServerPrint("[DEBUG] rf_config(): auto_create = %d, path = %s\n", params[arg_auto_create], wstos(path).c_str());
+    //UTIL_ServerPrint("[DEBUG] rf_config(): auto_create = %d, path = %s\n", params[arg_auto_create], wstos(path).c_str());
 
     bool is_exist;
     if ((is_exist = file_exists(path)) || params[arg_auto_create])
     {
         std::wfstream file;
         file.open(wstos(path).c_str(), is_exist ? std::ios::in | std::ios::out | std::ios::binary : std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
-        UTIL_ServerPrint("[DEBUG] rf_config(): is_exist = %d, is_open = %d\n", is_exist, file.is_open());
+        //UTIL_ServerPrint("[DEBUG] rf_config(): is_exist = %d, is_open = %d\n", is_exist, file.is_open());
         if (file.is_open())
         {
             file.imbue(_LOCALE);
@@ -211,7 +211,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 std::wstring var_value;
                 while (std::getline(file, line, L'\n'))
                 {
-                    UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", wstos(line).c_str());
+                    //UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", wstos(line).c_str());
                     // Is comments?
                     if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L"=")) == std::string::npos)
                         continue;
@@ -222,18 +222,18 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                         AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: the parameter <%s> has a value <%s> with a wrong quotation mark", __FUNCTION__, wstos(var_name).c_str(), wstos(var_value).c_str());
                     else
                         trim(var_value);
-                    UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstos(var_name).c_str(), wstos(var_value).c_str());
+                    //UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstos(var_name).c_str(), wstos(var_value).c_str());
                     load_cvars.insert({ var_name, var_value });
                 }
             }
-            UTIL_ServerPrint("[DEBUG] rf_config(): cvars read %d\n", load_cvars.size());
+            //UTIL_ServerPrint("[DEBUG] rf_config(): cvars read %d\n", load_cvars.size());
             bool need_update = g_cvar_mngr.need_update(load_cvars, plugin_cvars);
             load_cvars_t::iterator load_cvars_it;
             bool need_replace;
             m_cvar_t* m_cvar;
             if (need_update)
             {
-                UTIL_ServerPrint("[DEBUG] rf_config(): the config needs to be updated\n");
+                //UTIL_ServerPrint("[DEBUG] rf_config(): the config needs to be updated\n");
                 // Need truncate?
                 if (is_exist)
                 {
@@ -276,7 +276,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     load_cvars.erase(load_cvars_it);
                 }
             }
-            UTIL_ServerPrint("[DEBUG] rf_config(): cvars left %d\n", load_cvars.size());
+            //UTIL_ServerPrint("[DEBUG] rf_config(): cvars left %d\n", load_cvars.size());
             // Unknown cvars left?
             if (need_update && load_cvars.size() > 0)
             {
@@ -313,7 +313,7 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
     std::wstring value = stows(getAmxString(amx, params[arg_value], g_buff));
     std::wstring desc = stows(getAmxString(amx, params[arg_desc], g_buff));
     auto result = g_cvar_mngr.add(plugin, name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val]));
-    UTIL_ServerPrint("[DEBUG] rf_create_cvar(): RESULT = %d\n", result->second.cvar);
+    //UTIL_ServerPrint("[DEBUG] rf_create_cvar(): RESULT = %d\n", result->second.cvar);
     return check_it_empty(result) ? FALSE : (cell)((void*)(result->second.cvar));
 }
 
@@ -352,7 +352,7 @@ cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
     int fwd = g_amxxapi.RegisterSPForwardByName(plugin->getAMX(), wstos(name).c_str(), FP_CELL, FP_STRING, FP_STRING, FP_DONE);
     check_fwd_r(fwd);
     cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
-    UTIL_ServerPrint("[DEBUG] rf_hook_cvar_change(): fwd = %d, name = <%s>, cvar = %d\n", fwd, wstos(name).c_str(), cvar);
+    //UTIL_ServerPrint("[DEBUG] rf_hook_cvar_change(): fwd = %d, name = <%s>, cvar = %d\n", fwd, wstos(name).c_str(), cvar);
     auto result = g_cvar_mngr.create_hook(fwd, g_cvar_mngr.get(cvar), params[arg_state]);
     return check_it_empty(result) || fwd != result->first ? FALSE : (cell)result->first;
 }
@@ -459,7 +459,7 @@ cell AMX_NATIVE_CALL rf_get_cvar_ptr(AMX *amx, cell *params)
         arg_count,
         arg_cvar,
     };
-    UTIL_ServerPrint("[DEBUG] rf_get_cvar_ptr(): start\n");
+    //UTIL_ServerPrint("[DEBUG] rf_get_cvar_ptr(): start\n");
     std::wstring name = stows(getAmxString(amx, params[arg_cvar], g_buff));
     auto result = g_cvar_mngr.get(name);
     return check_it_empty(result) ? FALSE : (cell)((void*)(result->second.cvar));   
