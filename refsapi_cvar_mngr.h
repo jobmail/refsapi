@@ -28,7 +28,6 @@ typedef struct m_cvar_s
     std::wstring value;
     std::wstring desc;
     CVAR_TYPES_t type;
-    //CPluginMngr::CPlugin *plugin;
     int flags;
     bool has_min;
     bool has_max;
