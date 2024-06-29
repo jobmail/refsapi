@@ -49,15 +49,7 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	
 	GET_HOOK_TABLES(PLID, &g_pengfuncsTable, nullptr, nullptr);
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
-
-	///////////////
-	/*
-	meta_hack = (enginefuncs_t*)gpMetaGlobals->orig_ret;
-	UTIL_ServerPrint("\n[DEBUG] [Cvar_RegisterVariable]: meta hook %d!!!!!!!!\n", meta_hack);
-	meta_Cvar_RegisterVariable = meta_hack->pfnCvar_RegisterVariable; // pfnCvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister;
-	meta_hack->pfnCvar_RegisterVariable = Cvar_RegisterVariable; //g_engine.pl_funcs.pfnCVarRegister
-	meta_hack->pfnCVarRegister = Cvar_RegisterVariable;
-	*/
+	
 	return true;
 }
 
