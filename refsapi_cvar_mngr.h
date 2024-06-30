@@ -242,7 +242,7 @@ public:
         // Push bind
         bind_list.push_back(ptr_bind);
         copy_bind(&ptr_bind, m_cvar->cvar);
-        // Update bind
+        // Update binds
         if (is_exist)
             bind_it->second = bind_list;
         else
@@ -295,7 +295,6 @@ public:
             m_cvar.type = CVAR_TYPE_NONE;
             m_cvar.desc = desc;
             m_cvar.flags = cvar->flags;
-            //m_cvar.plugin = plugin;
             m_cvar.has_min = has_min;
             m_cvar.min_val = min_val;
             m_cvar.has_max = has_max;
@@ -311,7 +310,7 @@ public:
         }
         return cvar_list_it{};
     }
-    cvar_list_it add(CPluginMngr::CPlugin *plugin, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
+    cvar_list_it add(int plugin_id, std::wstring name, std::wstring value, int flags = 0, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
         if (!name.empty())
         {
@@ -325,11 +324,11 @@ public:
                 //UTIL_ServerPrint("[DEBUG] add(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
                 plugin_cvar_it plugin_cvar;
                 // Plugin cvars exist?
-                if ((plugin_cvar = cvars.plugin.find(plugin->getId())) != cvars.plugin.end())
+                if ((plugin_cvar = cvars.plugin.find(plugin_id)) != cvars.plugin.end())
                     plugin_cvar->second.push_back(cvar_list);
                 // Create plugin cvars
                 else
-                    cvars.plugin[plugin->getId()].push_back(cvar_list);
+                    cvars.plugin[plugin_id].push_back(cvar_list);
                 return cvar_list;
             }
         }
