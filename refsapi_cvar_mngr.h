@@ -87,8 +87,7 @@ private:
             return true;
         // Is number?
         std::string s = m_cvar->cvar->string;
-        bool is_num = is_number(s);
-        if (!is_num)
+        if (!is_number(s))
         {
             // Fix wrong value for bind
             //UTIL_ServerPrint("[DEBUG] check_range(): wrong non-number value <%s>\n", s.c_str());
