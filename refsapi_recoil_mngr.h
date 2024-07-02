@@ -22,7 +22,7 @@ private:
 public:
     void init()
     {
-        add(RECOIL_ALL, "all");
+        add(RECOIL_ALL, "weapon_all");
         for (int weapon_id = WEAPON_P228; weapon_id <= WEAPON_P90; weapon_id++)
         {
             auto slot_info = g_ReGameApi->GetWeaponSlot((WeaponIdType)weapon_id);
