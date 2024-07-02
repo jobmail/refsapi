@@ -465,6 +465,25 @@ cell AMX_NATIVE_CALL rf_get_cvar_ptr(AMX *amx, cell *params)
     return check_it_empty(result) ? FALSE : (cell)((void*)(result->second.cvar));   
 }
 
+// native rf_recoil_enable(type, cvar[]);
+cell AMX_NATIVE_CALL rf_recoil_enable(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_custom_impulse_offset,
+    };
+    g_recoil_mngr.enable(params[arg_custom_impulse_offset]);
+    return TRUE;   
+}
+
+// native rf_recoil_disable(type, cvar[]);
+cell AMX_NATIVE_CALL rf_recoil_disable(AMX *amx, cell *params)
+{
+    g_recoil_mngr.disable();
+    return TRUE;   
+}
+
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
     {"rf_get_weaponname", rf_get_weaponname},
@@ -481,6 +500,8 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_set_pcvar", rf_set_pcvar},
     {"rf_set_cvar", rf_set_cvar},
     {"rf_get_cvar_ptr", rf_get_cvar_ptr},
+    {"rf_recoil_enable", rf_recoil_enable},
+    {"rf_recoil_disable", rf_recoil_disable},
     {nullptr, nullptr}
 };
 
