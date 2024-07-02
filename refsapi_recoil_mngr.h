@@ -78,7 +78,7 @@ public:
                 auto pcvar = weapon_recoil[player->m_pActiveItem->m_iId];
                 auto pcvar_all = weapon_recoil[RECOIL_ALL];
                 auto recoil = IMPULSE_OFFSET > 0 && (wed->v.iuser4 - IMPULSE_OFFSET) >= 0 && wed->v.impulse == wed->v.iuser4 ? wed->v.fuser1 : (pcvar != nullptr ? pcvar->value : 0.33f);
-                UTIL_ServerPrint("[DEBUG] think_post(): pcvar = %d, pcvar_recoil = %f, weapon_id = %d, recoil = %f\n", pcvar, pcvar->value, player->m_pActiveItem->m_iId, recoil);
+                UTIL_ServerPrint("[DEBUG] think_post(): offset = %d, pcvar = %d, pcvar_recoil = %f, weapon_id = %d, recoil = %f\n", IMPULSE_OFFSET, pcvar, pcvar->value, player->m_pActiveItem->m_iId, recoil);
                 bool is_recoil_set = recoil > 0.0f && recoil < 1.0f;
                 if (!is_recoil_set && pcvar_all != nullptr && (is_recoil_set = pcvar_all->value > 0.0f && pcvar_all->value < 1.0f))
                     recoil = weapon_recoil[RECOIL_ALL]->value;
