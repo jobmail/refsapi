@@ -7,7 +7,7 @@ void RG_CBasePlayer_PostThink(IReGameHook_CBasePlayer_PostThink* chain, CBasePla
 
 class recoil_mngr
 {
-    size_t IMPULSE_OFFSET;
+    int IMPULSE_OFFSET;
     std::array<cvar_t*, MAX_WEAPONS + 1> weapon_recoil;
     std::array<float, MAX_PLAYERS + 1> last_fired;
     bool is_enabled;
@@ -34,7 +34,7 @@ public:
     {
         weapon_recoil[weapon_id]->value = recoil;
     }
-    void enable(size_t _offset = 0)
+    void enable(int _offset = 0)
     {   
         disable();
         init();
@@ -77,7 +77,7 @@ public:
                 auto wed = weapon->edict();
                 auto pcvar = weapon_recoil[player->m_pActiveItem->m_iId];
                 auto pcvar_all = weapon_recoil[RECOIL_ALL];
-                auto recoil = ((IMPULSE_OFFSET > 0) && ((wed->v.iuser4 - IMPULSE_OFFSET) >= 0) && (wed->v.impulse == wed->v.iuser4)) ? wed->v.fuser1 : (pcvar != nullptr ? pcvar->value : 0.33f);
+                auto recoil = IMPULSE_OFFSET > 0 && (wed->v.iuser4 - IMPULSE_OFFSET) >= 0 && wed->v.impulse == wed->v.iuser4 ? wed->v.fuser1 : (pcvar != nullptr ? pcvar->value : 0.33f);
                 UTIL_ServerPrint("[DEBUG] think_post(): offset = %d, pcvar = %d, pcvar_recoil = %f, weapon_id = %d, recoil = %f\n", IMPULSE_OFFSET, pcvar, pcvar->value, player->m_pActiveItem->m_iId, recoil);
                 bool is_recoil_set = recoil > 0.0f && recoil < 1.0f;
                 if (!is_recoil_set && pcvar_all != nullptr && (is_recoil_set = pcvar_all->value > 0.0f && pcvar_all->value < 1.0f))
