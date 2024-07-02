@@ -465,7 +465,7 @@ cell AMX_NATIVE_CALL rf_get_cvar_ptr(AMX *amx, cell *params)
     return check_it_empty(result) ? FALSE : (cell)((void*)(result->second.cvar));   
 }
 
-// native rf_recoil_enable(type, cvar[]);
+// native rf_recoil_enable(custom_impulse_offset);
 cell AMX_NATIVE_CALL rf_recoil_enable(AMX *amx, cell *params)
 {
     enum args_e
@@ -477,7 +477,7 @@ cell AMX_NATIVE_CALL rf_recoil_enable(AMX *amx, cell *params)
     return TRUE;   
 }
 
-// native rf_recoil_disable(type, cvar[]);
+// native rf_recoil_disable();
 cell AMX_NATIVE_CALL rf_recoil_disable(AMX *amx, cell *params)
 {
     g_recoil_mngr.disable();

@@ -315,7 +315,7 @@ public:
         if (!name.empty())
         {
             cvar_t *cvar = create_cvar(name, value, flags);
-            //UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
+            UTIL_ServerPrint("[DEBUG] add(): cvar = %d\n", cvar);
             cvar_list_it cvar_list = add_exists(cvar, desc, has_min, min_val, has_max, max_val);
             if (!check_it_empty(cvar_list))
             {
