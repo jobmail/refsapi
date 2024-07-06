@@ -7,7 +7,9 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp
 
-LINK = -ldl -m32 -s -Llib/linux32
+LINK = -m32
+
+#-static-libgcc -static-libstdc++
 
 # -static-libgcc -static-libstdc++
 
@@ -25,7 +27,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -fvisibility=hidden -shared -std=gnu++17
+CFLAGS += -g0 -m32 -fvisibility=hidden -shared -std=gnu++17 -fabi-version=5 -fabi-compat-version=5 -Wabi=5
 
 #-fabi-version=11 -fabi-compat-version=11 -Wabi=11 -fno-exceptions 
 
