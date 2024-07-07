@@ -212,8 +212,9 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 while (std::getline(file, line, L'\n'))
                 {
                     //UTIL_ServerPrint("[DEBUG] rf_config(): line = <%s>\n", wstos(line).c_str());
+                    trim(line);
                     // Is comments?
-                    if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L"=")) == std::string::npos)
+                    if (line.find(L";") == 0 || line.find(L"#") == 0 || line.find(L"//") == 0 || (pos = line.find(L" ")) == std::string::npos)
                         continue;
                     // Split var
                     var_name = trim_c(line.substr(0, pos++));

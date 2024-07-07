@@ -5,12 +5,11 @@ NAME = refsapi
 
 COMPILER = g++
 
-OBJECTS = *.cpp include/cssdk/public/interface.cpp
+OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs
 
-# -static-libgcc -static-libstdc++
-
+#-l:libm.a -l:libc.a
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
@@ -26,12 +25,11 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -g0 -m32 -fvisibility=hidden -shared -std=gnu++17
+CFLAGS += -m32 -fvisibility=hidden -shared -std=gnu++17 
 
+#-D_GLIBCXX_USE_CXX11_ABI=0
 #-fabi-version=11 -fabi-compat-version=11 -Wabi=11 
-
 #-fabi-version=11 -fabi-compat-version=11 -Wabi=11 -fno-exceptions 
-
 #-g0 -DNDEBUG -Dlinux -D__linux__ -std=gnu++14 -shared -m32 -D_GLIBCXX_USE_CXX11_ABI=0 -DHAVE_STRONG_TYPEDEF
 
 OBJ_LINUX := $(OBJECTS:%.c=$(BIN_DIR)/%.o)
