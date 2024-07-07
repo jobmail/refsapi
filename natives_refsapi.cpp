@@ -268,7 +268,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 // Is loaded cvar value?
                 need_replace = (load_cvars_it = load_cvars.find(m_cvar->name)) != load_cvars.end();
                 if (need_update)
-                    file << m_cvar->name << " = \"" << (need_replace ? load_cvars_it->second : m_cvar->value) << "\"\n";
+                    file << m_cvar->name << " \"" << (need_replace ? load_cvars_it->second : m_cvar->value) << "\"\n";
                 if (need_replace)
                 {
                     // Direct set
