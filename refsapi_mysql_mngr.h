@@ -48,10 +48,10 @@ typedef m_query_list_t::iterator m_query_list_it;
 
 class mysql_mngr {
     const size_t max_query_size = 16384;
-    m_conn_prm_list_t m_conn_prms;
-    m_query_list_t m_queries[MAX_QUERY_PRIORITY + 1];
-    int m_threads_num;
-    std::mutex threads_mutex;
+    static m_conn_prm_list_t m_conn_prms;
+    static m_query_list_t m_queries[MAX_QUERY_PRIORITY + 1];
+    static int m_threads_num;
+    static std::mutex threads_mutex;
 
 private:
     static int wait_for_mysql(MYSQL *conn, int status)
@@ -113,7 +113,7 @@ public:
                     break;
             }
     }
-    void exec_async_query(int pri, m_query_list_it q)
+    static void exec_async_query(int pri, m_query_list_it q)
     {
         MYSQL* conn = nullptr;
         q->result = nullptr;
@@ -158,7 +158,7 @@ public:
         threads_mutex.unlock();
         UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, END", pid);
     }
-    bool push_query(size_t conn_id, std::string query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY)
+    static bool push_query(size_t conn_id, std::string query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY)
     {
         if (query.empty() || pri > MAX_QUERY_PRIORITY)
             return false;
@@ -175,7 +175,7 @@ public:
         threads_mutex.unlock();
         return true;
     }
-    MYSQL_RES* exec_query(MYSQL *conn, std::string *query)
+    static MYSQL_RES* exec_query(MYSQL *conn, std::string *query)
     {
         if (conn == nullptr || query->empty())
             return nullptr;
@@ -183,7 +183,7 @@ public:
         check_conn_rc(rc, conn);
         return mysql_store_result(conn);
     }
-    MYSQL* connect(m_conn_prm_list_it prms)
+    static MYSQL* connect(m_conn_prm_list_it prms)
     {
         MYSQL *ret, *conn = mysql_init(NULL);
         if (!(conn = mysql_init(0)))
@@ -210,7 +210,7 @@ public:
         }
         return conn;
     }
-    size_t add_connect(int fwd, const char *db_host, const char *db_user, const char *db_pass, const char *db_name, size_t timeout = 60, bool is_nonblocking = false)
+    static size_t add_connect(int fwd, const char *db_host, const char *db_user, const char *db_pass, const char *db_name, size_t timeout = 60, bool is_nonblocking = false)
     {
         UTIL_ServerPrint(
             "[DEBUG] add_connect(): pid = %d, fwd = %d, host = <%s>, user = <%s>, pass = <%s>, name = <%s>, timeout = %d, block = %d",
@@ -228,7 +228,7 @@ public:
         m_conn_prms.push_back(prms);
         return m_conn_prms.size() - 1;
     }
-    m_conn_prm_list_it get_connect(size_t conn_id)
+    static m_conn_prm_list_it get_connect(size_t conn_id)
     {
         if (conn_id > m_conn_prms.size() - 1)
             return m_conn_prm_list_it();
