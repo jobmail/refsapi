@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -pthread
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -pthread $(mysql_config --cflags) $(mysql_config --libs)
 
 #-l:libm.a -l:libc.a
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
