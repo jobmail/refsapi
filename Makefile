@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -pthread -static -L/usr/lib/i386-linux-gnu/ -lmariadb
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -pthread -s -L/usr/lib/i386-linux-gnu/ -lmariadb
 
 #-l:libm.a -l:libc.a
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
