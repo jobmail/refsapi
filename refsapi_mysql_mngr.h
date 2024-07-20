@@ -48,10 +48,6 @@ typedef m_query_list_t::iterator m_query_list_it;
 
 class mysql_mngr {
     const size_t max_query_size = 16384;
-    static m_conn_prm_list_t m_conn_prms;
-    static m_query_list_t m_queries[MAX_QUERY_PRIORITY + 1];
-    static int m_threads_num;
-    static std::mutex threads_mutex;
 
 private:
     static int wait_for_mysql(MYSQL *conn, int status)
@@ -85,6 +81,10 @@ private:
     }
 
 public:
+    static m_conn_prm_list_t m_conn_prms;
+    static m_query_list_t m_queries[MAX_QUERY_PRIORITY + 1];
+    static int m_threads_num;
+    static std::mutex threads_mutex;
     static void main()
     {
         UTIL_ServerPrint("[DEBUG] main(): pid = %s, max_thread = %d, interval = %d, START", getpid(), MAX_QUERY_THREADS, QUERY_POOLING_INTERVAL);
@@ -210,7 +210,7 @@ public:
         }
         return conn;
     }
-    size_t add_connect(int fwd, const char *db_host, const char *db_user, const char *db_pass, const char *db_name, size_t timeout = 60, bool is_nonblocking = false)
+    static size_t add_connect(int fwd, const char *db_host, const char *db_user, const char *db_pass, const char *db_name, size_t timeout = 60, bool is_nonblocking = false)
     {
         UTIL_ServerPrint(
             "[DEBUG] add_connect(): pid = %d, fwd = %d, host = <%s>, user = <%s>, pass = <%s>, name = <%s>, timeout = %d, block = %d",
