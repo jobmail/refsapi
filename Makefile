@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -pthread
 
 #-l:libm.a -l:libc.a
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
