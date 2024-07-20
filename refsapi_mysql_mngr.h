@@ -103,7 +103,7 @@ public:
                 count = MAX_QUERY_THREADS - m_threads_num;
                 if (count > 0)
                 {
-                    std::thread t1(&mysql_mngr::exec_async_query, pri);
+                    //std::thread t1 { &mysql_mngr::exec_async_query, pri, q };
                     //exec_async_query(pri, q);
                     m_threads_num++;
                 }
@@ -114,6 +114,8 @@ public:
     }
     void exec_async_query(int pri, m_query_list_it q)
     {
+        int pri;
+        m_query_list_it q;
         MYSQL* conn = nullptr;
         q->result = nullptr;
         int pid = getpid();
@@ -238,7 +240,7 @@ public:
     {
         UTIL_ServerPrint("[DEBUG] mysql_mngr(): CREATED");
         m_threads_num = 0;
-        std::thread t1(&mysql_mngr::main);
+        //std::thread t1(&main);
     }
 };
 
