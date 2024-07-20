@@ -67,7 +67,10 @@
 #include "entity_callback_dispatcher.h"
 
 // MYSQL
+#include <thread>
 #include "db/mysql.h"
+#include <signal.h>
+#include <poll.h>
 
 // Refs API
 #include "refsapi.h"
