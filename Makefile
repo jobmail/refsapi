@@ -7,7 +7,8 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lmariadb -lpthread -lrt
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lmariadb
+#-lpthread
 #-lmariadb
 #-L/usr/lib/i386-linux-gnu/ -lmariadb
 
@@ -15,7 +16,8 @@ LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lmariadb -lpthread -lrt
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -flto=auto -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread
+OPT_FLAGS = -O3 -msse3 -flto=auto -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive
+#-pthread
 #-pipe
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
