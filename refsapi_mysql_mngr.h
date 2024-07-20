@@ -48,15 +48,16 @@ typedef m_query_list_t::iterator m_query_list_it;
 
 class mysql_mngr {
     const size_t max_query_size = 16384;
-    m_conn_prm_list_t m_conn_prms;
-    m_query_list_t m_queries[MAX_QUERY_PRIORITY + 1];
-    int m_threads_num;
-    std::mutex threads_mutex;
+    static m_conn_prm_list_t m_conn_prms;
+    static m_query_list_t m_queries[MAX_QUERY_PRIORITY + 1];
+    static int m_threads_num;
+    static std::mutex threads_mutex;
 
 private:
-    int wait_for_mysql(MYSQL *conn, int status)
+    static int wait_for_mysql(MYSQL *conn, int status)
     {
-        int status = 0, timeout, res;
+        int status = 0;
+        int timeout, res;
         struct pollfd pfd;
         pfd.fd = mysql_get_socket(conn);
         pfd.events =
@@ -84,7 +85,7 @@ private:
     }
 
 public:
-    void main()
+    static void main()
     {
         UTIL_ServerPrint("[DEBUG] main(): pid = %s, max_thread = %d, interval = %d, START", getpid(), MAX_QUERY_THREADS, QUERY_POOLING_INTERVAL);
         while (true)
@@ -93,7 +94,7 @@ public:
             usleep(QUERY_POOLING_INTERVAL * 1000);
         }
     }
-    void run_query()
+    static void run_query()
     {
         int pri, count;
         for (pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
@@ -111,7 +112,7 @@ public:
                     break;
             }
     }
-    void exec_async_query(int pri, m_query_list_it q)
+    static void exec_async_query(int pri, m_query_list_it q)
     {
         MYSQL* conn = nullptr;
         q->result = nullptr;
@@ -181,7 +182,7 @@ public:
         check_conn_rc(rc, conn);
         return mysql_store_result(conn);
     }
-    MYSQL* connect(m_conn_prm_list_it prms)
+    static MYSQL* connect(m_conn_prm_list_it prms)
     {
         MYSQL *ret, *conn = mysql_init(NULL);
         if (!(conn = mysql_init(0)))
@@ -226,14 +227,15 @@ public:
         m_conn_prms.push_back(prms);
         return m_conn_prms.size() - 1;
     }
-    m_conn_prm_list_it get_connect(size_t conn_id)
+    static m_conn_prm_list_it get_connect(size_t conn_id)
     {
         if (conn_id > m_conn_prms.size() - 1)
             return m_conn_prm_list_it();
         return std::next(m_conn_prms.begin(), conn_id);
     }
-    mysql_mngr() : m_threads_num(0)
+    mysql_mngr()
     {
+        m_threads_num = 0;
         std::thread(main);
     }
 };
