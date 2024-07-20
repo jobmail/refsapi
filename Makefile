@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -pthread $(mysql_config --cflags) $(mysql_config --libs)
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -pthread $(mysql_config --cflags) -L/usr/lib/i386-linux-gnu/ -lmariadb
 
 #-l:libm.a -l:libc.a
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
@@ -20,7 +20,7 @@ OPT_FLAGS = -O3 -msse3 -flto=auto -fno-strict-aliasing -Wno-uninitialized -funro
 
 INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
         -I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude \
-        -Iinclude/amxmodx -Iinclude/amxmodx/public -Iinclude/amxmodx/amtl -Iinclude/amxmodx/third_party/hashing -Icommon
+        -Iinclude/amxmodx -Iinclude/amxmodx/public -Iinclude/amxmodx/amtl -Iinclude/amxmodx/third_party/hashing -Icommon -I/usr/include/mariadb
 
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
