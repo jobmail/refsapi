@@ -84,35 +84,35 @@ private:
     }
 
 public:
-    void main(m_query_list_t* query, std::mutex* m, int* num)
+    void main()
     {
         UTIL_ServerPrint("[DEBUG] main(): pid = %s, max_thread = %d, interval = %d, START", getpid(), MAX_QUERY_THREADS, QUERY_POOLING_INTERVAL);
         while (true)
         {
-            run_query(query, m, num);
+            run_query();
             usleep(QUERY_POOLING_INTERVAL * 1000);
         }
     }
-    void run_query(m_query_list_t* query, std::mutex* m, int* num)
+    void run_query()
     {
         int pri, count;
         for (pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
-            for (auto q = query[pri].begin(); q != query[pri].end(); q++)
+            for (auto q = m_queries[pri].begin(); q != m_queries[pri].end(); q++)
             {
-                m->lock();
-                count = MAX_QUERY_THREADS - *num;
+                threads_mutex.lock();
+                count = MAX_QUERY_THREADS - m_threads_num;
                 if (count > 0)
                 {
-                    std::thread t1(&mysql_mngr::exec_async_query, pri, q, query, m, num);
+                    std::thread t1(&mysql_mngr::exec_async_query, pri);
                     //exec_async_query(pri, q);
-                    (*num)++;
+                    m_threads_num++;
                 }
-                m->unlock();
+                threads_mutex.unlock();
                 if (--count <= 0)
                     break;
             }
     }
-    void exec_async_query(int pri, m_query_list_it q, m_query_list_t* query, std::mutex* m, int* num)
+    void exec_async_query(int pri, m_query_list_it q)
     {
         MYSQL* conn = nullptr;
         q->result = nullptr;
@@ -152,10 +152,10 @@ public:
         if (conn != nullptr)
             mysql_close(conn);
         delete q->data;
-        m->lock();
-        query[pri].erase(q);
-        (*num)--;
-        m->unlock();
+        threads_mutex.lock();
+        m_queries[pri].erase(q);
+        m_threads_num--;
+        threads_mutex.unlock();
         UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, END", pid);
     }
     bool push_query(size_t conn_id, std::string query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY)
@@ -238,7 +238,7 @@ public:
     {
         UTIL_ServerPrint("[DEBUG] mysql_mngr(): CREATED");
         m_threads_num = 0;
-        std::thread t1(&mysql_mngr::main, (m_query_list_t *)&m_queries, (std::mutex *)&threads_mutex, (int *)&m_threads_num);
+        std::thread t1(&mysql_mngr::main);
     }
 };
 
