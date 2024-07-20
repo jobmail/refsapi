@@ -13,14 +13,14 @@ LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -pthread $(mysql_config 
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -flto=auto -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread
+OPT_FLAGS = -O3 -msse3 -flto=auto -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread $(mysql_config --cflags) $(mysql_config --libs)
 
 #-pipe
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
 INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
         -I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude \
-        -Iinclude/amxmodx -Iinclude/amxmodx/public -Iinclude/amxmodx/amtl -Iinclude/amxmodx/third_party/hashing -Icommon $(mysql_config --cflags) $(mysql_config --libs)
+        -Iinclude/amxmodx -Iinclude/amxmodx/public -Iinclude/amxmodx/amtl -Iinclude/amxmodx/third_party/hashing -Icommon
 
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
