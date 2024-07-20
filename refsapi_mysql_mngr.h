@@ -90,7 +90,7 @@ public:
         UTIL_ServerPrint("[DEBUG] main(): pid = %s, max_thread = %d, interval = %d, START", getpid(), MAX_QUERY_THREADS, QUERY_POOLING_INTERVAL);
         while (true)
         {
-            run_query();
+            mysql_mngr::run_query();
             usleep(QUERY_POOLING_INTERVAL * 1000);
         }
     }
@@ -98,17 +98,17 @@ public:
     {
         int pri, count;
         for (pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
-            for (auto q = m_queries[pri].begin(); q != m_queries[pri].end(); q++)
+            for (auto q = mysql_mngr::m_queries[pri].begin(); q != mysql_mngr::m_queries[pri].end(); q++)
             {
-                threads_mutex.lock();
-                count = MAX_QUERY_THREADS - m_threads_num;
+                mysql_mngr::threads_mutex.lock();
+                count = MAX_QUERY_THREADS - mysql_mngr::m_threads_num;
                 if (count > 0)
                 {
-                    std::thread t1(exec_async_query, pri, q);
+                    std::thread t1(mysql_mngr::exec_async_query, pri, q);
                     //exec_async_query(pri, q);
-                    m_threads_num++;
+                    mysql_mngr::m_threads_num++;
                 }
-                threads_mutex.unlock();
+                mysql_mngr::threads_mutex.unlock();
                 if (--count <= 0)
                     break;
             }
@@ -152,10 +152,10 @@ public:
         if (conn != nullptr)
             mysql_close(conn);
         delete q->data;
-        threads_mutex.lock();
-        m_queries[pri].erase(q);
-        m_threads_num--;
-        threads_mutex.unlock();
+        mysql_mngr::threads_mutex.lock();
+        mysql_mngr::m_queries[pri].erase(q);
+        mysql_mngr::m_threads_num--;
+        mysql_mngr::threads_mutex.unlock();
         UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, END", pid);
     }
     static bool push_query(size_t conn_id, std::string query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY)
@@ -170,9 +170,9 @@ public:
         m_query.data_size = data_size;
         Q_memcpy(m_query.data, data, data_size << 2);
         m_query.time_creation = g_RehldsData->GetTime();
-        threads_mutex.lock();
-        m_queries[pri].push_back(m_query);
-        threads_mutex.unlock();
+        mysql_mngr::threads_mutex.lock();
+        mysql_mngr::m_queries[pri].push_back(m_query);
+        mysql_mngr::threads_mutex.unlock();
         return true;
     }
     static MYSQL_RES* exec_query(MYSQL *conn, std::string *query)
@@ -225,18 +225,18 @@ public:
         prms.db_name = db_name;
         prms.timeout = timeout;
         prms.is_nonblocking = is_nonblocking;
-        m_conn_prms.push_back(prms);
-        return m_conn_prms.size() - 1;
+        mysql_mngr::m_conn_prms.push_back(prms);
+        return mysql_mngr::m_conn_prms.size() - 1;
     }
     static m_conn_prm_list_it get_connect(size_t conn_id)
     {
-        if (conn_id > m_conn_prms.size() - 1)
+        if (conn_id > mysql_mngr::m_conn_prms.size() - 1)
             return m_conn_prm_list_it();
-        return std::next(m_conn_prms.begin(), conn_id);
+        return std::next(mysql_mngr::m_conn_prms.begin(), conn_id);
     }
     mysql_mngr()
     {
-        m_threads_num = 0;
+        mysql_mngr::m_threads_num = 0;
         std::thread t1(main);
     }
 };
