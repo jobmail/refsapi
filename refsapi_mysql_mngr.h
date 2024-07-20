@@ -157,7 +157,7 @@ public:
         threads_mutex.unlock();
         UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, END", pid);
     }
-    bool push_query(size_t conn_id, std::string query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY)
+    static bool push_query(size_t conn_id, std::string query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY)
     {
         if (query.empty() || pri > MAX_QUERY_PRIORITY)
             return false;
@@ -174,7 +174,7 @@ public:
         threads_mutex.unlock();
         return true;
     }
-    MYSQL_RES* exec_query(MYSQL *conn, std::string *query)
+    static MYSQL_RES* exec_query(MYSQL *conn, std::string *query)
     {
         if (conn == nullptr || query->empty())
             return nullptr;
@@ -209,7 +209,7 @@ public:
         }
         return conn;
     }
-    size_t add_connect(int fwd, const char *db_host, const char *db_user, const char *db_pass, const char *db_name, size_t timeout = 60, bool is_nonblocking = false)
+    static size_t add_connect(int fwd, const char *db_host, const char *db_user, const char *db_pass, const char *db_name, size_t timeout = 60, bool is_nonblocking = false)
     {
         UTIL_ServerPrint(
             "[DEBUG] add_connect(): pid = %d, fwd = %d, host = <%s>, user = <%s>, pass = <%s>, name = <%s>, timeout = %d, block = %d",
