@@ -73,8 +73,6 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	g_ReGameHookchains->CBasePlayer_Spawn()->registerHook(CBasePlayer_Spawn_RG);
 	g_ReGameHookchains->CreateWeaponBox()->registerHook(CreateWeaponBox_RG);
 
-	
-
 	SET_META_RESULT(MRES_IGNORED);
 }
 

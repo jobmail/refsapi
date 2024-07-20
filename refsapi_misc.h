@@ -134,80 +134,6 @@ inline bool file_exists(const std::wstring &name)
     return (stat(wstos(name).c_str(), &buff) == 0);
 }
 
-inline int rm_quote(std::string &s)
-{
-    int result = 0;
-    bool f[2];
-    for (auto& ch : _QQ) //(size_t i = 0; i < sizeof(_QQ) - 1; i++)
-    {
-        f[0] = f[1] = 0;
-        if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
-        {
-            s.erase(s.begin());
-            s.erase(s.end() - 1);
-            result = 1;
-            break;
-        }
-        else if (f[0] != f[1])
-        {
-            result = -1;
-            break;
-        }
-    }
-    return result;
-}
-
-inline int rm_quote(std::wstring &s)
-{
-    int result = 0;
-    bool f[2];
-    for (auto& ch : _QQ)
-    {
-        f[0] = f[1] = 0;
-        if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
-        {
-            s.erase(s.begin());
-            s.erase(s.end() - 1);
-            result = 1;
-            break;
-        }
-        else if (f[0] != f[1])
-        {
-            result = -1;
-            break;
-        }
-    }
-    return result;
-}
-
-inline std::string rm_quote_c(std::string &s)
-{
-    for (auto& ch : _QQ)
-    {
-        if (s.front() == ch && s.back() == ch)
-        {
-            s.erase(s.begin());
-            s.erase(s.end() - 1);
-            break;
-        }
-    }
-    return s;
-}
-
-inline std::wstring rm_quote_c(std::wstring &s)
-{
-    for (auto& ch : _QQ)
-    {
-        if (s.front() == ch && s.back() == ch)
-        {
-            s.erase(s.begin());
-            s.erase(s.end() - 1);
-            break;
-        }
-    }
-    return s;
-}
-
 inline void remove_chars(std::string &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(std::remove_if(s.begin(), s.end(), [&](unsigned char ch)
@@ -331,4 +257,79 @@ inline std::wstring trim_c(std::wstring s, std::string chars = _TRIM_CHARS)
 inline void ws_convert_tolower(std::wstring &s)
 {
     std::transform(s.begin(), s.end(), s.begin(), std::bind(std::tolower<wchar_t>, std::placeholders::_1, _LOCALE));
+}
+
+inline int rm_quote(std::string &s)
+{
+    int result = 0;
+    bool f[2];
+    for (auto& ch : _QQ)
+    {
+        f[0] = f[1] = 0;
+        if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
+        {
+            s.erase(s.begin());
+            s.erase(s.end() - 1);
+            trim(s);
+            result = 1;
+            break;
+        }
+        else if (f[0] != f[1])
+        {
+            result = -1;
+            break;
+        }
+    }
+    return result;
+}
+
+inline int rm_quote(std::wstring &s)
+{
+    int result = 0;
+    bool f[2];
+    for (auto& ch : _QQ)
+    {
+        f[0] = f[1] = 0;
+        if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
+        {
+            s.erase(s.begin());
+            s.erase(s.end() - 1);
+            result = 1;
+            break;
+        }
+        else if (f[0] != f[1])
+        {
+            result = -1;
+            break;
+        }
+    }
+    return result;
+}
+
+inline std::string rm_quote_c(std::string &s)
+{
+    for (auto& ch : _QQ)
+    {
+        if (s.front() == ch && s.back() == ch)
+        {
+            s.erase(s.begin());
+            s.erase(s.end() - 1);
+            break;
+        }
+    }
+    return s;
+}
+
+inline std::wstring rm_quote_c(std::wstring &s)
+{
+    for (auto& ch : _QQ)
+    {
+        if (s.front() == ch && s.back() == ch)
+        {
+            s.erase(s.begin());
+            s.erase(s.end() - 1);
+            break;
+        }
+    }
+    return s;
 }
