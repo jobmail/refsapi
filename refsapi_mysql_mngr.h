@@ -114,8 +114,6 @@ public:
     }
     void exec_async_query(int pri, m_query_list_it q)
     {
-        int pri;
-        m_query_list_it q;
         MYSQL* conn = nullptr;
         q->result = nullptr;
         int pid = getpid();
