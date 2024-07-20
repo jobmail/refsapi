@@ -48,7 +48,7 @@ typedef m_query_list_t::iterator m_query_list_it;
 
 class mysql_mngr {
     const size_t max_query_size = 16384;
-    m_conn_prm_list_t m_conn_prms;
+    static m_conn_prm_list_t m_conn_prms;
     static m_query_list_t m_queries[MAX_QUERY_PRIORITY + 1];
     static int m_threads_num;
     static std::mutex threads_mutex;
@@ -122,7 +122,7 @@ public:
         try
         {
             UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, START", pid);
-            auto prms = g_mysql_mngr.get_connect(q->conn_id);
+            auto prms = get_connect(q->conn_id);
             if (!check_it_empty(prms))
             {
                 q->is_started = true;
@@ -228,7 +228,7 @@ public:
         m_conn_prms.push_back(prms);
         return m_conn_prms.size() - 1;
     }
-    m_conn_prm_list_it get_connect(size_t conn_id)
+    static m_conn_prm_list_it get_connect(size_t conn_id)
     {
         if (conn_id > m_conn_prms.size() - 1)
             return m_conn_prm_list_it();
