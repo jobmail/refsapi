@@ -503,7 +503,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     db_user = getAmxString(amx, params[arg_db_user], g_buff);
     db_pass = getAmxString(amx, params[arg_db_pass], g_buff);
     db_name = getAmxString(amx, params[arg_db_name], g_buff);
-    return g_mysql_mngr.add_connect(NULL, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), params[arg_timeout], params[arg_nonblock]);
+    return g_mysql_mngr.add_connect(-1, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), params[arg_timeout], params[arg_nonblock]);
 }
 
 // native rf_sql_async_query(tuple, query[], data[] = "", data_size = 0, pri = 3);
