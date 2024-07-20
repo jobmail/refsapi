@@ -56,7 +56,6 @@ class mysql_mngr {
 private:
     static int wait_for_mysql(MYSQL *conn, int status)
     {
-        int status = 0;
         int timeout, res;
         struct pollfd pfd;
         pfd.fd = mysql_get_socket(conn);
@@ -70,18 +69,19 @@ private:
             timeout = -1;
         res = poll(&pfd, 1, timeout);
         if (res == 0)
-            status = MYSQL_WAIT_TIMEOUT;
+            return MYSQL_WAIT_TIMEOUT;
         else if (res < 0)
-            status = MYSQL_WAIT_EXCEPT;
+            return MYSQL_WAIT_EXCEPT;
         else {
+            int status = 0;
             if (pfd.revents & POLLIN)
                 status |= MYSQL_WAIT_READ;
             if (pfd.revents & POLLOUT)
                 status |= MYSQL_WAIT_WRITE;
             if (pfd.revents & POLLPRI)
                 status |= MYSQL_WAIT_EXCEPT;
+            return status;
         }
-        return status;
     }
 
 public:
@@ -104,7 +104,8 @@ public:
                 count = MAX_QUERY_THREADS - m_threads_num;
                 if (count > 0)
                 {
-                    std::thread(exec_async_query, pri, &q);
+                    std::thread t1(exec_async_query, pri, q);
+                    //exec_async_query(pri, q);
                     m_threads_num++;
                 }
                 threads_mutex.unlock();
@@ -236,7 +237,7 @@ public:
     mysql_mngr()
     {
         m_threads_num = 0;
-        std::thread(main);
+        std::thread t1(main);
     }
 };
 
