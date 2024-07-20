@@ -86,6 +86,7 @@ private:
 public:
     void main()
     {
+        UTIL_ServerPrint("[DEBUG] main(): pid = %s, max_thread = %d, interval = %d, START", getpid(), MAX_QUERY_THREADS, QUERY_POOLING_INTERVAL);
         while (true)
         {
             run_query();
@@ -118,7 +119,7 @@ public:
         int err, status;
         try
         {
-            UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %s, START", pid);
+            UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, START", pid);
             auto prms = get_connect(q->conn_id);
             if (!check_it_empty(prms))
             {
@@ -136,13 +137,13 @@ public:
                 }
                 q->is_finished = true;
                 q->time_end = g_RehldsData->GetTime();
-                UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %s, end = %f, time = %f", pid, q->time_end, q->time_end - q->time_start);
+                UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, end = %f, err = %d, query_time = %f", pid, q->time_end, err, q->time_end - q->time_start);
                 //g_amxxapi.ExecuteForward(prms->fwd);
             }
         }
         catch (const char* error_message)
         {
-            UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %s, error = <%s>", pid, error_message);
+            UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, error = <%s>", pid, error_message);
         }
         if (q->result != nullptr)
             mysql_free_result(q->result);
@@ -153,9 +154,9 @@ public:
         m_queries[pri].erase(q);
         m_threads_num--;
         threads_mutex.unlock();
-        UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %s, END", pid);
+        UTIL_ServerPrint("[DEBUG] exec_async_query(): pid = %d, END", pid);
     }
-    bool push_query(size_t conn_id, std::string &query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY)
+    bool push_query(size_t conn_id, std::string query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY)
     {
         if (query.empty() || pri > MAX_QUERY_PRIORITY)
             return false;
@@ -167,7 +168,9 @@ public:
         m_query.data_size = data_size;
         Q_memcpy(m_query.data, data, data_size << 2);
         m_query.time_creation = g_RehldsData->GetTime();
+        threads_mutex.lock();
         m_queries[pri].push_back(m_query);
+        threads_mutex.unlock();
         return true;
     }
     MYSQL_RES* exec_query(MYSQL *conn, std::string *query)
@@ -205,14 +208,19 @@ public:
         }
         return conn;
     }
-    size_t add_connect(int fwd, const char *db_user, char *db_pass, const char *db_name, const char *db_port = "3306", size_t timeout = 60, bool is_nonblocking = false)
+    size_t add_connect(int fwd, const char *db_host, const char *db_user, const char *db_pass, const char *db_name, size_t timeout = 60, bool is_nonblocking = false)
     {
+        UTIL_ServerPrint(
+            "[DEBUG] add_connect(): pid = %d, fwd = %d, host = <%s>, user = <%s>, pass = <%s>, name = <%s>, timeout = %d, block = %d",
+            getpid(), fwd, db_host, db_user, db_pass, db_name, timeout, is_nonblocking
+        );
         m_conn_prm_t prms;
         prms.fwd = fwd;
+        prms.db_host = db_host;     //std::strtok((char*)db_host, ":");
+        prms.db_port = 3306;        //atoi(std::strtok(nullptr, ":"));
         prms.db_user = db_user;
         prms.db_pass = db_pass;
         prms.db_name = db_name;
-        prms.db_port = atoi(db_port);
         prms.timeout = timeout;
         prms.is_nonblocking = is_nonblocking;
         m_conn_prms.push_back(prms);
@@ -224,4 +232,10 @@ public:
             return m_conn_prm_list_it();
         return std::next(m_conn_prms.begin(), conn_id);
     }
+    mysql_mngr() : m_threads_num(0)
+    {
+        std::thread(main);
+    }
 };
+
+extern mysql_mngr g_mysql_mngr;
