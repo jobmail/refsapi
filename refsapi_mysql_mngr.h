@@ -1,6 +1,5 @@
 #include "precompiled.h"
 
-
 #define MAX_QUERY_PRIORITY              3
 #define MAX_QUERY_THREADS               10
 #define QUERY_POOLING_INTERVAL          5
