@@ -20,7 +20,7 @@ LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadbclient.a -L
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive
+OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -fPIC
 # -pthread
 #-flto=auto
 #-pipe

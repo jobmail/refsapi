@@ -235,7 +235,7 @@ public:
     }
     mysql_mngr()
     {
-        UTIL_ServerPrint("[DEBUG] mysql_mngr(): CREATED");
+        //UTIL_ServerPrint("[DEBUG] mysql_mngr(): CREATED");
         m_threads_num = 0;
         //std::thread t1(&main);
     }
