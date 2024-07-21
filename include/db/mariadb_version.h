@@ -39,6 +39,6 @@
 #endif
 
 /* Source information */
-#define CC_SOURCE_REVISION ""
+#define CC_SOURCE_REVISION "dev"
 
 #endif /* _mariadb_version_h_ */
