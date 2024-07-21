@@ -236,7 +236,7 @@ public:
     mysql_mngr()
     {
         m_threads_num = 0;
-        std::thread t1(&main);
+        std::thread t1(&mysql_mngr::main, this);
     }
 };
 
