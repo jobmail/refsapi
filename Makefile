@@ -7,7 +7,9 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -l:libssl.a -l:libcrypto.a -l:libm.a  -l:librt.a -l:libz.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
+LINK = -ldl -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -l:libssl.a -l:libm.a -l:librt.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
+# 
+#-l:libmariadb.a -l:libssl.a -l:libcrypto.a -l:libm.a  -l:librt.a -l:libz.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
 #-l:libmariadb.a -l:libm.a -l:librt.a -l:libz.a
 #-lpthread -lm -lrt
 #-L/usr/lib/i386-linux-gnu/
@@ -20,7 +22,7 @@ LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -l:libss
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -fPIC
+OPT_FLAGS = -O3 -msse3 -flto=auto -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -fPIC
 # -pthread
 #-flto=auto
 #-pipe
