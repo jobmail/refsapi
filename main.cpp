@@ -35,6 +35,7 @@ void OnAmxxAttach()
 
 bool OnMetaAttach()
 {
+	g_mysql_mngr.start();
 	return true;
 }
 
