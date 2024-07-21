@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -l:libmariadbclient.a
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lmariadb
 #-lpthread -lm -lrt
 #-L/usr/lib/i386-linux-gnu/
 #-l:libmysqlclient_r.a -l:libmariadbd.a -l:libmariadbclient.a -l:libpthread.a
