@@ -515,5 +515,3 @@ public:
         clear_pcvar_all();
     }
 };
-
-extern cvar_mngr g_cvar_mngr;
