@@ -67,9 +67,9 @@
 #include "entity_callback_dispatcher.h"
 
 // MYSQL
-//#include <chrono>
-//#include <thread>
-//#include <signal.h>
+#include <chrono>
+#include <thread>
+#include <signal.h>
 #include <poll.h>
 #include "db/mysql.h"
 
