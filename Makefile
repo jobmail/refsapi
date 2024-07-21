@@ -7,7 +7,8 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -l:libm.a -l:librt.a -l:libz.a
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lmariadb -L/usr/lib/i386-linux-gnu/ -L/libs/
+#-l:libmariadb.a -l:libm.a -l:librt.a -l:libz.a
 #-lpthread -lm -lrt
 #-L/usr/lib/i386-linux-gnu/
 #-l:libmysqlclient_r.a -l:libmariadbd.a -l:libmariadbclient.a -l:libpthread.a
@@ -34,7 +35,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -g0 -m32 -fvisibility=hidden -shared -std=gnu++17 
+CFLAGS += -m32 -fvisibility=hidden -shared -std=gnu++17 
 
 #-D_GLIBCXX_USE_CXX11_ABI=0
 #-fabi-version=11 -fabi-compat-version=11 -Wabi=11 
