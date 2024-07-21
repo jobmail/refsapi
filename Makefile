@@ -7,9 +7,17 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -l:libssl.a -l:libgnutlsxx.a -l:libcrypto.a -l:libm.a -l:librt.a -l:libz.a -l:libanl.a -l:libnettle.a -l:libffi.a -l:libhogweed.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/lib/
+
+
+#	-l:libmariadb.a -l:libssl.a -l:libgnutls.a -l:libcrypto.a \
+#	-l:librt.a -l:libz.a -l:libanl.a -l:libnettle.a \
+#	-l:libidn2.a -l:libunistring.a -l:libffi.a -l:libhogweed.a \
+#	-l:libgmp.a -l:libpcre.a -lpthread -L/lib/i386-linux-gnu/ -L/usr/lib/i386-linux-gnu/ -L/lib/
+
+# -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
 # 
-#-l:libmariadb.a -l:libssl.a -l:libcrypto.a -l:libm.a  -l:librt.a -l:libz.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
+#-l:libmariadb.a -l:libssl.a -l:libcrypto.a -l:libm.a  -l:librt.a -l:libz.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/lib/
 #-l:libmariadb.a -l:libm.a -l:librt.a -l:libz.a
 #-lpthread -lm -lrt
 #-L/usr/lib/i386-linux-gnu/
@@ -37,7 +45,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -m32 -fvisibility=hidden -shared -std=gnu++17 
+CFLAGS += -m32 -fvisibility=hidden -shared -std=c++17 #-std=gnu++17 
 
 #-D_GLIBCXX_USE_CXX11_ABI=0
 #-fabi-version=11 -fabi-compat-version=11 -Wabi=11 
