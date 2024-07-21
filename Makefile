@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadbclient.a -L/usr/lib/i386-linux-gnu/ -L/libs/
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadbclient.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
 #-l:libmariadb.a -l:libm.a -l:librt.a -l:libz.a
 #-lpthread -lm -lrt
 #-L/usr/lib/i386-linux-gnu/
@@ -20,7 +20,7 @@ LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadbclient.a -L
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -fPIC
+OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread
 # -pthread
 #-flto=auto
 #-pipe
