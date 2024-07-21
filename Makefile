@@ -7,7 +7,10 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lmariadb -lpthread -L/usr/lib/i386-linux-gnu/
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadbd.a -l:libmariadbclient.a
+#-lpthread -lm -lrt
+#-L/usr/lib/i386-linux-gnu/
+#-l:libmysqlclient_r.a -l:libmariadbd.a -l:libmariadbclient.a -l:libpthread.a
 #-lmariadb -lpthread 
 #-lmariadb
 #-L/usr/lib/i386-linux-gnu/ -lmariadb
@@ -16,7 +19,8 @@ LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lmariadb -lpthread -L/u
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread
+OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive
+# -pthread
 #-flto=auto
 #-pipe
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
