@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -ldl -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -l:libssl.a -l:libm.a -l:librt.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -l:libmariadb.a -l:libssl.a -l:libm.a -l:librt.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
 # 
 #-l:libmariadb.a -l:libssl.a -l:libcrypto.a -l:libm.a  -l:librt.a -l:libz.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
 #-l:libmariadb.a -l:libm.a -l:librt.a -l:libz.a
