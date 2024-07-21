@@ -50,6 +50,8 @@ class mysql_mngr {
     m_conn_prm_list_t m_conn_prms;
     m_query_list_t m_queries[MAX_QUERY_PRIORITY + 1];
     int m_threads_num;
+    std::thread main_thread;
+    bool stop_threads;
     std::mutex threads_mutex;
 private:
     static int wait_for_mysql(MYSQL *conn, int status)
@@ -86,7 +88,7 @@ public:
     void main()
     {
         //UTIL_ServerPrint("[DEBUG] main(): pid = %s, max_thread = %d, interval = %d, START", getpid(), MAX_QUERY_THREADS, QUERY_POOLING_INTERVAL);
-        while (true)
+        while (!stop_threads)
         {
             run_query();
             usleep(QUERY_POOLING_INTERVAL * 1000);
@@ -233,10 +235,19 @@ public:
             return m_conn_prm_list_it();
         return std::next(m_conn_prms.begin(), conn_id);
     }
-    mysql_mngr()
+    void start()
+    {
+        main_thread = std::thread(&mysql_mngr::main, this);
+    }
+    mysql_mngr() : main_thread()
     {
         m_threads_num = 0;
-        std::thread t1(&mysql_mngr::main, this);
+        stop_threads = false;
+    }
+    ~mysql_mngr()
+    {
+        stop_threads = true;
+        main_thread.join();
     }
 };
 
