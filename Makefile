@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -L/usr/lib/i386-linux-gnu/
+LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lmariadb -lpthread -L/usr/lib/i386-linux-gnu/
 #-lmariadb -lpthread 
 #-lmariadb
 #-L/usr/lib/i386-linux-gnu/ -lmariadb
@@ -16,7 +16,8 @@ LINK = -m32 -static-libgcc -static-libstdc++ -lstdc++fs -L/usr/lib/i386-linux-gn
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -flto=auto -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread
+OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread
+#-flto=auto
 #-pipe
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
@@ -29,7 +30,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -g3 -m32 -fvisibility=hidden -shared -std=gnu++17 
+CFLAGS += -g0 -m32 -fvisibility=hidden -shared -std=gnu++17 
 
 #-D_GLIBCXX_USE_CXX11_ABI=0
 #-fabi-version=11 -fabi-compat-version=11 -Wabi=11 
