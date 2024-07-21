@@ -237,6 +237,7 @@ public:
     }
     void start()
     {
+        UTIL_ServerPrint("[DEBUG] start(): pid = %d, START", getpid());
         main_thread = std::thread(&mysql_mngr::main, this);
     }
     mysql_mngr() : main_thread()
