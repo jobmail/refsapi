@@ -91,5 +91,3 @@ public:
         }
     }
 };
-
-extern recoil_mngr g_recoil_mngr;
