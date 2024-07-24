@@ -7,7 +7,7 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -L/usr/lib/i386-linux-gnu/ \
+LINK = -L/usr/lib/i386-linux-gnu/  \
 	-m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -lmariadb
 	
 #-l:libmariadb.a -l:librt.a -l:libm.a -l:libssl.a -l:libcrypto.a \
