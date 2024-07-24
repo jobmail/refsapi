@@ -58,7 +58,7 @@ LINK = -L/usr/lib/i386-linux-gnu/  \
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -fPIC
+OPT_FLAGS = -O3 -msse3 -msse4.1 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -pipe -fPIC -flto=auto
 #-fPIC -flto=auto
 # -pthread
 #-fPIC -flto=auto
