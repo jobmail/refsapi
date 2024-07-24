@@ -7,10 +7,30 @@ COMPILER = g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -L/lib/ -L/usr/lib/i386-linux-gnu/ -L/lib/i386-linux-gnu/ \
-	-m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb \
-	-l:libz -l:libgnutls -l:libanl -lp11-kit -l:libidn2 -l:libunistring \
-	-l:libasan -l:libnettle -l:libhogweed -l:libgmp -l:libffi -l:libp11-kit
+LINK = -L/usr/lib/i386-linux-gnu/ \
+	-m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -lmariadb
+	
+#-l:libmariadb.a -l:librt.a -l:libm.a -l:libssl.a -l:libcrypto.a \
+	-l:libgnutls.a -l:libz.a -l:libidn2.a -l:libunistring.a -l:libtasn1.a -l:libnettle.a -l:libhogweed.a -l:libgmp.a -l:libffi.a #-DWITH_SSL=OFF #-lmariadb
+
+#-L./lib/ 
+#-static -lpthread -lmariadb -lssl -lcrypto -DWITH_SSL=OFF
+
+#-DWITH_SSL=OFF \	
+#-l:libmariadb.a -l:libssl.a -l:libcrypto.a \
+	-l:libgnutls.a -l:libz.a -l:libidn2.a -l:libunistring.a -l:libtasn1.a -l:libnettle.a -l:libhogweed.a -l:libgmp.a -l:libffi.a #-lmariadb 
+	
+#-static-libgcc -static-libstdc++ -lstdc++fs
+#-l:libmariadb.a #-l:libssl.a -l:libcrypto.a
+
+#-static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a -l:libssl.a -l:libcrypto.a
+	
+# -l:libmariadb.a -l:libssl.a -l:libcrypto.a
+#-static-libgcc -static-libstdc++
+#	-Wl,--whole-archive -l:libmariadb.a -l:libz.a -l:libgnutls.a -l:libidn2.a \
+#	-l:libunistring.a -l:libtasn1.a -l:libnettle.a -l:libhogweed.a -l:libgmp.a -l:libffi.a -l:libpcre.a -Wl,--no-whole-archive
+#LINK = -L/lib/ -L/usr/lib/i386-linux-gnu/ -L/lib/i386-linux-gnu/ \
+#    -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -Wl,--whole-archive -l:libmariadb.a -l:libz.a -l:libssl.a -l:libcrypto.a -l:libzstd.a -Wl,--no-whole-archive
 # -lz -lgnutls -lanl -lp11-kit -lidn2 -lunistring -lasan -lnettle -lhogweed -lgmp -lffi
 #-static-libgcc -static-libstdc++ -lstdc++fs 
 #-Wl,--as-needed 
@@ -19,6 +39,9 @@ LINK = -L/lib/ -L/usr/lib/i386-linux-gnu/ -L/lib/i386-linux-gnu/ \
 #	-l:librt.a -l:libz.a -l:libanl.a -l:libnettle.a \
 #	-l:libidn2.a -l:libunistring.a -l:libffi.a -l:libhogweed.a \
 #	-l:libgmp.a -l:libpcre.a -lpthread -L/lib/i386-linux-gnu/ -L/usr/lib/i386-linux-gnu/ -L/lib/
+#
+
+
 
 # -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
 # 
@@ -36,6 +59,9 @@ LINK = -L/lib/ -L/usr/lib/i386-linux-gnu/ -L/lib/i386-linux-gnu/ \
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
 OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread
+#-fPIC -flto=auto
+# -pthread
+#-fPIC -flto=auto
 # -fPIC
 # -pthread
 #-flto=auto
@@ -51,7 +77,11 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -m32 -fvisibility=hidden -shared -std=gnu++17 -Wl,--allow-multiple-definition
+CFLAGS += -m32 -fvisibility=hidden -shared -std=gnu++17
+#-Wl,--as-needed
+#-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--as-needed
+#-static
+#-Wl,--allow-multiple-definition -Wl,--as-needed
 #-Wl,--allow-multiple-definition
 #-Wl,--as-needed -Wl,--whole-archive
 #-D_GLIBCXX_USE_CXX11_ABI=0

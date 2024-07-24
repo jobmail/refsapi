@@ -68,10 +68,11 @@
 
 // MYSQL
 #include <chrono>
+#include <future>
 #include <thread>
 #include <signal.h>
 #include <poll.h>
-#include "db/mysql.h"
+#include <db/mysql.h>
 
 // Refs API
 #include "refsapi.h"
@@ -82,3 +83,5 @@
 #include "natives_helper.h"
 #include "natives_refsapi.h"
 #include "sdk_util.h"
+
+//#include "force_link_glibc_2.9.h"

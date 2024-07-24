@@ -483,7 +483,7 @@ cell AMX_NATIVE_CALL rf_recoil_disable(AMX *amx, cell *params)
     return TRUE;   
 }
 
-// native rf_sql_tuple(callback[], db_host[], db_user[], db_pass[], db_name[], timeout = 60, nonblock = false);
+// native rf_sql_tuple(callback[], db_host[], db_user[], db_pass[], db_name[], timeout = 60);
 cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
 {
     enum args_e
@@ -494,8 +494,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
         arg_db_user, 
         arg_db_pass, 
         arg_db_name, 
-        arg_timeout, 
-        arg_nonblock, 
+        arg_timeout,
     };
     std::string callback, db_host, db_user, db_pass, db_name;
     callback = getAmxString(amx, params[arg_callback], g_buff);
@@ -503,7 +502,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     db_user = getAmxString(amx, params[arg_db_user], g_buff);
     db_pass = getAmxString(amx, params[arg_db_pass], g_buff);
     db_name = getAmxString(amx, params[arg_db_name], g_buff);
-    return g_mysql_mngr.add_connect(-1, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), params[arg_timeout], params[arg_nonblock]);
+    return g_mysql_mngr.add_connect(-1, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), params[arg_timeout], true);
 }
 
 // native rf_sql_async_query(tuple, query[], data[] = "", data_size = 0, pri = 3);
@@ -519,7 +518,7 @@ cell AMX_NATIVE_CALL rf_sql_async_query(AMX *amx, cell *params)
         arg_pri,
     };
     std::string query = getAmxString(amx, params[arg_query], g_buff);
-    return g_mysql_mngr.push_query(*getAmxAddr(amx, params[arg_tuple]), query, getAmxAddr(amx, params[arg_tuple]), params[arg_data_size], params[arg_pri]);
+    return g_mysql_mngr.push_query(params[arg_tuple], query, getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_pri]);
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
