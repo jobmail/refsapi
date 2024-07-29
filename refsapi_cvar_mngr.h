@@ -102,9 +102,9 @@ private:
         //UTIL_ServerPrint("[DEBUG] check_range(): in = %s, out = %f\n", s.c_str(), result);
         //UTIL_ServerPrint("[DEBUG] check_range(): has_min = %d, min_val = %f, has_max = %d, max_val = %f\n", m_cvar->has_min, m_cvar->min_val, m_cvar->has_max, m_cvar->max_val);
         // Check override
-        if (is_override |= m_cvar->has_min && result < m_cvar->min_val)
+        if ((is_override |= (m_cvar->has_min && result < m_cvar->min_val)))
             result = m_cvar->min_val;
-        else if (is_override |= m_cvar->has_max && result > m_cvar->max_val)
+        else if ((is_override |= (m_cvar->has_max && result > m_cvar->max_val)))
             result = m_cvar->max_val;
         // Fix overriden
         if (is_override)
@@ -127,7 +127,6 @@ private:
             case CVAR_TYPE_STR:
                 //UTIL_ServerPrint("[DEBUG] copy_bind(): from = %s, size = %d\n", cvar->string, bind->size);
                 setAmxString(bind->ptr, cvar->string, bind->size);
-                break;
         }
     }
     cvar_t* create_cvar(std::wstring name, std::wstring value, int flags = 0)
@@ -220,7 +219,7 @@ public:
         ptr_bind_t ptr_bind;
         bool is_exist;
         // Bind exists?
-        if (is_exist = (bind_it = cvars.bind_list.find(m_cvar->cvar)) != cvars.bind_list.end())
+        if ((is_exist = (bind_it = cvars.bind_list.find(m_cvar->cvar)) != cvars.bind_list.end()))
             bind_list = bind_it->second;
         // Bind not empty?
         if (!bind_list.empty())
@@ -455,7 +454,7 @@ public:
         bool result;
         cvar_hook_state_it hook_state_it;
         // Hook exists?
-        if (result = (hook_state_it = cvars.hook_state.find(fwd)) != cvars.hook_state.end())
+        if ((result = (hook_state_it = cvars.hook_state.find(fwd)) != cvars.hook_state.end()))
             hook_state_it->second = is_enable;
         return result;
     }

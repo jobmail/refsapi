@@ -4,15 +4,22 @@ METAMOD = include/metamod
 NAME = refsapi
 
 COMPILER = g++
+#clang++
+#g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
-LINK = -L/usr/lib/i386-linux-gnu/  \
-	-m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -lmariadb
+LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
+	-s -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a
 	
-#-l:libmariadb.a -l:librt.a -l:libm.a -l:libssl.a -l:libcrypto.a \
-	-l:libgnutls.a -l:libz.a -l:libidn2.a -l:libunistring.a -l:libtasn1.a -l:libnettle.a -l:libhogweed.a -l:libgmp.a -l:libffi.a #-DWITH_SSL=OFF #-lmariadb
+#-lm -lrt -Wl,--whole-archive -lmariadbd -lmariadb -lpcre -lz -llz4 -laio -ldl -lsnappy -lcrypt -Wl,--no-whole-archive
 
+#-lp11-kit -lgnutls -lidn2 -lunistring -ltasn1 -lnettle -lhogweed -lgmp -lc -ldl -lffi \
+-lpcre -lz -llz4 
+#-l:libmariadbd.a -l:libmariadb.a
+# -l:libz.a -l:liblz4.a -l:libpcre.a -l:libsnappy.a -l:libcrypt.a -l:libaio.a #-l:libmariadb.a -l:libpcre.a #-DWITH_SSL=OFF #-lmariadb
+#
+#
 #-L./lib/ 
 #-static -lpthread -lmariadb -lssl -lcrypto -DWITH_SSL=OFF
 
@@ -58,7 +65,12 @@ LINK = -L/usr/lib/i386-linux-gnu/  \
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -msse4.1 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -s -DNDEBUG -pipe -fPIC -flto=auto
+OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -s -shared -flto -fPIC -pipe
+# -flto -fPIC
+#-flto -fPIC -static
+#-flto -fPIC -pipe
+#-fPIC -flto
+#-s -DNDEBUG -pipe -flto=auto
 #-fPIC -flto=auto
 # -pthread
 #-fPIC -flto=auto
@@ -69,7 +81,7 @@ OPT_FLAGS = -O3 -msse3 -msse4.1 -fno-strict-aliasing -Wno-uninitialized -funroll
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
 INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
-        -I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude \
+        -I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude -Iinclude/mariadb \
         -Iinclude/amxmodx -Iinclude/amxmodx/public -Iinclude/amxmodx/amtl -Iinclude/amxmodx/third_party/hashing -Icommon
 		
 #-I/usr/include/mariadb
@@ -77,7 +89,11 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -m32 -fvisibility=hidden -shared -std=gnu++17 -D_GLIBCXX_USE_CXX11_ABI=0
+CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0
+#-Wl,--as-needed
+#-D_GLIBCXX_USE_CXX11_ABI=0 
+#-Wl,--as-needed
+#-Wl,--as-needed
 #-Wl,--as-needed
 #-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--as-needed
 #-static
