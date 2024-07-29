@@ -70,9 +70,12 @@
 #include <chrono>
 #include <future>
 #include <thread>
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <signal.h>
 #include <poll.h>
-#include <db/mysql.h>
+#include <mariadb/mysql.h>
 
 // Refs API
 #include "refsapi.h"
@@ -84,4 +87,7 @@
 #include "natives_refsapi.h"
 #include "sdk_util.h"
 
+// ARENA FIX
+//asm(".symver fcntl,fcntl@@GLIBC_2.0");
 //#include "force_link_glibc_2.9.h"
+//cmake ../ -DWITH_SSL=OFF -DCMAKE_TOOLCHAIN_FILE=../cmake/linux_x86_toolchain.cmake

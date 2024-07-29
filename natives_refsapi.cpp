@@ -82,7 +82,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params)
         {
             pEdict = INDEXENT(entity);
             // CHECK VALID ENTITY & CHECK OWNER
-            if (!is_valid_entity(pEdict) || is_valid && ENTINDEX(pEdict->v.owner) != owner_index)
+            if (!is_valid_entity(pEdict) || (is_valid && ENTINDEX(pEdict->v.owner) != owner_index))
                 continue;
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname))
@@ -104,7 +104,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params)
             {
                 pEdict = INDEXENT(entity);
                 // CHECK VALID ENTITY & CHECK OWNER
-                if (!is_valid_entity(pEdict) || is_valid && ENTINDEX(pEdict->v.owner) != owner_index)
+                if (!is_valid_entity(pEdict) || (is_valid && ENTINDEX(pEdict->v.owner) != owner_index))
                     continue;
                 // CHECK CREATION CLASSNAME
                 if (key == STRING(pEdict->v.classname))
@@ -348,8 +348,8 @@ cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
     };
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     std::wstring name = stows(getAmxString(amx, params[arg_callback], g_buff));
-    int fwd = g_amxxapi.RegisterSPForwardByName(plugin->getAMX(), wstos(name).c_str(), FP_CELL, FP_STRING, FP_STRING, FP_DONE);
-    check_fwd_r(fwd);
+    int fwd = g_amxxapi.RegisterSPForwardByName(amx, wstos(name).c_str(), FP_CELL, FP_STRING, FP_STRING, FP_DONE);
+    check_fwd_r(fwd, wstos(name).c_str());
     cvar_t* cvar = (cvar_t*)((void*)params[arg_pcvar]);
     //UTIL_ServerPrint("[DEBUG] rf_hook_cvar_change(): fwd = %d, name = <%s>, cvar = %d\n", fwd, wstos(name).c_str(), cvar);
     auto result = g_cvar_mngr.create_hook(fwd, g_cvar_mngr.get(cvar), params[arg_state]);
@@ -483,7 +483,7 @@ cell AMX_NATIVE_CALL rf_recoil_disable(AMX *amx, cell *params)
     return TRUE;   
 }
 
-// native rf_sql_tuple(callback[], db_host[], db_user[], db_pass[], db_name[], timeout = 60);
+// native Handle:rf_sql_tuple(callback[], db_host[], db_user[], db_pass[], db_name[], timeout_ms = 250, db_chrs[] = "utf8");
 cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
 {
     enum args_e
@@ -493,19 +493,53 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
         arg_db_host, 
         arg_db_user, 
         arg_db_pass, 
-        arg_db_name, 
+        arg_db_name,
         arg_timeout,
+        arg_db_chrs,
     };
-    std::string callback, db_host, db_user, db_pass, db_name;
+    int fwd = -1;
+    std::string callback, db_host, db_user, db_pass, db_name, db_chrs;
     callback = getAmxString(amx, params[arg_callback], g_buff);
+    if (!callback.empty())
+    {
+        //public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
+        fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_ARRAY, FP_CELL, FP_ARRAY, FP_CELL, FP_CELL, FP_DONE);
+        check_fwd_r(fwd, callback);
+    }
     db_host = getAmxString(amx, params[arg_db_host], g_buff);
     db_user = getAmxString(amx, params[arg_db_user], g_buff);
     db_pass = getAmxString(amx, params[arg_db_pass], g_buff);
     db_name = getAmxString(amx, params[arg_db_name], g_buff);
-    return g_mysql_mngr.add_connect(-1, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), params[arg_timeout], true);
+    db_chrs = getAmxString(amx, params[arg_db_chrs], g_buff);
+    return g_mysql_mngr.add_connect(fwd, db_host, db_user, db_pass, db_name, db_chrs, params[arg_timeout]);
 }
 
-// native rf_sql_async_query(tuple, query[], data[] = "", data_size = 0, pri = 3);
+// native Handle:rf_sql_connect(Handle:tuple, &err_num, error[], error_size);
+cell AMX_NATIVE_CALL rf_sql_connect(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_tuple,
+        arg_err_num,
+        arg_error,
+        arg_error_size,
+    };
+    return (cell)g_mysql_mngr.connect(params[arg_tuple], getAmxAddr(amx, params[arg_err_num]), getAmxAddr(amx, params[arg_error]), params[arg_error_size]);
+}
+
+// native bool:rf_sql_close(Handle:conn);
+cell AMX_NATIVE_CALL rf_sql_close(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_conn,
+    };
+    return (cell)g_mysql_mngr.close((MYSQL*)params[arg_conn]);
+}
+
+// native rf_sql_async_query(Handle:tuple, query[], data[] = "", data_size = 0, pri = 3, timeout_ms = 60);
 cell AMX_NATIVE_CALL rf_sql_async_query(AMX *amx, cell *params)
 {
     enum args_e
@@ -516,9 +550,10 @@ cell AMX_NATIVE_CALL rf_sql_async_query(AMX *amx, cell *params)
         arg_data,
         arg_data_size,
         arg_pri,
+        arg_timeout,
     };
     std::string query = getAmxString(amx, params[arg_query], g_buff);
-    return g_mysql_mngr.push_query(params[arg_tuple], query, getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_pri]);
+    return g_mysql_mngr.push_query(params[arg_tuple], query, getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_pri], params[arg_timeout]);
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
@@ -540,6 +575,8 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_recoil_enable", rf_recoil_enable},
     {"rf_recoil_disable", rf_recoil_disable},
     {"rf_sql_tuple", rf_sql_tuple},
+    {"rf_sql_connect", rf_sql_connect},
+    {"rf_sql_close", rf_sql_close}, 
     {"rf_sql_async_query", rf_sql_async_query},
     {nullptr, nullptr}
 };

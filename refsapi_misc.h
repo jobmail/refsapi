@@ -191,7 +191,7 @@ inline void rtrim(std::wstring &s, std::string chars = _TRIM_CHARS)
 
 inline void rtrim_zero(std::string &s)
 {
-    auto it = std::find(s.rbegin(), s.rend(), ".");
+    auto it = std::find(s.rbegin(), s.rend(), '.');
     if (it == s.rend())
         return;
     s.erase(std::find_if(s.rbegin(), it, [&](unsigned char ch)
