@@ -3,6 +3,8 @@
 #define MAX_QUERY_PRIORITY              3   // PRI->THREADS: 0 -> 8, 1 -> 4, 2 -> 2, 3 -> 1
 #define QUERY_POOLING_INTERVAL          5
 #define SQL_FLAGS                       CLIENT_COMPRESS | CLIENT_MULTI_STATEMENTS
+#define RF_MAX_FIELD_SIZE               1024
+#define RF_MAX_FIELD_NAME               256
 #define check_conn_rc(rc, mysql) \
 do {\
 if (rc)\
@@ -22,7 +24,7 @@ typedef enum field_types_e
     FT_INT,
     FT_FLT,
     FT_STR,
-    FT_STR_LEN
+    FT_STR_BUFF,
 } field_types_t;
 
 typedef struct m_conn_prm_s
@@ -56,13 +58,8 @@ typedef struct m_query_s
     double time_start;
     double time_end;
     MYSQL *conn;
-    /**/
     MYSQL_RES* result;
     bool is_buffered;
-    cell *buff;
-    cell buff_addr;
-    size_t buff_size;
-    /**/
     MYSQL_ROW row;
     m_conn_prm_list_it prms;
     std::string error;
@@ -190,22 +187,6 @@ public:
             }
             if (err)
                 failstate = TQUERY_QUERY_FAILED;
-            //else
-            //    q.result = mysql_use_result(q.conn);
-            
-            /*
-            int max_row = 10;
-            while (max_row--) {
-                status = mysql_fetch_row_start(&q.row, q.result);
-                while (status) {
-                    status = wait_for_mysql(q.conn, status);
-                    status = mysql_fetch_row_cont(&q.row, q.result, status);
-                }
-                if (!q.row)
-                    break;
-                UTIL_ServerPrint("[DEBUG] DUMP: %s: %s: %s: %s \n", q.row[0], q.row[1], q.row[2], q.row[3]);
-            }
-            */
         }
         else
             failstate = TQUERY_CONNECT_FAILED;
@@ -261,13 +242,12 @@ public:
         check_conn_rc(rc, conn);
         return mysql_store_result(conn);
     }
-    char* field_name(m_query_t *q, size_t offset)
+    cell field_name(m_query_t *q, size_t offset, cell *ret)
     {
-        //std::wstring str = stows(q->result->fields[offset].name);
-        //set_amx_string(ret, "test"/*wstos(str).c_str()*/, 256);
-        return q->result->fields[offset].name;
+        set_amx_string(ret, q->result->fields[offset].name, RF_MAX_FIELD_NAME);
+        return 1;
     }
-    cell fetch_field(m_query_t *q, size_t offset, int type)
+    cell fetch_field(m_query_t *q, size_t offset, int type, cell *ret, cell *buff, size_t buff_len)
     {
         switch (type)
         {
@@ -279,22 +259,30 @@ public:
                     case MYSQL_TYPE_INT24:
                     case MYSQL_TYPE_LONG:
                     case MYSQL_TYPE_BIT:
-                        return atoi(q->row[offset]);
+                        *ret = atoi(q->row[offset]);
+                        return 1;
                     case MYSQL_TYPE_FLOAT:
                     case MYSQL_TYPE_DOUBLE:
                     case MYSQL_TYPE_DECIMAL:
-                        return (float)atof(q->row[offset]);
+                        *ret = (float)atof(q->row[offset]);
+                        return 1;
                     default:
-                        set_amx_string(q->buff, q->row[offset], q->buff_size);
-                        return q->buff_addr;
+                        set_amx_string(ret, q->row[offset], RF_MAX_FIELD_SIZE);
+                        return 1;
                 }
+                
             case FT_INT:
-                return atoi(q->row[offset]);
+                *ret = atoi(q->row[offset]);
+                return 1;
             case FT_FLT:
-                return (float)atof(q->row[offset]);
+                *ret = (float)atof(q->row[offset]);
+                return 1;
             default:
-                auto size = set_amx_string(q->buff, q->row[offset], q->buff_size);
-                return type == FT_STR ? q->buff_addr : size;
+                if (type == FT_STR)
+                    set_amx_string(ret, q->row[offset], RF_MAX_FIELD_SIZE);
+                else if (buff)
+                    *ret = set_amx_string(buff, q->row[offset], buff_len);
+                return 1;
         }
     }
     bool fetch_row(m_query_t *q)
@@ -317,13 +305,10 @@ public:
     {
         return q->result->field_count;
     }
-    bool get_result(m_query_t *q, cell buff_addr, cell *buff, size_t buff_size, bool is_buffered = false)
+    bool get_result(m_query_t *q, bool is_buffered = false)
     {
         if (q->result == nullptr)
         {
-            q->buff_addr = buff_addr;
-            q->buff = buff;
-            q->buff_size = buff_size;
             q->result = q->is_buffered ? mysql_store_result(q->conn) : mysql_use_result(q->conn);
             return true;
         }
@@ -389,7 +374,7 @@ public:
     size_t add_connect(int fwd, std::string &db_host, std::string &db_user, std::string &db_pass, std::string &db_name, std::string &db_chrs, size_t timeout_ms = 250)
     {
         UTIL_ServerPrint("[DEBUG] add_connect(): pid = %d, fwd = %d, host = <%s>, user = <%s>, pass = <%s>, name = <%s>, timeout = %d\n",
-            gettid(), fwd, db_host, db_user, db_pass, db_name, timeout_ms
+            gettid(), fwd, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), timeout_ms
         );
         m_conn_prm_t prms;
         prms.fwd = fwd;

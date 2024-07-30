@@ -567,7 +567,7 @@ cell AMX_NATIVE_CALL rf_sql_get_result(AMX *amx, cell *params)
         arg_buff_size,
         arg_buffered,
     };
-    return g_mysql_mngr.get_result((m_query_t*)params[arg_query], params[arg_buff], getAmxAddr(amx, params[arg_buff]), params[arg_buff_size], params[arg_buffered]);
+    return g_mysql_mngr.get_result((m_query_t*)params[arg_query], params[arg_buffered]);
 }
 
 // native rf_sql_num_rows(Handle:query);
@@ -603,7 +603,7 @@ cell AMX_NATIVE_CALL rf_sql_field_count(AMX *amx, cell *params)
     return g_mysql_mngr.field_count((m_query_t*)params[arg_query]);
 }
 
-// native any:rf_sql_fetch_field(Handle:query, offset, type = FT_AUTO);
+// native [RF_MAX_FIELD_SIZE] rf_sql_fetch_field(Handle:query, offset, type = FT_AUTO, buff[] = 0, buff_size = 0);
 cell AMX_NATIVE_CALL rf_sql_fetch_field(AMX *amx, cell *params)
 {
     enum args_e
@@ -612,11 +612,14 @@ cell AMX_NATIVE_CALL rf_sql_fetch_field(AMX *amx, cell *params)
         arg_query,
         arg_offset,
         arg_type,
+        arg_buff,
+        arg_buff_size,
+        arg_ret,
     };
-    return g_mysql_mngr.fetch_field((m_query_t*)params[arg_query], params[arg_offset], params[arg_type]);
+    return g_mysql_mngr.fetch_field((m_query_t*)params[arg_query], params[arg_offset], params[arg_type], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]), params[arg_buff_size]);
 }
 
-// native any:rf_sql_field_name(Handle:query, offset);
+// native [RF_MAX_FIELD_NAME] rf_sql_field_name(Handle:query, offset, buff[] = 0, buff_size = 0);
 cell AMX_NATIVE_CALL rf_sql_field_name(AMX *amx, cell *params)
 {
     enum args_e
@@ -624,13 +627,11 @@ cell AMX_NATIVE_CALL rf_sql_field_name(AMX *amx, cell *params)
         arg_count,
         arg_query,
         arg_offset,
-        arg_return,
+        arg_buff,
+        arg_buff_size,
+        arg_ret,
     };
-    //g_amxxapi.SetAmxStringUTF8Char(amx, )
-    std::string ret = g_mysql_mngr.field_name((m_query_t*)params[arg_query], params[arg_offset]);
-    UTIL_ServerPrint("[DEBUG] field_name = %s\n", ret.c_str());
-    g_amxxapi.SetAmxStringUTF8Char(amx, params[arg_return], ret.c_str(), ret.size(), 256);
-    return TRUE;
+    return g_mysql_mngr.field_name((m_query_t*)params[arg_query], params[arg_offset], getAmxAddr(amx, params[arg_ret]));
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
