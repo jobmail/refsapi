@@ -556,6 +556,83 @@ cell AMX_NATIVE_CALL rf_sql_async_query(AMX *amx, cell *params)
     return g_mysql_mngr.push_query(params[arg_tuple], query, getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_pri], params[arg_timeout]);
 }
 
+// native bool:rf_sql_get_result(Handle:query, buff[], buff_size, bool:is_buffered = false);
+cell AMX_NATIVE_CALL rf_sql_get_result(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+        arg_buff,
+        arg_buff_size,
+        arg_buffered,
+    };
+    return g_mysql_mngr.get_result((m_query_t*)params[arg_query], params[arg_buff], getAmxAddr(amx, params[arg_buff]), params[arg_buff_size], params[arg_buffered]);
+}
+
+// native rf_sql_num_rows(Handle:query);
+cell AMX_NATIVE_CALL rf_sql_num_rows(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+    };
+    return g_mysql_mngr.num_rows((m_query_t*)params[arg_query]);
+}
+
+// native bool:rf_sql_fetch_row(Handle:query);
+cell AMX_NATIVE_CALL rf_sql_fetch_row(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+    };
+    return g_mysql_mngr.fetch_row((m_query_t*)params[arg_query]);
+}
+
+// native rf_sql_field_count(Handle:query);
+cell AMX_NATIVE_CALL rf_sql_field_count(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+    };
+    return g_mysql_mngr.field_count((m_query_t*)params[arg_query]);
+}
+
+// native any:rf_sql_fetch_field(Handle:query, offset, type = FT_AUTO);
+cell AMX_NATIVE_CALL rf_sql_fetch_field(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+        arg_offset,
+        arg_type,
+    };
+    return g_mysql_mngr.fetch_field((m_query_t*)params[arg_query], params[arg_offset], params[arg_type]);
+}
+
+// native any:rf_sql_field_name(Handle:query, offset);
+cell AMX_NATIVE_CALL rf_sql_field_name(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+        arg_offset,
+        arg_return,
+    };
+    //g_amxxapi.SetAmxStringUTF8Char(amx, )
+    std::string ret = g_mysql_mngr.field_name((m_query_t*)params[arg_query], params[arg_offset]);
+    UTIL_ServerPrint("[DEBUG] field_name = %s\n", ret.c_str());
+    g_amxxapi.SetAmxStringUTF8Char(amx, params[arg_return], ret.c_str(), ret.size(), 256);
+    return TRUE;
+}
+
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
     {"rf_get_weaponname", rf_get_weaponname},
@@ -577,7 +654,13 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_sql_tuple", rf_sql_tuple},
     {"rf_sql_connect", rf_sql_connect},
     {"rf_sql_close", rf_sql_close}, 
+    {"rf_sql_get_result", rf_sql_get_result},
     {"rf_sql_async_query", rf_sql_async_query},
+    {"rf_sql_num_rows", rf_sql_num_rows},
+    {"rf_sql_fetch_row", rf_sql_fetch_row},
+    {"rf_sql_field_count", rf_sql_field_count},
+    {"rf_sql_fetch_field", rf_sql_fetch_field},
+    {"rf_sql_field_name", rf_sql_field_name},
     {nullptr, nullptr}
 };
 

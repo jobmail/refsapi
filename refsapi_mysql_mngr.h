@@ -16,6 +16,15 @@ if (rc)\
 #define TQUERY_QUERY_FAILED	            -1
 #define TQUERY_SUCCESS		            0
 
+typedef enum field_types_e
+{
+    FT_AUTO,
+    FT_INT,
+    FT_FLT,
+    FT_STR,
+    FT_STR_LEN
+} field_types_t;
+
 typedef struct m_conn_prm_s
 {
     int fwd;
@@ -47,7 +56,13 @@ typedef struct m_query_s
     double time_start;
     double time_end;
     MYSQL *conn;
+    /**/
     MYSQL_RES* result;
+    bool is_buffered;
+    cell *buff;
+    cell buff_addr;
+    size_t buff_size;
+    /**/
     MYSQL_ROW row;
     m_conn_prm_list_it prms;
     std::string error;
@@ -175,8 +190,9 @@ public:
             }
             if (err)
                 failstate = TQUERY_QUERY_FAILED;
-            else
-                q.result = mysql_use_result(q.conn);
+            //else
+            //    q.result = mysql_use_result(q.conn);
+            
             /*
             int max_row = 10;
             while (max_row--) {
@@ -244,6 +260,78 @@ public:
         int rc = mysql_query(conn, query->c_str());
         check_conn_rc(rc, conn);
         return mysql_store_result(conn);
+    }
+    char* field_name(m_query_t *q, size_t offset)
+    {
+        //std::wstring str = stows(q->result->fields[offset].name);
+        //set_amx_string(ret, "test"/*wstos(str).c_str()*/, 256);
+        return q->result->fields[offset].name;
+    }
+    cell fetch_field(m_query_t *q, size_t offset, int type)
+    {
+        switch (type)
+        {
+            case FT_AUTO:
+                switch (q->result->fields[offset].type)
+                {
+                    case MYSQL_TYPE_TINY:
+                    case MYSQL_TYPE_SHORT:
+                    case MYSQL_TYPE_INT24:
+                    case MYSQL_TYPE_LONG:
+                    case MYSQL_TYPE_BIT:
+                        return atoi(q->row[offset]);
+                    case MYSQL_TYPE_FLOAT:
+                    case MYSQL_TYPE_DOUBLE:
+                    case MYSQL_TYPE_DECIMAL:
+                        return (float)atof(q->row[offset]);
+                    default:
+                        set_amx_string(q->buff, q->row[offset], q->buff_size);
+                        return q->buff_addr;
+                }
+            case FT_INT:
+                return atoi(q->row[offset]);
+            case FT_FLT:
+                return (float)atof(q->row[offset]);
+            default:
+                auto size = set_amx_string(q->buff, q->row[offset], q->buff_size);
+                return type == FT_STR ? q->buff_addr : size;
+        }
+    }
+    bool fetch_row(m_query_t *q)
+    {
+        if (q->result == nullptr)
+            return false;
+        if (!q->is_buffered)
+        {
+            auto status = mysql_fetch_row_start(&q->row, q->result);
+            while (status) {
+                status = wait_for_mysql(q->conn, status);
+                status = mysql_fetch_row_cont(&q->row, q->result, status);
+            }
+        }
+        else
+            q->row = mysql_fetch_row(q->result);
+        return q->row != 0;
+    }
+    cell field_count(m_query_t *q)
+    {
+        return q->result->field_count;
+    }
+    bool get_result(m_query_t *q, cell buff_addr, cell *buff, size_t buff_size, bool is_buffered = false)
+    {
+        if (q->result == nullptr)
+        {
+            q->buff_addr = buff_addr;
+            q->buff = buff;
+            q->buff_size = buff_size;
+            q->result = q->is_buffered ? mysql_store_result(q->conn) : mysql_use_result(q->conn);
+            return true;
+        }
+        return false;
+    }
+    size_t num_rows(m_query_t *q)
+    {
+        return mysql_num_rows(q->result);
     }
     MYSQL* connect(size_t conn_id, cell *err_num, cell *err_str, size_t err_str_size)
     {

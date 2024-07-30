@@ -48,8 +48,8 @@ static struct funcreq_t
 	DECLARE_REQ(FindAmxScriptByAmx),
 	//DECLARE_REQ(FindAmxScriptByName),
 	DECLARE_REQ(SetAmxString),
-	//DECLARE_REQ(SetAmxStringUTF8Char),			// AMXX 1.8.3-dev
-	//DECLARE_REQ(SetAmxStringUTF8Cell),			// AMXX 1.8.3-dev
+	DECLARE_REQ(SetAmxStringUTF8Char),			// AMXX 1.8.3-dev
+	DECLARE_REQ(SetAmxStringUTF8Cell),			// AMXX 1.8.3-dev
 	DECLARE_REQ(GetAmxString),
 	//DECLARE_REQ(GetAmxStringNull),			// AMXX 1.8.3-dev
 	//DECLARE_REQ(GetAmxStringLen),
