@@ -3,6 +3,7 @@
 #include "refsapi.h"
 
 bool is_number(std::string &s);
+size_t set_amx_string(cell* dest, const char* str, size_t max_len);
 
 class fmt
 {
