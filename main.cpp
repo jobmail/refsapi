@@ -86,6 +86,7 @@ void ServerDeactivate_Post()
 	g_hookManager.Clear();
 	EntityCallbackDispatcher().DeleteAllCallbacks();
 	g_cvar_mngr.clear();
+	g_mysql_mngr.close_all();
 
 	g_pFunctionTable->pfnSpawn = DispatchSpawn;
 	g_pFunctionTable->pfnKeyValue = KeyValue;

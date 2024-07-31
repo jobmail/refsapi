@@ -65,7 +65,8 @@ LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -s -shared -flto -fPIC -pipe
+OPT_FLAGS = -O2 -msse3 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -s -shared -flto
+#-fPIC -pipe
 # -flto -fPIC
 #-flto -fPIC -static
 #-flto -fPIC -pipe
@@ -89,7 +90,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0
+CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -g
 #-Wl,--as-needed
 #-D_GLIBCXX_USE_CXX11_ABI=0 
 #-Wl,--as-needed
