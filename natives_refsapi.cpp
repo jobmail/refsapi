@@ -552,19 +552,17 @@ cell AMX_NATIVE_CALL rf_sql_async_query(AMX *amx, cell *params)
         arg_pri,
         arg_timeout,
     };
-    std::string query = getAmxString(amx, params[arg_query], g_buff);
-    return g_mysql_mngr.push_query(params[arg_tuple], query, getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_pri], params[arg_timeout]);
+    //std::string query = getAmxString(amx, params[arg_query], g_buff);
+    return g_mysql_mngr.push_query(params[arg_tuple], getAmxString(amx, params[arg_query], g_buff), getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_pri], params[arg_timeout]);
 }
 
-// native bool:rf_sql_get_result(Handle:query, buff[], buff_size, bool:is_buffered = false);
+// native bool:rf_sql_get_result(Handle:query, bool:is_buffered = false);
 cell AMX_NATIVE_CALL rf_sql_get_result(AMX *amx, cell *params)
 {
     enum args_e
     {
         arg_count,
         arg_query,
-        arg_buff,
-        arg_buff_size,
         arg_buffered,
     };
     return g_mysql_mngr.get_result((m_query_t*)params[arg_query], params[arg_buffered]);
@@ -616,7 +614,7 @@ cell AMX_NATIVE_CALL rf_sql_fetch_field(AMX *amx, cell *params)
         arg_buff_size,
         arg_ret,
     };
-    return g_mysql_mngr.fetch_field((m_query_t*)params[arg_query], params[arg_offset], params[arg_type], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]), params[arg_buff_size]);
+    return g_mysql_mngr.fetch_field((m_query_t*)params[arg_query], params[arg_offset], params[arg_type], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]) , params[arg_buff_size]);
 }
 
 // native [RF_MAX_FIELD_NAME] rf_sql_field_name(Handle:query, offset, buff[] = 0, buff_size = 0);
@@ -631,7 +629,43 @@ cell AMX_NATIVE_CALL rf_sql_field_name(AMX *amx, cell *params)
         arg_buff_size,
         arg_ret,
     };
-    return g_mysql_mngr.field_name((m_query_t*)params[arg_query], params[arg_offset], getAmxAddr(amx, params[arg_ret]));
+    return g_mysql_mngr.field_name((m_query_t*)params[arg_query], params[arg_offset], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]) , params[arg_buff_size]);
+}
+
+// native rf_sql_insert_id(Handle:query);
+cell AMX_NATIVE_CALL rf_sql_insert_id(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+    };
+    return g_mysql_mngr.insert_id((m_query_t*)params[arg_query]);
+}
+
+// native rf_sql_affected_rows(Handle:query);
+cell AMX_NATIVE_CALL rf_sql_affected_rows(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+    };
+    return g_mysql_mngr.affected_rows((m_query_t*)params[arg_query]);
+}
+
+// native [RF_MAX_FIELD_SIZE] rf_sql_query_str(Handle:query, buff[] = 0, buff_size = 0);
+cell AMX_NATIVE_CALL rf_sql_query_str(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+        arg_buff,
+        arg_buff_size,
+        arg_ret,
+    };
+    return g_mysql_mngr.query_str((m_query_t*)params[arg_query], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]) , params[arg_buff_size]);
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
@@ -662,6 +696,9 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_sql_field_count", rf_sql_field_count},
     {"rf_sql_fetch_field", rf_sql_fetch_field},
     {"rf_sql_field_name", rf_sql_field_name},
+    {"rf_sql_insert_id", rf_sql_insert_id},
+    {"rf_sql_affected_rows", rf_sql_affected_rows},
+    {"rf_sql_query_str", rf_sql_query_str},
     {nullptr, nullptr}
 };
 
