@@ -136,7 +136,7 @@ private:
         mysql_optionsv(conn, MYSQL_OPT_PROTOCOL, (void *)&prot_type);
         mysql_optionsv(conn, MYSQL_OPT_CONNECT_TIMEOUT, (void *)&prms->timeout);
         my_bool my_true = true;
-	    mysql_optionsv(conn, MYSQL_OPT_RECONNECT, (const char *)&my_true);
+        mysql_optionsv(conn, MYSQL_OPT_RECONNECT, (const char *)&my_true);
         if (!prms->db_chrs.empty())
             mysql_set_character_set(conn, prms->db_chrs.c_str());
     }
