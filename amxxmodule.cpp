@@ -53,7 +53,7 @@ static struct funcreq_t
 	DECLARE_REQ(GetAmxString),
 	//DECLARE_REQ(GetAmxStringNull),			// AMXX 1.8.3-dev
 	//DECLARE_REQ(GetAmxStringLen),
-	//DECLARE_REQ(FormatAmxString),
+	DECLARE_REQ(FormatAmxString),
 	//DECLARE_REQ(CopyAmxMemory),
 	DECLARE_REQ(Log),
 	DECLARE_REQ(LogError),

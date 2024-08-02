@@ -498,6 +498,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
         arg_db_chrs,
     };
     int fwd = -1;
+    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     std::string callback, db_host, db_user, db_pass, db_name, db_chrs;
     callback = getAmxString(amx, params[arg_callback], g_buff);
     if (!callback.empty())
@@ -511,7 +512,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     db_pass = getAmxString(amx, params[arg_db_pass], g_buff);
     db_name = getAmxString(amx, params[arg_db_name], g_buff);
     db_chrs = getAmxString(amx, params[arg_db_chrs], g_buff);
-    return g_mysql_mngr.add_connect(fwd, db_host, db_user, db_pass, db_name, db_chrs, params[arg_timeout]);
+    return g_mysql_mngr.add_connect(fwd, plugin->isDebug(), db_host, db_user, db_pass, db_name, db_chrs, params[arg_timeout]);
 }
 
 // native Handle:rf_sql_connect(Handle:tuple, &err_num, error[], error_size);
@@ -536,10 +537,10 @@ cell AMX_NATIVE_CALL rf_sql_close(AMX *amx, cell *params)
         arg_count,
         arg_conn,
     };
-    return (cell)g_mysql_mngr.close((MYSQL*)params[arg_conn]);
+    return g_mysql_mngr.close((MYSQL*)params[arg_conn]);
 }
 
-// native rf_sql_async_query(Handle:tuple, query[], data[] = "", data_size = 0, pri = 3, timeout_ms = 60);
+// native bool:rf_sql_async_query(Handle:tuple, query[], data[] = "", data_size = 0, pri = 3, timeout = 60);
 cell AMX_NATIVE_CALL rf_sql_async_query(AMX *amx, cell *params)
 {
     enum args_e
@@ -601,7 +602,7 @@ cell AMX_NATIVE_CALL rf_sql_field_count(AMX *amx, cell *params)
     return g_mysql_mngr.field_count((m_query_t*)params[arg_query]);
 }
 
-// native [RF_MAX_FIELD_SIZE] rf_sql_fetch_field(Handle:query, offset, type = FT_AUTO, buff[] = 0, buff_size = 0);
+// native [RF_MAX_FIELD_SIZE] rf_sql_fetch_field(Handle:query, offset, mode = FT_AUTO, buff[] = "", buff_size = 0);
 cell AMX_NATIVE_CALL rf_sql_fetch_field(AMX *amx, cell *params)
 {
     enum args_e
@@ -614,7 +615,24 @@ cell AMX_NATIVE_CALL rf_sql_fetch_field(AMX *amx, cell *params)
         arg_buff_size,
         arg_ret,
     };
-    return g_mysql_mngr.fetch_field((m_query_t*)params[arg_query], params[arg_offset], params[arg_type], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]) , params[arg_buff_size]);
+    return g_mysql_mngr.fetch_field((m_query_t*)params[arg_query], params[arg_offset], params[arg_type], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]), params[arg_buff_size]);
+}
+
+// native [RF_MAX_FIELD_SIZE] rf_sql_fetch_nm_field(Handle:query, name[], mode = FT_AUTO, buff[] = "", buff_size = 0);
+cell AMX_NATIVE_CALL rf_sql_fetch_nm_field(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+        arg_name,
+        arg_type,
+        arg_buff,
+        arg_buff_size,
+        arg_ret,
+    };
+    char buff[2 * RF_MAX_FIELD_NAME];
+    return g_mysql_mngr.fetch_field((m_query_t*)params[arg_query], getAmxString(amx, params[arg_name], buff), params[arg_type], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]), params[arg_buff_size]);
 }
 
 // native [RF_MAX_FIELD_NAME] rf_sql_field_name(Handle:query, offset, buff[] = 0, buff_size = 0);
@@ -654,7 +672,7 @@ cell AMX_NATIVE_CALL rf_sql_affected_rows(AMX *amx, cell *params)
     return g_mysql_mngr.affected_rows((m_query_t*)params[arg_query]);
 }
 
-// native [RF_MAX_FIELD_SIZE] rf_sql_query_str(Handle:query, buff[] = 0, buff_size = 0);
+// native [RF_MAX_FIELD_SIZE] rf_sql_query_str(Handle:query, buff[] = "", buff_size = 0);
 cell AMX_NATIVE_CALL rf_sql_query_str(AMX *amx, cell *params)
 {
     enum args_e
@@ -666,6 +684,44 @@ cell AMX_NATIVE_CALL rf_sql_query_str(AMX *amx, cell *params)
         arg_ret,
     };
     return g_mysql_mngr.query_str((m_query_t*)params[arg_query], getAmxAddr(amx, params[arg_ret]), getAmxAddr(amx, params[arg_buff]) , params[arg_buff_size]);
+}
+
+// native Handle:rf_sql_query(Handle:conn, const fmt[], any:...);
+cell AMX_NATIVE_CALL rf_sql_query(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_conn,
+        arg_fmt,
+    };
+    int len;
+    auto fmt = g_amxxapi.FormatAmxString(amx, params, arg_fmt, &len);
+    UTIL_ServerPrint("TEST = %s\n", fmt);
+    return (cell)g_mysql_mngr.prepare_query((MYSQL*)params[arg_conn], fmt);
+}
+
+// native bool:rf_sql_exec(Handle:query);
+cell AMX_NATIVE_CALL rf_sql_exec(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+    };
+    return g_mysql_mngr.exec_query((m_query_t*)params[arg_query]);
+}
+
+// native rf_sql_free(Handle:query);
+cell AMX_NATIVE_CALL rf_sql_free(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_query,
+    };
+    g_mysql_mngr.free_query((m_query_t*)params[arg_query]);
+    return TRUE;
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
@@ -695,10 +751,14 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_sql_fetch_row", rf_sql_fetch_row},
     {"rf_sql_field_count", rf_sql_field_count},
     {"rf_sql_fetch_field", rf_sql_fetch_field},
+    {"rf_sql_fetch_nm_field", rf_sql_fetch_nm_field},
     {"rf_sql_field_name", rf_sql_field_name},
     {"rf_sql_insert_id", rf_sql_insert_id},
     {"rf_sql_affected_rows", rf_sql_affected_rows},
+    {"rf_sql_query", rf_sql_query},
     {"rf_sql_query_str", rf_sql_query_str},
+    {"rf_sql_exec", rf_sql_exec},
+    {"rf_sql_free", rf_sql_free},
     {nullptr, nullptr}
 };
 
