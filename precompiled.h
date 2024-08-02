@@ -68,6 +68,7 @@
 
 // MYSQL
 #include <chrono>
+#include <ctime>
 #include <future>
 #include <thread>
 #ifndef _GNU_SOURCE

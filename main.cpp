@@ -35,7 +35,7 @@ void OnAmxxAttach()
 
 bool OnMetaAttach()
 {
-	g_mysql_mngr.start();
+	g_mysql_mngr.start_main();
 	return true;
 }
 
@@ -52,6 +52,8 @@ void OnMetaDetach()
 void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 {
 	SERVER_PRINT("[DEBUG] SERVER_ACTIVATED\n");
+
+	g_mysql_mngr.start();
 
 	for (auto& msg : g_RegUserMsg) {
 
@@ -80,6 +82,7 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 void ServerDeactivate_Post()
 {
 	SERVER_PRINT("[DEBUG] SERVER_DEACTIVATED\n");
+	g_mysql_mngr.stop();
 
 	g_pEdicts = nullptr;
 	api_cfg.ServerDeactivate();
