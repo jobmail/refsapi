@@ -368,13 +368,7 @@ void Client_Disconnected(edict_t *pEdict, bool crash, char *format) {
                 
                 g_Clients[id].is_bot = false;
 
-            //if (--g_PlayersNum[g_Clients[id].team] < 0)
-
-                //UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, team = %d, count = %d << WARNING !!!", id, g_Clients[id].team, g_PlayersNum[g_Clients[id].team]);
-
-            //CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(id);
-
-            //UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s\n", id, STRING(pPlayer->edict()->v.netname));
+            ////UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s\n", id, STRING(pPlayer->edict()->v.netname));
 
             g_PlayersNum[g_Clients[id].team]--;
             
