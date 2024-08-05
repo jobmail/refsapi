@@ -159,7 +159,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
         arg_name,
         arg_folder
     };
-    bool result = FALSE;
+    int result = FALSE;
     //UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
     CPluginMngr::CPlugin *plugin = findPluginFast(amx);
     auto plugin_cvars = g_cvar_mngr.get(plugin->getId());
@@ -697,7 +697,6 @@ cell AMX_NATIVE_CALL rf_sql_query(AMX *amx, cell *params)
     };
     int len;
     auto fmt = g_amxxapi.FormatAmxString(amx, params, arg_fmt, &len);
-    UTIL_ServerPrint("TEST = %s\n", fmt);
     return (cell)g_mysql_mngr.prepare_query((MYSQL*)params[arg_conn], fmt);
 }
 
@@ -726,6 +725,7 @@ cell AMX_NATIVE_CALL rf_sql_free(AMX *amx, cell *params)
 
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
+    {"rf_get_user_weapons", rf_get_user_weapons},
     {"rf_get_weaponname", rf_get_weaponname},
     {"rf_get_ent_by_class", rf_get_ent_by_class},
     {"rf_roundfloat", rf_roundfloat},
