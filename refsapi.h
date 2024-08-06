@@ -126,5 +126,3 @@ int acs_vector_add(std::vector<cell> *v, int value);
 int acs_vector_remove(std::vector<cell> *v, int value);
 float acs_roundfloat(float value, int precision);
 bool acs_get_user_buyzone(const edict_t *pEdict);
-
-

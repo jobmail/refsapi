@@ -1,7 +1,7 @@
 #include "precompiled.h"
 
+#ifndef WITHOUT_SQL
 #define _DEBUG                          1
-
 #define MAX_QUERY_PRIORITY              3   // PRI->THREADS: 0 -> 8, 1 -> 4, 2 -> 2, 3 -> 1
 #define QUERY_POOLING_INTERVAL          5
 #define QUERY_RETRY_COUNT               3
@@ -589,3 +589,4 @@ public:
 };
 
 extern mysql_mngr g_mysql_mngr;
+#endif

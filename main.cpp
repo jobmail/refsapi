@@ -35,7 +35,9 @@ void OnAmxxAttach()
 
 bool OnMetaAttach()
 {
+#ifndef WITHOUT_SQL
 	g_mysql_mngr.start_main();
+#endif
 	return true;
 }
 
@@ -52,9 +54,9 @@ void OnMetaDetach()
 void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 {
 	SERVER_PRINT("[DEBUG] SERVER_ACTIVATED\n");
-
+#ifndef WITHOUT_SQL
 	g_mysql_mngr.start();
-
+#endif
 	for (auto& msg : g_RegUserMsg) {
 
 		msg.id = GET_USER_MSG_ID(PLID, msg.pszName, NULL);
@@ -82,14 +84,15 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 void ServerDeactivate_Post()
 {
 	SERVER_PRINT("[DEBUG] SERVER_DEACTIVATED\n");
+#ifndef WITHOUT_SQL
 	g_mysql_mngr.stop();
-
+	g_cvar_mngr.clear();
+	g_mysql_mngr.close_all();
+#endif
 	g_pEdicts = nullptr;
 	api_cfg.ServerDeactivate();
 	g_hookManager.Clear();
 	EntityCallbackDispatcher().DeleteAllCallbacks();
-	g_cvar_mngr.clear();
-	g_mysql_mngr.close_all();
 
 	g_pFunctionTable->pfnSpawn = DispatchSpawn;
 	g_pFunctionTable->pfnKeyValue = KeyValue;

@@ -483,6 +483,7 @@ cell AMX_NATIVE_CALL rf_recoil_disable(AMX *amx, cell *params)
     return TRUE;   
 }
 
+#ifndef WITHOUT_SQL
 // native Handle:rf_sql_tuple(callback[], db_host[], db_user[], db_pass[], db_name[], timeout_ms = 250, db_chrs[] = "utf8");
 cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
 {
@@ -722,6 +723,7 @@ cell AMX_NATIVE_CALL rf_sql_free(AMX *amx, cell *params)
     g_mysql_mngr.free_query((m_query_t*)params[arg_query]);
     return TRUE;
 }
+#endif
 
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
@@ -742,6 +744,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_cvar_ptr", rf_get_cvar_ptr},
     {"rf_recoil_enable", rf_recoil_enable},
     {"rf_recoil_disable", rf_recoil_disable},
+#ifndef WITHOUT_SQL
     {"rf_sql_tuple", rf_sql_tuple},
     {"rf_sql_connect", rf_sql_connect},
     {"rf_sql_close", rf_sql_close}, 
@@ -759,6 +762,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_sql_query_str", rf_sql_query_str},
     {"rf_sql_exec", rf_sql_exec},
     {"rf_sql_free", rf_sql_free},
+#endif
     {nullptr, nullptr}
 };
 
