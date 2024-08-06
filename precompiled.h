@@ -1,5 +1,7 @@
 #pragma once
 
+//#define WITHOUT_SQL
+
 // C
 #include <string.h>
 #include <stdarg.h>
@@ -67,6 +69,7 @@
 #include "entity_callback_dispatcher.h"
 
 // MYSQL
+#ifndef WITHOUT_SQL
 #include <chrono>
 #include <ctime>
 #include <future>
@@ -77,13 +80,16 @@
 #include <signal.h>
 #include <poll.h>
 #include <mariadb/mysql.h>
+#endif
 
 // Refs API
 #include "refsapi.h"
 #include "refsapi_misc.h"
 #include "refsapi_cvar_mngr.h"
 #include "refsapi_recoil_mngr.h"
+#ifndef WITHOUT_SQL
 #include "refsapi_mysql_mngr.h"
+#endif
 #include "natives_helper.h"
 #include "natives_refsapi.h"
 #include "sdk_util.h"

@@ -11,7 +11,7 @@ OBJECTS = *.cpp include/cssdk/public/interface.cpp
 
 LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 	-s -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a
-	
+
 #-lm -lrt -Wl,--whole-archive -lmariadbd -lmariadb -lpcre -lz -llz4 -laio -ldl -lsnappy -lcrypt -Wl,--no-whole-archive
 
 #-lp11-kit -lgnutls -lidn2 -lunistring -ltasn1 -lnettle -lhogweed -lgmp -lc -ldl -lffi \
@@ -65,20 +65,9 @@ LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -msse4.2 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -pthread -s -shared -flto -fPIC -pipe
+OPT_FLAGS = -O3 -msse3 -msse4.2 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -s -shared -flto -fPIC -pipe -pthread -fno-rtti
 #-fno-split-stack
 # -flto -fPIC
-#-flto -fPIC -static
-#-flto -fPIC -pipe
-#-fPIC -flto
-#-s -DNDEBUG -pipe -flto=auto
-#-fPIC -flto=auto
-# -pthread
-#-fPIC -flto=auto
-# -fPIC
-# -pthread
-#-flto=auto
-#-pipe
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
 INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
@@ -94,15 +83,11 @@ CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0
 #-Wl,--as-needed
 #-D_GLIBCXX_USE_CXX11_ABI=0 
 #-Wl,--as-needed
-#-Wl,--as-needed
-#-Wl,--as-needed
 #-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--as-needed
 #-static
-#-Wl,--allow-multiple-definition -Wl,--as-needed
 #-Wl,--allow-multiple-definition
 #-Wl,--as-needed -Wl,--whole-archive
 #-D_GLIBCXX_USE_CXX11_ABI=0
-#-fabi-version=11 -fabi-compat-version=11 -Wabi=11 
 #-fabi-version=11 -fabi-compat-version=11 -Wabi=11 -fno-exceptions 
 #-g0 -DNDEBUG -Dlinux -D__linux__ -std=gnu++14 -shared -m32 -D_GLIBCXX_USE_CXX11_ABI=0 -DHAVE_STRONG_TYPEDEF
 
