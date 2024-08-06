@@ -310,16 +310,20 @@ public:
                 mysql_free_result(q->result);
             q->result = nullptr;
         }
-        if (q->async && q->conn != nullptr)
+        if (q->conn != nullptr)
         {
             DEBUG("free_query: CLOSE, q = %p", q);
-            auto status = mysql_close_start(q->conn);
-            while (status)
+            if (q->async)
             {
-                status = wait_for_mysql(q->conn, status);
-                status = mysql_close_cont(q->conn, status);
+                auto status = mysql_close_start(q->conn);
+                while (status)
+                {
+                    status = wait_for_mysql(q->conn, status);
+                    status = mysql_close_cont(q->conn, status);
+                }
             }
-            //mysql_close(q->conn);
+            else
+                mysql_close(q->conn);
             q->conn = nullptr;
         }
         if (q->data != nullptr && (q->successful || stop_threads))
