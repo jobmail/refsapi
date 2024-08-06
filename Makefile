@@ -65,7 +65,8 @@ LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -msse4.2 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -s -shared -flto -fPIC -pipe -pthread -fno-rtti
+OPT_FLAGS = -O3 -msse3 -msse4.2 -fno-strict-aliasing -Wno-uninitialized -funroll-loops -fomit-frame-pointer -fpermissive -s -shared -flto -fPIC -pipe -pthread
+# -fno-rtti
 #-fno-split-stack
 # -flto -fPIC
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
