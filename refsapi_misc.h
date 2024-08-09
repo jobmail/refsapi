@@ -3,7 +3,7 @@
 #include "refsapi.h"
 
 bool is_number(std::string &s);
-size_t set_amx_string(cell* dest, const char* str, size_t max_len);
+size_t set_amx_string(cell *dest, const char *str, size_t max_len);
 
 class fmt
 {
@@ -103,7 +103,7 @@ inline std::wstring stows(const std::string &s)
     {
         std::wstring result;
         size_t length = s.length();
-        //UTIL_ServerPrint("[DEBUG] stows(): catch !!! length = %d\n", length);
+        // UTIL_ServerPrint("[DEBUG] stows(): catch !!! length = %d\n", length);
         result.reserve(length);
         for (size_t i = 0; i < length; i++)
             result.push_back(s[i] & 0xFF);
@@ -113,8 +113,8 @@ inline std::wstring stows(const std::string &s)
 
 inline double stod(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
 {
-    auto result = std::stod(s);//std::strtof(s.c_str(), 0); //(float)std::stod(s);
-    //UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f\n", s.c_str(), result);
+    auto result = std::stod(s); // std::strtof(s.c_str(), 0); //(float)std::stod(s);
+    // UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f\n", s.c_str(), result);
     if (has_min && result < min_val)
         result = min_val;
     if (has_min && result > max_val)
@@ -124,7 +124,7 @@ inline double stod(std::string s, bool has_min = false, float min_val = 0.0f, bo
 
 inline double roundd(double value, int precision = -6)
 {
-    //UTIL_ServerPrint("[DEBUG] acs_roundfloat(): value = %f, precision = %d", value, precision);
+    // UTIL_ServerPrint("[DEBUG] acs_roundfloat(): value = %f, precision = %d", value, precision);
     auto power = pow(10.0f, -precision);
     return floor(value * power + 0.5) / power;
 }
@@ -138,56 +138,56 @@ inline bool file_exists(const std::wstring &name)
 inline void remove_chars(std::string &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(std::remove_if(s.begin(), s.end(), [&](unsigned char ch)
-    {
+                           {
         for (auto& sub : chars)
             if (ch == sub)
                 return true;
-        return false;
-    }), s.end());
+        return false; }),
+            s.end());
 }
 
 inline void ltrim(std::string &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch)
-    {
+                                    {
         for (auto& sub : chars)
             if (ch == sub)
                 return false;
-        return true;
-    }));
+        return true; }));
 }
 
 inline void ltrim(std::wstring &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch)
-    {
+                                    {
         for (auto& sub : chars)
             if (ch == sub)
                 return false;
-        return true;
-    }));
+        return true; }));
 }
 
 inline void rtrim(std::string &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch)
-    {
+                         {
         for (auto& sub : chars)
             if (ch == sub)
                 return false;
-        return true;
-    }).base(), s.end());
+        return true; })
+                .base(),
+            s.end());
 }
 
 inline void rtrim(std::wstring &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch)
-    {
+                         {
         for (auto& sub : chars)
             if (ch == sub)
                 return false;
-        return true;
-    }).base(), s.end());
+        return true; })
+                .base(),
+            s.end());
 }
 
 inline void rtrim_zero(std::string &s)
@@ -196,9 +196,9 @@ inline void rtrim_zero(std::string &s)
     if (it == s.rend())
         return;
     s.erase(std::find_if(s.rbegin(), it, [&](unsigned char ch)
-    {
-        return ch != '0';
-    }).base(), s.end());
+                         { return ch != '0'; })
+                .base(),
+            s.end());
 }
 
 inline std::string rtrim_zero_c(std::string s)
@@ -264,7 +264,7 @@ inline int rm_quote(std::string &s)
 {
     int result = 0;
     bool f[2];
-    for (auto& ch : _QQ)
+    for (auto &ch : _QQ)
     {
         f[0] = f[1] = 0;
         if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
@@ -288,7 +288,7 @@ inline int rm_quote(std::wstring &s)
 {
     int result = 0;
     bool f[2];
-    for (auto& ch : _QQ)
+    for (auto &ch : _QQ)
     {
         f[0] = f[1] = 0;
         if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
@@ -309,7 +309,7 @@ inline int rm_quote(std::wstring &s)
 
 inline std::string rm_quote_c(std::string &s)
 {
-    for (auto& ch : _QQ)
+    for (auto &ch : _QQ)
     {
         if (s.front() == ch && s.back() == ch)
         {
@@ -323,7 +323,7 @@ inline std::string rm_quote_c(std::string &s)
 
 inline std::wstring rm_quote_c(std::wstring &s)
 {
-    for (auto& ch : _QQ)
+    for (auto &ch : _QQ)
     {
         if (s.front() == ch && s.back() == ch)
         {
