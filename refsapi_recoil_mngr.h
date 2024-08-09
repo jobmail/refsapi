@@ -68,7 +68,8 @@ public:
             return;
         auto ped = player->edict();
         auto index = player->entindex();
-        if (is_valid_entity(ped) && (ped->v.button & IN_ATTACK) && (player->m_flLastFired != last_fired[index]) && player->m_pActiveItem)
+        if (is_valid_entity(ped) && (ped->v.button & IN_ATTACK) && player->m_flLastFired != last_fired[index]
+            && player->m_pActiveItem && player->m_pActiveItem->IsWeapon()/* <--Fix crash ReGAME*/) 
         {
             last_fired[index] = player->m_flLastFired;
             CBasePlayerWeapon* weapon = static_cast<CBasePlayerWeapon*>(player->m_pActiveItem);

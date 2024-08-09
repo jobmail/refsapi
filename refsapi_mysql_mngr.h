@@ -251,6 +251,7 @@ public:
         q->data = nullptr;
         q->result = nullptr;
         q->async = async;
+        q->is_buffered = q->is_buffered;
         q->started = false;
         q->aborted = false;
         q->finished = false;
@@ -310,20 +311,15 @@ public:
                 mysql_free_result(q->result);
             q->result = nullptr;
         }
-        if (q->conn != nullptr)
+        if (q->conn != nullptr && q->async)
         {
-            DEBUG("free_query: CLOSE, q = %p", q);
-            if (q->async)
+            DEBUG("free_query: CLOSE, q = %p, async = %d", q, q->async);
+            auto status = mysql_close_start(q->conn);
+            while (status)
             {
-                auto status = mysql_close_start(q->conn);
-                while (status)
-                {
-                    status = wait_for_mysql(q->conn, status);
-                    status = mysql_close_cont(q->conn, status);
-                }
+                status = wait_for_mysql(q->conn, status);
+                status = mysql_close_cont(q->conn, status);
             }
-            else
-                mysql_close(q->conn);
             q->conn = nullptr;
         }
         if (q->data != nullptr && (q->successful || stop_threads))
@@ -490,6 +486,7 @@ public:
         auto it = std::find(conns.begin(), conns.end(), conn);
         if (it == conns.end())
             return false;
+        DEBUG("close(): STATIC, conn = %p", conn);
         conns.erase(it);
         mysql_close(conn);
         return true;
@@ -562,6 +559,8 @@ public:
     }
     mysql_mngr() : main_thread()
     {
+        stop_main = false;
+        stop_threads = true;
         m_query_nums = 1;
         num_threads  = 0;
         num_finished = 0;
@@ -579,13 +578,13 @@ public:
     {
 #ifdef _DEBUG
         va_list arg_ptr;
-        char str[1024], out[1024];
-        str[sizeof(str) - 1] = 0;
-        out[sizeof(out) - 1] = 0;
+        char str[1014], out[1024];
         va_start(arg_ptr, fmt);
         vsnprintf(str, sizeof(str) - 1, fmt, arg_ptr);
         va_end(arg_ptr);
+        str[sizeof(str) - 1] = 0;
         snprintf(out, sizeof(out) - 1, "[DEBUG] %s\n", str);
+        out[sizeof(out) - 1] = 0;
         std::lock_guard lock(std_mutex);
         SERVER_PRINT(out);
 #endif
