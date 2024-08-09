@@ -87,7 +87,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params)
             // CHECK CREATION CLASSNAME
             if (key != STRING(pEdict->v.classname))
             {
-                acs_trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), entity);
+                trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), entity);
                 continue;
             }
             *(getAmxAddr(amx, params[arg_ent_arr]) + result) = entity;
@@ -112,9 +112,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params)
                     *(getAmxAddr(amx, params[arg_ent_arr]) + result) = entity;
                     // TRANSFER CLASSNAME
                     if (key != g_Tries.classnames[entity])
-                    {
-                        acs_trie_transfer(&g_Tries.entities, g_Tries.classnames[entity], key, entity);
-                    }
+                        trie_transfer(&g_Tries.entities, g_Tries.classnames[entity], key, entity);
                     if (++result >= params[arg_ent_arr_size])
                         break;
                 }
@@ -146,7 +144,7 @@ cell AMX_NATIVE_CALL rf_get_user_buyzone(AMX *amx, cell *params)
         arg_index
     };
     CHECK_ISPLAYER(arg_index);
-    return (qboolean)acs_get_user_buyzone(INDEXENT(params[arg_index]));
+    return (qboolean)get_user_buyzone(INDEXENT(params[arg_index]));
 }
 
 // native rf_config(const bool:auto_create = true, const name[] = "", const folder[] = "");

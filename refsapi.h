@@ -79,28 +79,21 @@ extern void (*endfunction)(void*);
 
 edict_t* CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
-edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
-void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict);
+//edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);
+//void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict);
 
 void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *pPlayer, entvars_t *pevAttacker, int iGib);
 void CSGameRules_CheckMapConditions_RG(IReGameHook_CSGameRules_CheckMapConditions *chain);
 qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *chain, CBasePlayer *pPlayer, class CBasePlayerItem *pItem);
+qboolean CBasePlayer_RemovePlayerItem_RG(IReGameHook_CBasePlayer_RemovePlayerItem *chain, CBasePlayer *pthis, CBasePlayerItem *pItem);
 CBaseEntity* CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem *chain, CBasePlayer *pPlayer, const char *classname);
 qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem);
 CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo);
 void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer);
 
-qboolean R_ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128]);
-void R_ClientPutInServer(edict_t *pEntity);
 void R_ClientPutInServer_Post(edict_t *pEntity);
 void R_ClientDisconnect(edict_t *pEntity);
-int R_Spawn(edict_t *pEntity);
-edict_t* R_CreateNamedEntity(string_t className);
-
 void* R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb);
-void* R_PvEntPrivateData(edict_t *pEdict);
-void* R_PvEntPrivateData_Post(edict_t *pEdict);
-
 int	 R_RegUserMsg_Post(const char *pszName, int iSize);
 void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
 void R_WriteByte_Post(int iValue);
@@ -119,10 +112,9 @@ void Client_Disconnected(edict_t *pEdict, bool crash, char *format);
 void Alloc_EntPrivateData(edict_t *pEdict);
 void Free_EntPrivateData(edict_t *pEdict);
 
-int acs_trie_add(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
-int acs_trie_remove(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
-void acs_trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::string key_from, std::string key_to, int value);
-int acs_vector_add(std::vector<cell> *v, int value);
-int acs_vector_remove(std::vector<cell> *v, int value);
-float acs_roundfloat(float value, int precision);
-bool acs_get_user_buyzone(const edict_t *pEdict);
+int trie_add(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
+int trie_remove(std::map<std::string, std::vector<cell>>* trie, std::string key, int value);
+void trie_transfer(std::map<std::string, std::vector<cell>>* trie, std::string key_from, std::string key_to, int value);
+int vector_add(std::vector<cell> *v, int value);
+int vector_remove(std::vector<cell> *v, int value);
+bool get_user_buyzone(const edict_t *pEdict);

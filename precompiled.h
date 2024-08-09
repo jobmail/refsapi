@@ -64,9 +64,9 @@
 #include <main.h>
 #include "api_config.h"
 #include "api_config.h"
-#include "hook_manager.h"
-#include "hook_callback.h"
-#include "entity_callback_dispatcher.h"
+//#include "hook_manager.h"
+//#include "hook_callback.h"
+//#include "entity_callback_dispatcher.h"
 
 // MYSQL
 #ifndef WITHOUT_SQL
