@@ -1,6 +1,7 @@
 #include "precompiled.h"
 
-bool is_number(std::string &s) {
+bool is_number(std::string &s)
+{
     trim(s);
     if (s.empty())
         return false;
@@ -22,11 +23,11 @@ bool is_number(std::string &s) {
         }
         it++;
     }
-    //UTIL_ServerPrint("[DEBUG] is_number(): s = <%s>, result = %d\n", s.c_str(), it == s.end());
+    // UTIL_ServerPrint("[DEBUG] is_number(): s = <%s>, result = %d\n", s.c_str(), it == s.end());
     return it == s.end();
 }
 
-size_t set_amx_string(cell* dest, const char* str, size_t max_len)
+size_t set_amx_string(cell *dest, const char *str, size_t max_len)
 {
     size_t count = 0;
     if (max_len)
