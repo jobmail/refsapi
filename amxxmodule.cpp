@@ -85,7 +85,7 @@ static struct funcreq_t
 		// DECLARE_REQ(GetPlayerHealth),
 		// DECLARE_REQ(amx_Exec),
 		// DECLARE_REQ(amx_Execv),
-		// DECLARE_REQ(amx_Allot),
+		DECLARE_REQ(amx_Allot),
 		DECLARE_REQ(amx_FindPublic),
 		// DECLARE_REQ(LoadAmxScript),
 		// DECLARE_REQ(UnloadAmxScript),

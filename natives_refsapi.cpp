@@ -501,7 +501,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     if (!callback.empty())
     {
         // public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
-        fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_ARRAY, FP_CELL, FP_ARRAY, FP_CELL, FP_CELL, FP_DONE);
+        fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_STRING, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_DONE);
         check_fwd_r(fwd, callback);
     }
     db_host = getAmxString(amx, params[arg_db_host], g_buff);
@@ -509,7 +509,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     db_pass = getAmxString(amx, params[arg_db_pass], g_buff);
     db_name = getAmxString(amx, params[arg_db_name], g_buff);
     db_chrs = getAmxString(amx, params[arg_db_chrs], g_buff);
-    return g_mysql_mngr.add_connect(fwd, plugin->isDebug(), db_host, db_user, db_pass, db_name, db_chrs, params[arg_timeout]);
+    return g_mysql_mngr.add_connect(amx, fwd, plugin->isDebug(), db_host, db_user, db_pass, db_name, db_chrs, params[arg_timeout]);
 }
 
 // native Handle:rf_sql_connect(Handle:tuple, &err_num, error[], error_size);

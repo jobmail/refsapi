@@ -500,6 +500,9 @@ public:
     }
     void clear_hook_state()
     {
+        for (auto &h : cvars.hook_state)
+            if (h.first != -1)
+                g_amxxapi.UnregisterSPForward(h.first);
         cvars.hook_state.clear();
     }
     void clear()

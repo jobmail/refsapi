@@ -160,7 +160,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
     {
         int id = pPlayer->entindex();
         int entity_index = pItem->entindex();
-        int owner_index = ENTINDEX(pItem->pev->owner);
+        //int owner_index = ENTINDEX(pItem->pev->owner);
         vector_add(&g_Tries.player_entities[id], entity_index);
         // UTIL_ServerPrint"[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d prev_owner = %d\n", id, entity_index, owner_index);
         //  FIX OWNER
