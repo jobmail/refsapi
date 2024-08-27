@@ -25,6 +25,7 @@ typedef enum field_types_e
 typedef struct prm_s
 {
     int fwd;
+    AMX *amx;
     bool is_debug;
     std::string db_host;
     std::string db_user;
@@ -201,7 +202,8 @@ public:
                 }
             }
         }
-        threads_mutex.lock();
+        std::lock_guard<std::mutex> lock(threads_mutex);
+        //threads_mutex.lock();
         for (auto it : finished)
         {
             auto q = it->second;
@@ -209,11 +211,12 @@ public:
             m_queries[q->pri].erase(q->id);
             delete q;
         }
-        threads_mutex.unlock();
+        //threads_mutex.unlock();
     }
     void exec_async_query(int pri, m_query_t *q)
     {
         int err, status;
+        static cell tmpdata[1] = {0};
         std::thread::id pid = gettid();
         DEBUG("exec_async_query(): pid = %p, q = %p, typle = %d, START", pid, q, q->conn_id);
         int failstate = TQUERY_SUCCESS;
@@ -235,14 +238,42 @@ public:
         float queuetime = q->time_end - q->time_start;
         if (!stop_threads && q->prms->fwd != -1)
         {
+            std::lock_guard<std::mutex> lock(fwd_mutex);
             // public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
             DEBUG("exec_async_query: EXEC AMXX FORWARD = %d, is_debug = %d, failstate = %d, err = %d, query = %p, time = %f (%f / %f / %f), error = %s", q->prms->fwd, q->prms->is_debug, failstate, err, q, queuetime, q->time_create, q->time_start, q->time_end, q->error.c_str());
-            if (q->prms->is_debug)
-                fwd_mutex.lock();
-            g_amxxapi.ExecuteForward(q->prms->fwd, failstate, q, g_amxxapi.PrepareCharArray((char *)q->error.c_str(), q->error.size() + 1), err, g_amxxapi.PrepareCellArray(q->data, q->data_size), q->data_size, amx_ftoc(queuetime));
-            if (q->prms->is_debug)
-                fwd_mutex.unlock();
-            DEBUG("exec_async_query: AFTER FORWARD");
+            auto data_size = clamp(q->data_size, 1U, 4096U);
+            auto data = q->data_size ? q->data : tmpdata;
+            // Prepare array
+            cell *tmp, data_param;
+            auto amx = q->prms->amx;
+            g_amxxapi.amx_Allot(amx, data_size, &data_param, &tmp);
+            Q_memcpy(tmp, data, data_size << 2);
+            int ret = g_amxxapi.ExecuteForward(q->prms->fwd, failstate, q, q->error.c_str(), err, data_param, data_size, amx_ftoc(queuetime));
+            DEBUG("exec_async_query: AFTER FORWARD, fix = %d, hea = %p, param = %p", amx->hea > data_param, amx->hea, data_param);
+            // AMXX amx_Release()
+            if (amx->hea > data_param)
+                amx->hea = data_param;
+            //if (q->prms->is_debug)
+            //while (!fwd_mutex.try_lock())
+            //{
+            //    std::this_thread::yield();
+            //    usleep(QUERY_POOLING_INTERVAL * 100);
+            //}
+            /*
+            auto data_size = clamp(q->data_size, 1U, 4096U);
+            auto error = g_amxxapi.PrepareCharArray(q->error.size() ? (char *)q->error.c_str() : (char *)"", q->error.size() + 1);
+            auto data = g_amxxapi.PrepareCellArray(q->data_size ? q->data : tmpdata, data_size);
+            if (error == 0 && data == 1)
+            {
+                DEBUG("exec_async_query: PREPARE() error = %d, data = %d", error, data);
+                int ret = g_amxxapi.ExecuteForward(q->prms->fwd, failstate, q, error, err, data, data_size, amx_ftoc(queuetime));
+                //if (q->prms->is_debug)
+                //fwd_mutex.unlock();
+                DEBUG("exec_async_query: AFTER FORWARD");
+            }
+            else
+                DEBUG("exec_async_query: CONCURENCY CALLBACK ERROR !!!");
+            */
         }
         free_query(q);
         num_finished++;
@@ -502,12 +533,13 @@ public:
             mysql_close(it);
         conns.clear();
     }
-    size_t add_connect(int fwd, bool is_debug, std::string &db_host, std::string &db_user, std::string &db_pass, std::string &db_name, std::string &db_chrs, size_t timeout)
+    size_t add_connect(AMX *amx, int fwd, bool is_debug, std::string &db_host, std::string &db_user, std::string &db_pass, std::string &db_name, std::string &db_chrs, size_t timeout)
     {
         // DEBUG("add_connect(): pid = %d, fwd = %d, host = <%s>, user = <%s>, pass = <%s>, name = <%s>, timeout = %d",
         //     gettid(), fwd, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), timeout_ms
         //);
         prm_t prms;
+        prms.amx = amx;
         prms.fwd = fwd;
         prms.is_debug = is_debug;
         size_t pos = db_host.find(':');
@@ -543,6 +575,9 @@ public:
     {
         stop_threads = true;
         abort();
+        for (auto &p : m_conn_prms)
+            if (p.fwd != -1)
+                g_amxxapi.UnregisterSPForward(p.fwd);
         m_conn_prms.clear();
     }
     void abort()
