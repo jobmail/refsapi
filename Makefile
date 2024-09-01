@@ -11,6 +11,8 @@ OBJECTS = *.cpp include/cssdk/public/interface.cpp
 
 LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 	-s -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a
+	
+#-l:libssl.a -l:libcrypto.a
 
 #-lm -lrt -Wl,--whole-archive -lmariadbd -lmariadb -lpcre -lz -llz4 -laio -ldl -lsnappy -lcrypt -Wl,--no-whole-archive
 
@@ -80,7 +82,7 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -g0 -s -fno-stack-protector
+CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -g3 -s
 #-g -DWITHOUT_SQL
 #-Wl,--as-needed
 #-D_GLIBCXX_USE_CXX11_ABI=0 

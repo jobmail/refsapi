@@ -32,8 +32,8 @@ size_t set_amx_string(cell *dest, const char *str, size_t max_len)
     size_t count = 0;
     if (max_len)
     {
-        while (*str && count++ < max_len)
-            *dest++ = *(cell*)str++;
+        while (*str && ++count < max_len)
+            *dest++ = (cell)*str++;
         *dest = 0;
     }
     return count;

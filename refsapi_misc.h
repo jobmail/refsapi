@@ -99,14 +99,17 @@ inline std::wstring stows(const std::string &s)
     {
         return g_converter.from_bytes(s);
     }
-    catch (std::range_error &e)
+    catch (...)
     {
         std::wstring result;
-        size_t length = s.length();
-        // UTIL_ServerPrint("[DEBUG] stows(): catch !!! length = %d\n", length);
-        result.reserve(length);
-        for (size_t i = 0; i < length; i++)
-            result.push_back(s[i] & 0xFF);
+        size_t len = s.size();
+        UTIL_ServerPrint("[DEBUG] stows(): catch !!! str = %s, len = %d\n", s.c_str(), len);
+        if (len)
+        {
+            result.reserve(len);
+            for (size_t i = 0; i < len; i++)
+                result.push_back(s[i] & 0xFF);
+        }
         return result;
     }
 }
