@@ -480,7 +480,7 @@ cell AMX_NATIVE_CALL rf_recoil_disable(AMX *amx, cell *params)
 }
 
 #ifndef WITHOUT_SQL
-// native Handle:rf_sql_tuple(callback[], db_host[], db_user[], db_pass[], db_name[], timeout_ms = 250, db_chrs[] = "utf8");
+// native Handle:rf_sql_tuple(callback[], db_host[], db_user[], db_pass[], db_name[], timeout = 3, db_chrs[] = "utf8");
 cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
 {
     enum args_e

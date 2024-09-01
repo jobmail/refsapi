@@ -356,7 +356,7 @@ public:
             if ((cvar_list = cvars.cvar_list.find(name)) != cvars.cvar_list.end())
                 return cvar_list;
             // Check global cvar
-            cvar_t *p_cvar = CVAR_GET_POINTER(wstos(name).data());
+            cvar_t *p_cvar = CVAR_GET_POINTER(wstos(name).c_str());
             // Cvar exist?
             if (p_cvar != nullptr)
                 return add_exists(p_cvar);
