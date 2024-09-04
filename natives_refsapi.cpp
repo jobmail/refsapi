@@ -501,7 +501,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     if (!callback.empty())
     {
         // public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
-        fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_STRING, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_DONE);
+        fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_DONE);
         check_fwd_r(fwd, callback);
     }
     db_host = getAmxString(amx, params[arg_db_host], g_buff);

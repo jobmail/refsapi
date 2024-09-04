@@ -198,7 +198,7 @@ NOINLINE void AMXX_LogError(AMX *amx, int err, const char *fmt, ...)
 char *getAmxString(cell *src, char *dest, size_t max, size_t *len)
 {
 	char *start = dest;
-	while (*src && --max)
+	while (*src && --max > 0)
 		*dest++ = (char)*src++;
 	*dest = '\0';
 	if (len)
@@ -208,7 +208,7 @@ char *getAmxString(cell *src, char *dest, size_t max, size_t *len)
 
 void setAmxString(cell *dest, const char *string, size_t max)
 {
-	while (*string && max--)
+	while (*string && max-- > 0)
 		*dest++ = (cell)*string++;
 	*dest = 0;
 }

@@ -103,7 +103,7 @@ inline std::wstring stows(const std::string &s)
     {
         std::wstring result;
         size_t len = s.size();
-        UTIL_ServerPrint("[DEBUG] stows(): catch !!! str = %s, len = %d\n", s.c_str(), len);
+        //UTIL_ServerPrint("[DEBUG] stows(): catch !!! str = %s, len = %d\n", s.c_str(), len);
         if (len)
         {
             result.reserve(len);
