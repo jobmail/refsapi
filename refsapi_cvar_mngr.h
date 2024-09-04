@@ -421,7 +421,7 @@ public:
         switch (type)
         {
         case CVAR_TYPE_NUM:
-            direct_set(cvar, std::to_string((int)*ptr).c_str());
+            direct_set(cvar, std::to_string(*(int *)ptr).c_str());
             break;
         case CVAR_TYPE_FLT:
             CVAR_SET_FLOAT(cvar->name, *(float *)ptr);

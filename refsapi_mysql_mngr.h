@@ -248,7 +248,7 @@ public:
             // Callback data
             g_amxxapi.amx_Allot(amx, data_size, &data_param, &tmp);
             Q_memcpy(tmp, data, data_size << 2);
-            int ret = g_amxxapi.ExecuteForward(q->prms->fwd, failstate, q, q->error.c_str(), err, data_param, data_size, amx_ftoc(queuetime));
+            int ret = g_amxxapi.ExecuteForward(q->prms->fwd, failstate, q, error_param, err, data_param, data_size, amx_ftoc(queuetime));
             DEBUG("exec_async_query: AFTER FORWARD, fix = %d, hea = %p, param = %p, size = %d (%d)", amx->hea > data_param, amx->hea, data_param, amx->hea - data_param, data_size << 2);
             // Fix heap
             amx->hea = error_param;
