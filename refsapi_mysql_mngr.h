@@ -33,7 +33,7 @@ typedef struct prm_s
     std::string db_name;
     std::string db_chrs; // charterset
     size_t db_port;      // 3306
-    size_t timeout;      // ms
+    size_t timeout;      // sec
 } prm_t;
 
 typedef std::list<prm_t> prm_list_t;
