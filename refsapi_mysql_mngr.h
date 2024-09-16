@@ -151,13 +151,12 @@ public:
     {
         int pri;
         std::thread::id key;
-        m_query_t *q;
         std::vector<m_query_list_t::iterator> finished;
         for (pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
         {
             for (auto it = m_queries[pri].begin(); it != m_queries[pri].end(); it++)
             {
-                q = it->second;
+                auto q = it->second;
                 if (q->finished || q->aborted)
                 {
                     key = q->tid;
@@ -630,7 +629,7 @@ public:
     ~mysql_mngr()
     {
         stop();
-        while (num_threads)
+        while (num_threads > 0)
             usleep(QUERY_POOLING_INTERVAL * 1000);
         stop_main = true;
         main_thread.join();
