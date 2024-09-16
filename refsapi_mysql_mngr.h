@@ -1,7 +1,7 @@
 #include "precompiled.h"
 
 #ifndef WITHOUT_SQL
-#define _DEBUG 1
+//#define _DEBUG 1
 #define MAX_QUERY_PRIORITY 5 // PRI->THREADS: 0 -> 8, 1 -> 4, 2 -> 2, 3 -> 1
 #define QUERY_POOLING_INTERVAL 5
 #define QUERY_RETRY_COUNT 3
@@ -84,10 +84,11 @@ class mysql_mngr
     std::atomic<int> num_finished;
     std::atomic<bool> stop_main;
     std::atomic<bool> stop_threads;
-    std::mutex threads_mutex, fwd_mutex, std_mutex;
+    std::mutex frame_mutex, threads_mutex, fwd_mutex, std_mutex;
     std::atomic<uint64> m_query_nums;
     std::vector<MYSQL *> conns;
     time_point_t _time_0;
+    size_t m_frames;
 
 private:
     int wait_for_mysql(MYSQL *conn, int status, int timeout_ms = 0)
@@ -232,9 +233,10 @@ public:
             failstate = TQUERY_CONNECT_FAILED;
         q->successful = failstate == TQUERY_SUCCESS && get_result(q, false);
         float queuetime = q->time_end - q->time_start;
+        frame_mutex.lock();
         if (!stop_threads && !q->aborted && q->prms->fwd != -1)
         {
-            std::lock_guard<std::mutex> lock(fwd_mutex);
+            std::lock_guard lock(fwd_mutex);
             // public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
             DEBUG("exec_async_query: EXEC AMXX FORWARD = %d, is_debug = %d, failstate = %d, err = %d, query = %p, time = %f (%f / %f / %f), error = %s", q->prms->fwd, q->prms->is_debug, failstate, err, q, queuetime, q->time_create, q->time_start, q->time_end, q->error.c_str());
             auto data_size = clamp(q->data_size, 1U, 4096U);
@@ -248,32 +250,17 @@ public:
             // Callback data
             g_amxxapi.amx_Allot(amx, data_size, &data_param, &tmp);
             Q_memcpy(tmp, data, data_size << 2);
+            auto total_size = (q->error.size() + 1 + data_size) << 2;
             int ret = g_amxxapi.ExecuteForward(q->prms->fwd, failstate, q, error_param, err, data_param, data_size, amx_ftoc(queuetime));
-            DEBUG("exec_async_query: AFTER FORWARD, fix = %d, hea = %p, param = %p, size = %d (%d)", amx->hea > data_param, amx->hea, data_param, amx->hea - data_param, data_size << 2);
+            //int ret = g_amxxapi.ExecuteForward(q->prms->fwd, failstate, q, q->error.c_str(), err, g_amxxapi.PrepareCellArray(data, data_size), data_size, amx_ftoc(queuetime));
+            DEBUG("exec_async_query: AFTER FORWARD, fix = %d, hea = %p, param = %p, size = %d (%d)", amx->hea > data_param, amx->hea, data_param, amx->hea - error_param, total_size);
             // Fix heap
-            amx->hea = error_param;
-            //if (q->prms->is_debug)
-            //while (!fwd_mutex.try_lock())
-            //{
-            //    std::this_thread::yield();
-            //    usleep(QUERY_POOLING_INTERVAL * 100);
-            //}
-            /*
-            auto data_size = clamp(q->data_size, 1U, 4096U);
-            auto error = g_amxxapi.PrepareCharArray(q->error.size() ? (char *)q->error.c_str() : (char *)"", q->error.size() + 1);
-            auto data = g_amxxapi.PrepareCellArray(q->data_size ? q->data : tmpdata, data_size);
-            if (error == 0 && data == 1)
-            {
-                DEBUG("exec_async_query: PREPARE() error = %d, data = %d", error, data);
-                int ret = g_amxxapi.ExecuteForward(q->prms->fwd, failstate, q, error, err, data, data_size, amx_ftoc(queuetime));
-                //if (q->prms->is_debug)
-                //fwd_mutex.unlock();
-                DEBUG("exec_async_query: AFTER FORWARD");
-            }
+            if ((amx->hea - error_param) == total_size)
+                amx->hea = error_param;
             else
-                DEBUG("exec_async_query: CONCURENCY CALLBACK ERROR !!!");
-            */
-        }
+                AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: can't fix amx->hea, possible memory leak!", __FUNCTION__);
+        } else if (stop_threads)
+            frame_mutex.unlock();
         free_query(q);
         num_finished++;
         q->finished = true;
@@ -286,7 +273,7 @@ public:
         q->data = nullptr;
         q->result = nullptr;
         q->async = async;
-        q->is_buffered = q->is_buffered;
+        q->is_buffered = true;
         q->started = false;
         q->aborted = false;
         q->finished = false;
@@ -360,7 +347,7 @@ public:
         if (q->data != nullptr && (q->successful || q->aborted || stop_threads))
         {
             DEBUG("free_query: FREE DATA, q = %p", q);
-            delete[] q->data;
+            delete q->data;
             q->data = nullptr;
         }
     }
@@ -578,6 +565,7 @@ public:
     void start()
     {
         _time_0 = std::chrono::system_clock::now();
+        frame_mutex.lock();
         stop_threads = false;
     }
     void stop()
@@ -588,6 +576,7 @@ public:
     }
     void abort()
     {
+        threads_mutex.lock();
         for (int pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
         {
             for (auto it = m_queries[pri].begin(); it != m_queries[pri].end(); it++)
@@ -596,6 +585,8 @@ public:
                 q->aborted = true;
             }
         }
+        threads_mutex.unlock();
+        frame_mutex.unlock();
         // Wait before
         while (num_threads > 0)
             usleep(QUERY_POOLING_INTERVAL * 1000);
@@ -605,6 +596,27 @@ public:
         elapsed_time_t queuetime = std::chrono::system_clock::now() - _time_0;
         return queuetime.count();
     }
+    void start_frame()
+    {
+        bool has_threads = (num_threads - num_finished) > 0;
+#ifdef _DEBUG
+        if (has_threads)
+            UTIL_ServerPrint("[ START ] ==>: frame = %u, num_threads = %d, stop_threads = %d\n", m_frames, num_threads.load(), stop_threads.load());
+#endif
+        if (!stop_threads && has_threads)    //!stop_threads && 
+        {
+            frame_mutex.unlock();
+            usleep(1);
+            fwd_mutex.lock();
+            frame_mutex.try_lock();
+            fwd_mutex.unlock();
+        }
+#ifdef _DEBUG
+        if (has_threads)
+            UTIL_ServerPrint("[ END ] ==>: frame = %u, num_threads = %d, stop_threads = %d\n", m_frames, num_threads.load(), stop_threads.load());
+#endif
+        m_frames++;
+    }
     mysql_mngr() : main_thread()
     {
         stop_main = false;
@@ -612,6 +624,7 @@ public:
         m_query_nums = 1;
         num_threads = 0;
         num_finished = 0;
+        m_frames = 0;
         max_threads = clamp(std::thread::hardware_concurrency() >> 1, 1U, 4U);
     }
     ~mysql_mngr()

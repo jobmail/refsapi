@@ -21,7 +21,9 @@ public:
     }
     ~fmt()
     {
-        delete buff;
+        if (buff != nullptr)
+            delete buff;
+        buff = nullptr;
     }
     char *c_str()
     {
@@ -45,7 +47,9 @@ public:
     }
     ~wfmt()
     {
-        delete buff;
+        if (buff != nullptr)
+            delete buff;
+        buff = nullptr;
     }
     wchar_t *c_str()
     {

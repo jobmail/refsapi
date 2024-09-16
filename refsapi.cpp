@@ -5,6 +5,7 @@ int m_state;
 int g_PlayersNum[6];
 bool r_bMapHasBuyZone;
 char g_buff[4096];
+const std::locale _LOCALE = std::locale("ru_RU.UTF-8");
 cvar_mngr g_cvar_mngr;
 #ifndef WITHOUT_SQL
 mysql_mngr g_mysql_mngr;
@@ -23,131 +24,74 @@ g_RegUserMsg g_user_msg[] =
         {"TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false},
 };
 
-void *R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb)
+void R_StartFrame_Post(void)
 {
-    Alloc_EntPrivateData(pEdict);
+#ifndef WITHOUT_SQL
+    g_mysql_mngr.start_frame();
+#endif
+    RETURN_META(MRES_IGNORED);
+}
+
+void *R_PvAllocEntPrivateData(edict_t *p, int32 cb)
+{
+    Alloc_EntPrivateData(p);
     RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
-/*
-void ED_Free_RH(IRehldsHook_ED_Free *chain, edict_t *pEdict) {
-    Free_EntPrivateData(pEdict);
-    chain->callNext(pEdict);
-}
-
-edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain) {
-    auto origin = chain->callNext();
-    Alloc_EntPrivateData(origin);
-    return origin;
-}
-*/
-
-void Alloc_EntPrivateData(edict_t *pEdict)
+void Alloc_EntPrivateData(edict_t *p)
 {
-    if (FStringNull(pEdict->v.classname))
+    if (FStringNull(p->v.classname))
         return;
-    // UTIL_ServerPrint"[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(pEdict), STRING(pEdict->v.classname), ENTINDEX(pEdict->v.owner));
-    int entity_index = ENTINDEX(pEdict);
-    std::string key = STRING(pEdict->v.classname);
-    // ADD ENTITIES
-    int result = trie_add(&g_Tries.entities, key, entity_index);
+    // UTIL_ServerPrint"[DEBUG] Alloc_EntPrivateData(): id = %d, classname = <%s>, owner = %d\n", ENTINDEX(p), STRING(p->v.classname), ENTINDEX(p->v.owner));
+    auto index = ENTINDEX(p);
+    std::string key = STRING(p->v.classname);
+    trie_add(g_Tries.entities, key, index);
     // UTIL_ServerPrint"[DEBUG] Alloc_EntPrivateData(): classname = <%s>, new_count = %d\n", key.c_str(), result);
-    //  ADD CLASSNAMES
-    g_Tries.classnames[entity_index] = key;
-    // ADD WP_ENTITIES
+    g_Tries.classnames[index] = key;
     if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN)
     {
-        vector_add(&g_Tries.wp_entities, entity_index);
+        vector_add(g_Tries.wp_entities, index);
         // UTIL_ServerPrint"[DEBUG] Alloc_EntPrivateData(): WEAPONS, new_count = %d\n", result);
     }
 }
 
-void Free_EntPrivateData(edict_t *pEdict)
+void Free_EntPrivateData(edict_t *p)
 {
-    std::string key;
-    int entity_index, owner_index;
-    entity_index = ENTINDEX(pEdict);
-    owner_index = ENTINDEX(pEdict->v.owner);
-    // UTIL_ServerPrint"[DEBUG] Free_EntPrivateData(): pEdict = %p, privdata = %p, free = %d, kill = %d, entity = %d, classname = <%s>, owner = %d\n", pEdict, pEdict->pvPrivateData, pEdict->free, pEdict->v.flags & FL_KILLME, entity_index, STRING(pEdict->v.classname), owner_index);
-    //  CHECK CREATION CLASSNAME
-    if (pEdict == nullptr || pEdict->pvPrivateData == nullptr || pEdict->free || FStringNull(pEdict->v.classname))
-    {
-        // WAS REGISTERED?
-        if (g_Tries.classnames.find(entity_index) != g_Tries.classnames.end())
-        {
-            key = g_Tries.classnames[entity_index];
-            // UTIL_ServerPrint"[DEBUG] Free_EntPrivateData(): found deleted entity = %d with creation_classname = <%s> << WARNING !!!\n", entity_index, key);
-            //  REMOVE FROM ENTITIES
-            vector_remove(&g_Tries.entities[key], entity_index);
-            // REMOVE PLAYER_ENTITIES
-            if (is_valid_index(owner_index))
-                vector_remove(&g_Tries.player_entities[owner_index], entity_index);
-            // REMOVE WP_ENITITIES
-            if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN)
-                vector_remove(&g_Tries.wp_entities, entity_index);
-            // REMOVE CLASSNAME
-            g_Tries.classnames.erase(entity_index);
-            return;
-        }
-    }
-    key = STRING(pEdict->v.classname);
-    // CHECK ENTITY CREATION CLASS
-    if (key != g_Tries.classnames[entity_index])
-    {
-        // UTIL_ServerPrint"[DEBUG] Free_EntPrivateData(): entity = %d, classname = <%s> was changed from <%s> << WARNING !!!\n", entity_index, key.c_str(), g_Tries.classnames[entity_index].c_str());
-        key = g_Tries.classnames[entity_index];
-    }
-    // REMOVE ENTITIES
-    int result = trie_remove(&g_Tries.entities, key, entity_index);
-    // UTIL_ServerPrint"[DEBUG] Free_EntPrivateData(): remove entity = %d from classname = <%s>, new_count = %d\n", entity_index, key.c_str(), result);
-    //  REMOVE PLAYER_ENTITIES
-    if (is_valid_index(owner_index))
-        vector_remove(&g_Tries.player_entities[owner_index], entity_index);
-    // REMOVE CLASSNAME
-    g_Tries.classnames.erase(entity_index);
-    // REMOVE WP_ENTITIES
+    auto index = ENTINDEX(p);
+    auto owner = ENTINDEX(p->v.owner);
+    // UTIL_ServerPrint"[DEBUG] Free_EntPrivateData(): p = %p, privdata = %p, free = %d, kill = %d, entity = %d, classname = <%s>, owner = %d\n", p, p->pvPrivateData, p->free, p->v.flags & FL_KILLME, index, STRING(p->v.classname), owner);
+    auto key_old = g_Tries.classnames[index];
+    auto key = FStringNull(p->v.classname) ? key_old : STRING(p->v.classname);
+    if (key_old != key)
+        trie_transfer(g_Tries.entities, key_old, key, index);
+    trie_remove(g_Tries.entities, key, index);
     if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > WP_CLASS_PREFIX_LEN)
-    {
-        vector_remove(&g_Tries.wp_entities, entity_index);
-        // UTIL_ServerPrint"[DEBUG] Free_EntPrivateData(): WEAPONS, new_count = %d\n", result);
-    }
+        vector_remove(g_Tries.wp_entities, index);
+    if (is_valid_index(owner))
+        vector_remove(g_Tries.player_entities[owner], index);
+    g_Tries.classnames.erase(index);
 }
 
 void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer)
 {
-    int id = pPlayer->entindex();
+    auto id = pPlayer->entindex();
     // FIX TEAMS DEAD COUNT
     if (is_valid_index(id) && is_valid_team(g_Clients[id].team) && pPlayer->edict()->v.deadflag != DEAD_NO && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
         g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
     chain->callNext(pPlayer);
 }
 
-/*
-CWeaponBox* CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo)
-{
-    auto origin = chain->callNext(pItem, pPlayer, model, v_origin, v_angels, v_velocity, life_time, pack_ammo);
-    int owner_index = pPlayer->entindex();
-    int entity_index = pItem->entindex();
-    // REMOVE PLAYER_ENTITIES
-    if (is_valid_index(owner_index))
-        vector_remove(&g_Tries.player_entities[owner_index], entity_index);
-    // FIX OWNER
-    origin->edict()->v.owner = pPlayer->edict();
-    return origin;
-}
-*/
-
 qboolean CBasePlayer_RemovePlayerItem_RG(IReGameHook_CBasePlayer_RemovePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem)
 {
     auto origin = chain->callNext(pPlayer, pItem);
     if (origin)
     {
-        int entity_index = pItem->entindex();
-        int owner_index = ENTINDEX(pItem->pev->owner);
-        if (is_valid_index(owner_index))
+        auto index = pItem->entindex();
+        auto owner = ENTINDEX(pItem->pev->owner);
+        if (is_valid_index(owner))
         {
-            vector_remove(&g_Tries.player_entities[owner_index], entity_index);
-            // UTIL_ServerPrint"[DEBUG] CBasePlayer_RemovePlayerItem_RG(): remove entity = %d from owner = %d\n", entity_index, owner_index);
+            vector_remove(g_Tries.player_entities[owner], index);
+            // UTIL_ServerPrint"[DEBUG] CBasePlayer_RemovePlayerItem_RG(): remove entity = %d from owner = %d\n", index, owner);
         }
     }
     return origin;
@@ -158,25 +102,25 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
     auto origin = chain->callNext(pPlayer, pItem);
     if (origin)
     {
-        int id = pPlayer->entindex();
-        int entity_index = pItem->entindex();
-        //int owner_index = ENTINDEX(pItem->pev->owner);
-        vector_add(&g_Tries.player_entities[id], entity_index);
-        // UTIL_ServerPrint"[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d prev_owner = %d\n", id, entity_index, owner_index);
+        auto id = pPlayer->entindex();
+        auto index = pItem->entindex();
+        //int owner = ENTINDEX(pItem->pev->owner);
+        vector_add(g_Tries.player_entities[id], index);
+        // UTIL_ServerPrint"[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d prev_owner = %d\n", id, index, owner);
         //  FIX OWNER
         pItem->pev->owner = pPlayer->edict();
-        // UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = <%s>, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner_index);
+        // UTIL_ServerPrint("[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d, item_classname = <%s>, item_owner = %d\n", pPlayer->entindex(), pItem->entindex(), STRING(pItem->pev->classname), owner);
     }
     return origin;
 }
 
-void R_ClientPutInServer_Post(edict_t *pEntity)
+void R_ClientPutInServer_Post(edict_t *p)
 {
     // UTIL_ServerPrint("[DEBUG] ClientPutInServer_Post() ===>\n");
-    CBasePlayer *pPlayer = UTIL_PlayerByIndexSafe(ENTINDEX(pEntity));
+    auto *pPlayer = UTIL_PlayerByIndexSafe(ENTINDEX(p));
     if (pPlayer != nullptr && !pPlayer->IsBot())
-        Client_PutInServer(pEntity, STRING(pEntity->v.netname), false);
-    // Client_PutInServer(pEntity, STRING(pEntity->v.netname), false);
+        Client_PutInServer(p, STRING(p->v.netname), false);
+    // Client_PutInServer(p, STRING(p->v.netname), false);
     RETURN_META(MRES_IGNORED);
 }
 
@@ -199,16 +143,16 @@ void CBasePlayer_Killed_RG(IReGameHook_CBasePlayer_Killed *chain, CBasePlayer *p
 
 edict_t *CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname)
 {
-    edict_t *pEntity = chain->callNext(netname);
-    // UTIL_ServerPrint("[DEBUG] CreateFakeClient(): id = %d, name = %s\n", ENTINDEX(pEntity), netname);
-    Client_PutInServer(pEntity, netname, true);
-    return pEntity;
+    auto p = chain->callNext(netname);
+    // UTIL_ServerPrint("[DEBUG] CreateFakeClient(): id = %d, name = %s\n", ENTINDEX(p), netname);
+    Client_PutInServer(p, netname, true);
+    return p;
 }
 
-void R_ClientDisconnect(edict_t *pEntity)
+void R_ClientDisconnect(edict_t *p)
 {
     // UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
-    Client_Disconnected(pEntity, false, 0);
+    Client_Disconnected(p, false, 0);
     RETURN_META(MRES_IGNORED);
 }
 
@@ -222,23 +166,23 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
     chain->callNext(cl, crash, format);
 }
 
-void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot)
+void Client_PutInServer(edict_t *p, const char *netname, const bool is_bot)
 {
-    int id = ENTINDEX(pEntity);
+    auto id = ENTINDEX(p);
     if (is_valid_index(id))
     {
         g_Clients[id].is_bot = is_bot;
         g_Clients[id].is_connected = true;
         g_Clients[id].team = TEAM_UNASSIGNED;
         g_PlayersNum[TEAM_UNASSIGNED]++;
-        // UTIL_ServerPrint("[DEBUG] PutInServer_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, netname, GETPLAYERAUTHID(pEntity), g_Clients[id].team, g_Clients[id].is_connected);
+        // UTIL_ServerPrint("[DEBUG] PutInServer_Post(): id = %d, name = %s, authid = %s, team = %d, is_connected = %d\n", id, netname, GETPLAYERAUTHID(p), g_Clients[id].team, g_Clients[id].is_connected);
         // UTIL_ServerPrint("[DEBUG] num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d\n", g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR]);
     }
 }
 
-void Client_Disconnected(edict_t *pEdict, bool crash, char *format)
+void Client_Disconnected(edict_t *p, bool crash, char *format)
 {
-    int id = ENTINDEX(pEdict);
+    auto id = ENTINDEX(p);
     if (is_valid_index(id))
     {
         // UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, is_connected = %d\n", id, g_Clients[id].is_connected);
@@ -249,7 +193,7 @@ void Client_Disconnected(edict_t *pEdict, bool crash, char *format)
             ////UTIL_ServerPrint("[DEBUG] Client_Disconnected(): id = %d, name = %s\n", id, STRING(pPlayer->edict()->v.netname));
             g_PlayersNum[g_Clients[id].team]--;
             // FIX TEAMS DEAD COUNT
-            if (is_valid_entity(pEdict) && pEdict->v.deadflag != DEAD_NO && is_valid_team(g_Clients[id].team) && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
+            if (is_valid_entity(p) && p->v.deadflag != DEAD_NO && is_valid_team(g_Clients[id].team) && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
                 g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
             // UTIL_ServerPrint("[DEBUG] DISCONNECT: num_unassigned = %d, num_tt = %d, num_ct = %d, num_spec = %d, num_dead_tt = %d, num_dead_ct = %d\n",
             //     g_PlayersNum[TEAM_UNASSIGNED], g_PlayersNum[TEAM_TERRORIST], g_PlayersNum[TEAM_CT], g_PlayersNum[TEAM_SPECTRATOR], g_PlayersNum[TEAM_DEAD_TT], g_PlayersNum[TEAM_DEAD_CT]
@@ -289,15 +233,15 @@ void Client_TeamInfo(void *m_value)
             new_team = TEAM_UNASSIGNED;
         }
         // UTIL_ServerPrint("[DEBUG] id = %d, old_team = %d, new_team = %d\n", id, g_Clients[id].team, new_team);
+        auto p = INDEXENT(id);
         if (!g_Clients[id].is_connected)
         {
             g_Clients[id].team = new_team;
         }
         else if (new_team != TEAM_UNASSIGNED && g_Clients[id].team != new_team)
         {
-            edict_t *pEdict = INDEXENT(id);
             // FIX TEAMS DEAD COUNT
-            if (is_valid_entity(pEdict) && pEdict->v.deadflag != DEAD_NO)
+            if (is_valid_entity(p) && p->v.deadflag != DEAD_NO)
             {
                 if (is_valid_team(g_Clients[id].team) && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
                     g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
@@ -313,9 +257,8 @@ void Client_TeamInfo(void *m_value)
             //);
         }
         // FIX TEAM
-        edict_t *pEdict = INDEXENT(id);
-        if (is_valid_entity(pEdict))
-            pEdict->v.team = new_team;
+        if (is_valid_entity(p))
+            p->v.team = new_team;
     }
 }
 
@@ -409,66 +352,78 @@ void R_MessageEnd_Post(void)
     RETURN_META(MRES_IGNORED);
 }
 
-int trie_add(std::map<std::string, std::vector<int>> *trie, std::string key, int value)
+int trie_add(std::map<std::string, std::vector<int>> &trie, std::string key, int value)
 {
-    std::vector<int> v;
-    if (trie->find(key) != trie->end())
-        v = (*trie)[key];
-
+    auto &v = trie[key];
     if (v.size() < v.max_size())
-    {
         v.push_back(value);
-        (*trie)[key] = v;
-    }
     return v.size();
 }
 
-int trie_remove(std::map<std::string, std::vector<int>> *trie, std::string key, int value)
+int trie_remove(std::map<std::string, std::vector<int>> &trie, std::string key, int value)
 {
-    std::vector<int> v;
-    std::vector<int>::iterator it_value;
-    if (trie->find(key) != trie->end())
+    auto &v = trie[key];
+    if (v.size())
     {
-        v = (*trie)[key];
-        if ((it_value = std::find(v.begin(), v.end(), value)) != v.end())
+        auto it = std::find(v.begin(), v.end(), value);
+        if (it != v.end())
         {
-            v.erase(it_value);
-            if (v.size() > 0)
-                (*trie)[key] = v;
-            else
-                trie->erase(key);
+            v.erase(it);
+            if (!v.size())
+                trie.erase(key);
         }
     }
     return v.size();
 }
 
-void trie_transfer(std::map<std::string, std::vector<cell>> *trie, std::string key_from, std::string key_to, int value)
+void trie_transfer(std::map<std::string, std::vector<cell>> &trie, std::string key_from, std::string key_to, int value)
 {
     trie_remove(trie, key_from, value);
-
     g_Tries.classnames[value] = key_to;
     trie_add(trie, key_to, value);
 }
 
-int vector_add(std::vector<cell> *v, int value)
+int vector_add(std::vector<cell> &v, int value)
 {
-    v->push_back(value);
-    return v->size();
+    v.push_back(value);
+    return v.size();
 }
 
-int vector_remove(std::vector<cell> *v, int value)
+int vector_remove(std::vector<cell> &v, int value)
 {
-    std::vector<cell>::iterator it_value;
-    if ((it_value = std::find(v->begin(), v->end(), value)) != v->end())
-        v->erase(it_value);
-    return v->size();
+    auto it = std::find(v.begin(), v.end(), value);
+    if (it != v.end())
+        v.erase(it);
+    return v.size();
 }
 
-bool get_user_buyzone(const edict_t *pEdict)
+size_t copy_entities(std::vector<int> &v, std::string &key, cell *dest, size_t max_size)
+{
+    size_t result = 0;
+    for (auto &entity : v)
+    {
+        auto p = INDEXENT(entity);
+        if (!is_valid_entity(p))
+        {
+            vector_remove(v, entity);
+            continue;
+        }
+        if (g_Tries.classnames[entity] != STRING(p->v.classname))
+            trie_transfer(g_Tries.entities, g_Tries.classnames[entity], STRING(p->v.classname), entity);
+        if (key != STRING(p->v.classname))
+            continue;
+        *(dest + result) = entity;
+        if (++result >= max_size)
+            break;
+    }
+    return result;
+}
+
+bool get_user_buyzone(const edict_t *p)
 {
     bool result = false;
-    // UTIL_ServerPrint("[DEBUG] get_user_buyzone(): id = %d, team = %d, classname = %s\n", ENTINDEX(pEdict), pEdict->v.team, STRING(pEdict->v.classname));
-    if (is_valid_entity(pEdict) && is_valid_team(pEdict->v.team) && pEdict->v.deadflag == DEAD_NO)
+    // UTIL_ServerPrint("[DEBUG] get_user_buyzone(): id = %d, team = %d, classname = %s\n", ENTINDEX(p), p->v.team, STRING(p->v.classname));
+    if (is_valid_entity(p) && is_valid_team(p->v.team) && p->v.deadflag == DEAD_NO)
     {
         if (r_bMapHasBuyZone)
         {
@@ -477,7 +432,7 @@ bool get_user_buyzone(const edict_t *pEdict)
             {
                 edict_t *pBuyZone = INDEXENT(buyzone);
                 // UTIL_ServerPrint("[DEBUG] get_user_buyzone(): entity = %d, team = %d\n", buyzone, pBuyZone->v.team);
-                if (is_valid_entity(pBuyZone) && pEdict->v.team == pBuyZone->v.team && is_entity_intersects(pEdict, pBuyZone))
+                if (is_valid_entity(pBuyZone) && p->v.team == pBuyZone->v.team && is_entity_intersects(p, pBuyZone))
                 {
                     result = true;
                     break;
@@ -486,11 +441,11 @@ bool get_user_buyzone(const edict_t *pEdict)
         }
         else
         {
-            for (auto &spawn : g_Tries.entities[pEdict->v.team == TEAM_TERRORIST ? "info_player_deathmatch" : "info_player_start"])
+            for (auto &spawn : g_Tries.entities[p->v.team == TEAM_TERRORIST ? "info_player_deathmatch" : "info_player_start"])
             {
                 edict_t *pSpawn = INDEXENT(spawn);
                 // UTIL_ServerPrint("[DEBUG] get_user_buyzone(): spawn = %d, classname = %s, kill = %d\n", spawn, STRING(pSpawn->v.classname), (pSpawn->v.flags & FL_KILLME));
-                if (is_valid_entity(pSpawn) && (pSpawn->v.origin - pEdict->v.origin).Length() < 200.0f)
+                if (is_valid_entity(pSpawn) && (pSpawn->v.origin - p->v.origin).Length() < 200.0f)
                 {
                     result = true;
                     break;

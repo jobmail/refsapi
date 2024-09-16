@@ -16,7 +16,6 @@
 
 #define _QQ "\"'`"
 #define _TRIM_CHARS " \r\t\n"
-#define _LOCALE std::locale("ru_RU.UTF-8")
 #define _COUNT(x) (size_t)(sizeof(x) / sizeof(cell))
 
 #define amx_ftoc(f) (*((cell *)&f))  /* float to cell */
@@ -75,6 +74,7 @@ extern cell g_PlayersNum[6];
 extern int mState;
 extern int gmsgTeamInfo;
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
+extern const std::locale _LOCALE;
 
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
 extern funEventCall modMsgs[MAX_REG_MSGS];
@@ -96,9 +96,10 @@ qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerI
 CWeaponBox *CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo);
 void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer);
 
-void R_ClientPutInServer_Post(edict_t *pEntity);
-void R_ClientDisconnect(edict_t *pEntity);
-void *R_PvAllocEntPrivateData(edict_t *pEdict, int32 cb);
+void R_StartFrame_Post(void);
+void R_ClientPutInServer_Post(edict_t *p);
+void R_ClientDisconnect(edict_t *p);
+void *R_PvAllocEntPrivateData(edict_t *p, int32 cb);
 int R_RegUserMsg_Post(const char *pszName, int iSize);
 void R_MessageBegin_Post(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
 void R_WriteByte_Post(int iValue);
@@ -112,14 +113,15 @@ void R_WriteEntity_Post(int iValue);
 void R_MessageEnd_Post(void);
 
 void Client_TeamInfo(void *);
-void Client_PutInServer(edict_t *pEntity, const char *netname, const bool is_bot);
-void Client_Disconnected(edict_t *pEdict, bool crash, char *format);
-void Alloc_EntPrivateData(edict_t *pEdict);
-void Free_EntPrivateData(edict_t *pEdict);
+void Client_PutInServer(edict_t *p, const char *netname, const bool is_bot);
+void Client_Disconnected(edict_t *p, bool crash, char *format);
+void Alloc_EntPrivateData(edict_t *p);
+void Free_EntPrivateData(edict_t *p);
 
-int trie_add(std::map<std::string, std::vector<cell>> *trie, std::string key, int value);
-int trie_remove(std::map<std::string, std::vector<cell>> *trie, std::string key, int value);
-void trie_transfer(std::map<std::string, std::vector<cell>> *trie, std::string key_from, std::string key_to, int value);
-int vector_add(std::vector<cell> *v, int value);
-int vector_remove(std::vector<cell> *v, int value);
+int trie_add(std::map<std::string, std::vector<int>> &trie, std::string key, int value);
+int trie_remove(std::map<std::string, std::vector<int>> &trie, std::string key, int value);
+void trie_transfer(std::map<std::string, std::vector<cell>> &trie, std::string key_from, std::string key_to, int value);
+int vector_add(std::vector<cell> &v, int value);
+int vector_remove(std::vector<cell> &v, int value);
+size_t copy_entities(std::vector<int> &v, std::string &key, cell *dest, size_t max_size);
 bool get_user_buyzone(const edict_t *pEdict);
