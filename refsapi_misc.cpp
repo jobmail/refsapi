@@ -30,9 +30,9 @@ bool is_number(std::string &s)
 size_t set_amx_string(cell *dest, const char *str, size_t max_len)
 {
     size_t count = 0;
-    if (max_len)
+    if (dest && max_len)
     {
-        while (*str && ++count < max_len)
+        while (str && *str && ++count < max_len)
             *dest++ = (cell)*str++;
         *dest = 0;
     }

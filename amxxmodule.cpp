@@ -169,6 +169,7 @@ C_DLLEXPORT int AMXX_PluginsLoaded()
 
 C_DLLEXPORT void AMXX_PluginsUnloaded()
 {
+	
 }
 
 C_DLLEXPORT void AMXX_PluginsUnloading()
@@ -197,18 +198,18 @@ NOINLINE void AMXX_LogError(AMX *amx, int err, const char *fmt, ...)
 
 char *getAmxString(cell *src, char *dest, size_t max, size_t *len)
 {
-	char *start = dest;
-	while (*src && --max > 0)
+	auto start = dest;
+	while (*src && --max)
 		*dest++ = (char)*src++;
-	*dest = '\0';
+	*dest = 0;
 	if (len)
 		*len = dest - start;
 	return start;
 }
 
-void setAmxString(cell *dest, const char *string, size_t max)
+void setAmxString(cell *dest, const char *src, size_t max)
 {
-	while (*string && max-- > 0)
-		*dest++ = (cell)*string++;
+	while (*src && --max > 0)
+		*dest++ = (cell)*src++;
 	*dest = 0;
 }

@@ -12,9 +12,10 @@ cell AMX_NATIVE_CALL rf_get_players_num(AMX *amx, cell *params)
         arg_nums_arr_size,
         arg_teams_only
     };
-    size_t max_size = *getAmxAddr(amx, params[arg_nums_arr_size]);
-    if (max_size > 0)
-        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, std::min(max_size, _COUNT(g_PlayersNum)) << 2);
+    // UTIL_ServerPrint("[DEBUG] rf_get_players_num(): size = %u (%u)\n", params[arg_nums_arr_size], *getAmxAddr(amx, params[arg_nums_arr_size]));
+    size_t max_size = std::min(_COUNT(g_PlayersNum), (size_t)params[arg_nums_arr_size]);
+    if (max_size)
+        Q_memcpy(getAmxAddr(amx, params[arg_nums_arr]), &g_PlayersNum, max_size << 2);
     int total = g_PlayersNum[TEAM_TERRORIST] + g_PlayersNum[TEAM_CT];
     return params[arg_teams_only] ? total : total + g_PlayersNum[TEAM_UNASSIGNED] + g_PlayersNum[TEAM_SPECTRATOR];
 }
@@ -29,13 +30,11 @@ cell AMX_NATIVE_CALL rf_get_user_weapons(AMX *amx, cell *params)
         arg_ent_arr,
         arg_ent_arr_size
     };
-    if (params[arg_ent_arr_size] < 1)
-        return 0;
     CHECK_ISPLAYER(arg_index);
-    std::vector<cell> v = g_Tries.player_entities[params[arg_index]];
-    size_t max_size = std::min(v.size(), (size_t)*getAmxAddr(amx, params[arg_ent_arr_size]));
-    if (max_size > 0)
-        Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v.data(), max_size << 2);
+    auto v = &g_Tries.player_entities[params[arg_index]];
+    size_t max_size = std::min(v->size(), (size_t)params[arg_ent_arr_size]);
+    if (max_size)
+        Q_memcpy(getAmxAddr(amx, params[arg_ent_arr]), v->data(), max_size << 2);
     return max_size;
 }
 
@@ -70,56 +69,20 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params)
         arg_ent_arr,
         arg_ent_arr_size
     };
+    std::string key = getAmxString(amx, params[arg_classname], g_buff);
+    auto dest = getAmxAddr(amx, params[arg_ent_arr]);
+    size_t max_size = params[arg_ent_arr_size];
+    if (dest == nullptr || key.empty() || !max_size)
+        return 0;
     int owner_index = params[arg_owner];
-    int result = 0;
-    edict_t *pEdict;
-    char classname[256];
-    std::string key = getAmxString(amx, params[arg_classname], classname);
-    bool is_valid = is_valid_index(owner_index);
-    if (g_Tries.entities.find(key) != g_Tries.entities.end())
-    {
-        for (auto &entity : g_Tries.entities[key])
-        {
-            pEdict = INDEXENT(entity);
-            // CHECK VALID ENTITY & CHECK OWNER
-            if (!is_valid_entity(pEdict) || (is_valid && ENTINDEX(pEdict->v.owner) != owner_index))
-                continue;
-            // CHECK CREATION CLASSNAME
-            if (key != STRING(pEdict->v.classname))
-            {
-                trie_transfer(&g_Tries.entities, key, STRING(pEdict->v.classname), entity);
-                continue;
-            }
-            *(getAmxAddr(amx, params[arg_ent_arr]) + result) = entity;
-            if (++result >= params[arg_ent_arr_size])
-                break;
-        }
-    }
-    else
-    {
-        // CHECK WEAPON
-        if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX))
-        {
-            for (const int &entity : g_Tries.wp_entities)
-            {
-                pEdict = INDEXENT(entity);
-                // CHECK VALID ENTITY & CHECK OWNER
-                if (!is_valid_entity(pEdict) || (is_valid && ENTINDEX(pEdict->v.owner) != owner_index))
-                    continue;
-                // CHECK CREATION CLASSNAME
-                if (key == STRING(pEdict->v.classname))
-                {
-                    *(getAmxAddr(amx, params[arg_ent_arr]) + result) = entity;
-                    // TRANSFER CLASSNAME
-                    if (key != g_Tries.classnames[entity])
-                        trie_transfer(&g_Tries.entities, g_Tries.classnames[entity], key, entity);
-                    if (++result >= params[arg_ent_arr_size])
-                        break;
-                }
-            }
-        }
-    }
-    return result;
+    if (is_valid_index(owner_index))
+        return copy_entities(g_Tries.player_entities[owner_index], key, dest, max_size);
+    // CHECK WEAPON
+    else if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX))
+        return copy_entities(g_Tries.wp_entities, key, dest, max_size);
+    // CHECK GLOBAL
+    else //if (g_Tries.entities.find(key) != g_Tries.entities.end())
+        return copy_entities(g_Tries.entities[key], key, dest, max_size);
 }
 
 // native rf_roundfloat(const Float:value, const precision);
@@ -144,7 +107,7 @@ cell AMX_NATIVE_CALL rf_get_user_buyzone(AMX *amx, cell *params)
         arg_index
     };
     CHECK_ISPLAYER(arg_index);
-    return (qboolean)get_user_buyzone(INDEXENT(params[arg_index]));
+    return get_user_buyzone(INDEXENT(params[arg_index]));
 }
 
 // native rf_config(const bool:auto_create = true, const name[] = "", const folder[] = "");
@@ -159,14 +122,14 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     };
     int result = FALSE;
     // UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    auto plugin = findPluginFast(amx);
     auto plugin_cvars = g_cvar_mngr.get(plugin->getId());
     if (check_it_empty(plugin_cvars))
         return FALSE;
     // Sort list
-    plugin_cvars->second.sort([](cvar_list_it p1, cvar_list_it p2)
-                              { return p1->first < p2->first; });
-    // g_cvar_mngr.sort(plugin_cvars);
+    //plugin_cvars->second.sort([](m_cvar_t *p1, m_cvar_t *p2)
+    //                          { return p1->name < p2->name; }); // p1->first < p2->first
+    g_cvar_mngr.sort(plugin_cvars);
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
     std::wstring path = stows(getAmxString(amx, params[arg_folder], g_buff));
     // UTIL_ServerPrint("[DEBUG] rf_config(): path = %s\n", wstos(path).c_str());
@@ -240,9 +203,11 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 file << L"// This file was auto-generated by REFSAPI\n";
                 file << L"// Cvars for plugin \"" << plugin->getTitle() << L"\" by \"" << plugin->getAuthor() << L"\" (" << plugin->getName() << L", v" << plugin->getVersion() << L")\n";
             }
-            for (auto &cvar_it : plugin_cvars->second)
+            for (auto m_cvar : plugin_cvars->second)
             {
-                m_cvar = &cvar_it->second;
+                // Skip cvar witout bind
+                // if (m_cvar->type == CVAR_TYPE_NONE)
+                //    continue;
                 if (need_update)
                 {
                     file << L"\n// ";
@@ -253,7 +218,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                             file << L"// ";
                     }
                     file << L"\n// -\n";
-                    file << L"// Default: \"" << cvar_it->second.value << L"\"\n";
+                    file << L"// Default: \"" << m_cvar->value << L"\"\n";
                     if (m_cvar->has_min)
                         file << L"// Minimum: \"" << std::to_wstring(m_cvar->min_val) << "\"\n";
                     if (m_cvar->has_max)
@@ -266,14 +231,14 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 if (need_replace)
                 {
                     // Direct set
-                    g_cvar_mngr.direct_set(m_cvar->cvar, wstos(load_cvars_it->second).c_str());
+                    g_cvar_mngr.direct_set(m_cvar->cvar, wstos(load_cvars_it->second).c_str()); // g_cvar_mngr.set(CVAR_TYPE_STR, m_cvar, (cell *)wstos(load_cvars_it->second).c_str());
                     // Remove from list
                     load_cvars.erase(load_cvars_it);
                 }
             }
             // UTIL_ServerPrint("[DEBUG] rf_config(): cvars left %d\n", load_cvars.size());
             //  Unknown cvars left?
-            if (need_update && load_cvars.size() > 0)
+            if (need_update && load_cvars.size())
             {
                 file << L"\n// - DISABLED\n";
                 for (auto &cvar : load_cvars)
@@ -303,13 +268,12 @@ cell AMX_NATIVE_CALL rf_create_cvar(AMX *amx, cell *params)
         arg_has_max,
         arg_max_val
     };
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    auto plugin = findPluginFast(amx);
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
     std::wstring value = stows(getAmxString(amx, params[arg_value], g_buff));
     std::wstring desc = stows(getAmxString(amx, params[arg_desc], g_buff));
-    auto result = g_cvar_mngr.add(plugin->getId(), name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val]));
-    // UTIL_ServerPrint("[DEBUG] rf_create_cvar(): RESULT = %d\n", result->second.cvar);
-    return check_it_empty(result) ? FALSE : (cell)((void *)(result->second.cvar));
+    // UTIL_ServerPrint("[DEBUG] rf_create_cvar(): name = <%s>\n", wstos(name).c_str());
+    return (cell)((void *)g_cvar_mngr.add(plugin->getId(), name, value, params[arg_flags], desc, params[arg_has_min], amx_ctof(params[arg_min_val]), params[arg_has_max], amx_ctof(params[arg_max_val])));
 }
 
 // native rf_bind_pcvar(type, pcvar, any:var[], varlen = 0);
@@ -323,12 +287,12 @@ cell AMX_NATIVE_CALL rf_bind_pcvar(AMX *amx, cell *params)
         arg_var,
         arg_var_size,
     };
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    auto plugin = findPluginFast(amx);
     // Variable address is not inside global area?
     check_global_r(params[arg_var]);
     check_type_r(params[arg_type]);
-    cvar_t *cvar = (cvar_t *)((void *)params[arg_pcvar]);
-    g_cvar_mngr.bind(plugin, (CVAR_TYPES_t)params[arg_type], g_cvar_mngr.get(cvar), getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    m_cvar_t *m_cvar = (m_cvar_t *)((void *)params[arg_pcvar]);
+    g_cvar_mngr.bind(plugin, (CVAR_TYPES_t)params[arg_type], m_cvar, getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
 
@@ -342,14 +306,13 @@ cell AMX_NATIVE_CALL rf_hook_cvar_change(AMX *amx, cell *params)
         arg_callback,
         arg_state
     };
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    auto plugin = findPluginFast(amx);
     std::wstring name = stows(getAmxString(amx, params[arg_callback], g_buff));
     int fwd = g_amxxapi.RegisterSPForwardByName(amx, wstos(name).c_str(), FP_CELL, FP_STRING, FP_STRING, FP_DONE);
     check_fwd_r(fwd, wstos(name).c_str());
-    cvar_t *cvar = (cvar_t *)((void *)params[arg_pcvar]);
+    m_cvar_t *m_cvar = (m_cvar_t *)((void *)params[arg_pcvar]);
     // UTIL_ServerPrint("[DEBUG] rf_hook_cvar_change(): fwd = %d, name = <%s>, cvar = %d\n", fwd, wstos(name).c_str(), cvar);
-    auto result = g_cvar_mngr.create_hook(fwd, g_cvar_mngr.get(cvar), params[arg_state]);
-    return check_it_empty(result) || fwd != result->first ? FALSE : (cell)result->first;
+    return g_cvar_mngr.create_hook(fwd, m_cvar, params[arg_state]);
 }
 
 // native rf_cvar_hook_state(phook, bool:is_enbale);
@@ -375,8 +338,8 @@ cell AMX_NATIVE_CALL rf_get_pcvar(AMX *amx, cell *params)
         arg_var,
         arg_var_size,
     };
-    cvar_t *cvar = (cvar_t *)((void *)params[arg_pcvar]);
-    return g_cvar_mngr.get((CVAR_TYPES_t)params[arg_type], cvar, getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    m_cvar_t *m_cvar = (m_cvar_t *)((void *)params[arg_pcvar]);
+    return g_cvar_mngr.get((CVAR_TYPES_t)params[arg_type], m_cvar, getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
 }
 
 // native rf_get_cvar(type, cvar[], any:value[] = "", size = 0);
@@ -404,7 +367,7 @@ cell AMX_NATIVE_CALL rf_set_pcvar(AMX *amx, cell *params)
         arg_pcvar,
         arg_var,
     };
-    cvar_t *cvar = (cvar_t *)((void *)params[arg_pcvar]);
+    m_cvar_t *m_cvar = (m_cvar_t *)((void *)params[arg_pcvar]);
     cell *ptr;
     switch (params[arg_type])
     {
@@ -416,7 +379,7 @@ cell AMX_NATIVE_CALL rf_set_pcvar(AMX *amx, cell *params)
     case CVAR_TYPE_STR:
         ptr = (cell *)getAmxString(amx, params[arg_var], g_buff);
     }
-    g_cvar_mngr.set((CVAR_TYPES_t)params[arg_type], cvar, ptr);
+    g_cvar_mngr.set((CVAR_TYPES_t)params[arg_type], m_cvar, ptr);
     return TRUE;
 }
 
@@ -456,8 +419,7 @@ cell AMX_NATIVE_CALL rf_get_cvar_ptr(AMX *amx, cell *params)
     };
     // UTIL_ServerPrint("[DEBUG] rf_get_cvar_ptr(): start\n");
     std::wstring name = stows(getAmxString(amx, params[arg_cvar], g_buff));
-    auto result = g_cvar_mngr.get(name);
-    return check_it_empty(result) ? FALSE : (cell)((void *)(result->second.cvar));
+    return (cell)((void *)g_cvar_mngr.get(name));
 }
 
 // native rf_recoil_enable(custom_impulse_offset);
@@ -495,14 +457,15 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
         arg_db_chrs,
     };
     int fwd = -1;
-    CPluginMngr::CPlugin *plugin = findPluginFast(amx);
+    auto plugin = findPluginFast(amx);
     std::string callback, db_host, db_user, db_pass, db_name, db_chrs;
     callback = getAmxString(amx, params[arg_callback], g_buff);
     if (!callback.empty())
     {
         // public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
+        //fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_STRING, FP_CELL, FP_ARRAY, FP_CELL, FP_CELL, FP_DONE);
         fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_DONE);
-        check_fwd_r(fwd, callback);
+        check_fwd_r(fwd, callback.c_str());
     }
     db_host = getAmxString(amx, params[arg_db_host], g_buff);
     db_user = getAmxString(amx, params[arg_db_user], g_buff);
