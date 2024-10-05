@@ -587,8 +587,8 @@ public:
         threads_mutex.unlock();
         frame_mutex.unlock();
         // Wait before
-        while (num_threads > 0)
-            usleep(QUERY_POOLING_INTERVAL * 1000);
+        //while (num_threads > 0)
+        //    usleep(QUERY_POOLING_INTERVAL * 1000);
     }
     double get_time()
     {
