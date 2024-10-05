@@ -115,16 +115,16 @@ private:
     }
     void copy_bind(ptr_bind_t *bind, cvar_t *cvar)
     {
+        // UTIL_ServerPrint("[DEBUG] copy_bind(): from = %s, type = %d, size = %d\n", cvar->string, bind->type, bind->size);
         switch (bind->type)
         {
         case CVAR_TYPE_NUM:
-            *bind->ptr = (int)std::stof(cvar->string);
+            *bind->ptr = (int)std::stod(cvar->string);
             break;
         case CVAR_TYPE_FLT:
             *bind->ptr = amx_ftoc(cvar->value);
             break;
         case CVAR_TYPE_STR:
-            // UTIL_ServerPrint("[DEBUG] copy_bind(): from = %s, size = %d\n", cvar->string, bind->size);
             setAmxString(bind->ptr, cvar->string, bind->size);
         }
     }
@@ -265,8 +265,7 @@ public:
                 if (h->second)
                     g_amxxapi.ExecuteForward(h->first, (cell)((void *)(m_cvar)), wstos(m_cvar->value).c_str(), wstos(new_value).c_str());
             }
-        } // else
-          // UTIL_ServerPrint("[DEBUG] on_change(): hook for cvar <%d> not found !!!\n", m_cvar->cvar);
+        }
     }
     m_cvar_t *add_exists(cvar_t *cvar, std::wstring desc = L"", bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
     {
@@ -301,7 +300,9 @@ public:
     {
         if (!name.empty())
         {
-            auto m_cvar = add_exists(create_cvar(name, value, flags), desc, has_min, min_val, has_max, max_val);
+            auto m_cvar = get(name);
+            if (m_cvar == nullptr)
+                m_cvar = add_exists(create_cvar(name, value, flags), desc, has_min, min_val, has_max, max_val);
             if (m_cvar != nullptr && !desc.empty())
             {
                 auto plugin_cvars = cvars.plugin.find(plugin_id);
