@@ -455,18 +455,16 @@ public:
     }
     bool get_result(m_query_t *q, bool is_buffered)
     {
-        if (q->result == nullptr && !q->aborted)
-        {
-            q->result = (q->is_buffered = is_buffered) ? mysql_store_result(q->conn) : mysql_use_result(q->conn);
-            q->time_end = get_time();
-            DEBUG("get_result(): result = %p, query = %p, conn = %p, is_buffered = %d, state = %s", q->result, q, q->conn, is_buffered, q->conn->net.sqlstate);
-            if ((q->f_count = mysql_field_count(q->conn)) && q->result)
-                for (int i = 0; i < q->f_count; i++)
-                    q->f_names.insert({q->result->fields[i].name, i});
-            DEBUG("get_result(): done, field count = %d", q->f_count);
-            return true;
-        }
-        return false;
+        if (q->result || q->aborted)
+            return false;
+        q->result = (q->is_buffered = is_buffered) ? mysql_store_result(q->conn) : mysql_use_result(q->conn);
+        q->time_end = get_time();
+        DEBUG("get_result(): result = %p, query = %p, conn = %p, is_buffered = %d, state = %s", q->result, q, q->conn, is_buffered, q->conn->net.sqlstate);
+        if ((q->f_count = mysql_field_count(q->conn)) && q->result)
+            for (int i = 0; i < q->f_count; i++)
+                q->f_names.insert({q->result->fields[i].name, i});
+        DEBUG("get_result(): done, field count = %d", q->f_count);
+        return true;
     }
     size_t num_rows(m_query_t *q)
     {
