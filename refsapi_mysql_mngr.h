@@ -455,7 +455,7 @@ public:
     }
     bool get_result(m_query_t *q, bool is_buffered)
     {
-        if (q->result || q->aborted)
+        if (q->result != nullptr || q->aborted)
             return false;
         q->result = (q->is_buffered = is_buffered) ? mysql_store_result(q->conn) : mysql_use_result(q->conn);
         q->time_end = get_time();
