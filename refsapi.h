@@ -96,6 +96,7 @@ qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerI
 CWeaponBox *CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo);
 void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer);
 
+void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char* cmd, cmd_source_t src, IGameClient* id);
 void R_StartFrame_Post(void);
 void R_ClientPutInServer_Post(edict_t *p);
 void R_ClientDisconnect(edict_t *p);

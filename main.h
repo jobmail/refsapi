@@ -41,4 +41,5 @@ inline void EWRITE_STRING(const char *sz) { (*g_pengfuncsTable->pfnWriteString)(
 inline void EWRITE_ENTITY(int iValue) { (*g_pengfuncsTable->pfnWriteEntity)(iValue); }
 
 void UTIL_ServerPrint(const char *fmt, ...);
+void UTIL_GetFlags(char* f, int a);
 extern void NORETURN UTIL_SysError(const char *fmt, ...);

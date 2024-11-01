@@ -85,6 +85,7 @@ CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
 CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -fno-stack-protector
 #-DWITHOUT_SQL
+#-DWITHOUT_SQL
 #-g3
 #-fsanitize=undefined
 #-fsanitize=address
