@@ -96,7 +96,7 @@ static struct funcreq_t
 		DECLARE_REQ(UnregisterSPForward),
 		// DECLARE_REQ(MergeDefinitionFile),
 		// DECLARE_REQ(amx_FindNative),
-		// DECLARE_REQ(GetPlayerFlags),
+		DECLARE_REQ(GetPlayerFlags),
 		// DECLARE_REQ(GetPlayerEdict),
 		// DECLARE_REQ(Format),
 		// DECLARE_REQ(RegisterFunction),

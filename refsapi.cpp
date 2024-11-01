@@ -24,6 +24,20 @@ g_RegUserMsg g_user_msg[] =
         {"TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false},
 };
 
+void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char* cmd, cmd_source_t src, IGameClient* client)
+{
+    if (src == src_client && !Q_stricmp(cmd, "status"))
+    {
+        char flags_str[32];
+        auto ip = client->GetNetChan()->GetRemoteAdr()->ip;
+        UTIL_GetFlags(flags_str, g_amxxapi.GetPlayerFlags(ENTINDEX(client->GetEdict())));
+        Q_snprintf(g_buff, sizeof(g_buff), "[ACS] Имя: %s\n[ACS] Стим: %s\n[ACS] IP: %d.%d.%d.%d\n[ACS] Флаги: %s\n", client->GetName(), GETPLAYERAUTHID(client->GetEdict()), ip[0], ip[1], ip[2], ip[3], flags_str);
+        //UTIL_ServerPrint("[DEBUG] R_ExecuteServerStringCmd(): id = %d, cmd = %s\n", client->GetId(), cmd);
+        g_engfuncs.pfnClientPrintf(client->GetEdict(), print_console, g_buff);
+    } else
+        chain->callNext(cmd, src, client);
+}
+
 void R_StartFrame_Post(void)
 {
 #ifndef WITHOUT_SQL

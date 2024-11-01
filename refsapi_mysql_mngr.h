@@ -163,9 +163,9 @@ public:
                     if (key != std::thread::id())
                     {
                         DEBUG("run_query(): cleaner, total finished: %d", num_finished.load());
-                        auto &t = m_threads[key];
-                        if (t.joinable())
-                            t.join();
+                        auto t = &m_threads[key];
+                        if (t->joinable())
+                            t->join();
                         num_threads--;
                         num_finished--;
                         m_threads.erase(key);

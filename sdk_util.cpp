@@ -43,3 +43,13 @@ void UTIL_ServerPrint(const char *fmt, ...)
 	va_end(argptr);
 	SERVER_PRINT(string);
 }
+
+void UTIL_GetFlags(char* f, int a)
+{
+	for (int i = 'a'; i <= 'z'; ++i)
+	{
+		if (a & 1) *f++ = i;
+		a >>= 1;
+	}
+	*f = 0;
+}

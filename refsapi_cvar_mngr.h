@@ -301,7 +301,19 @@ public:
         if (!name.empty())
         {
             auto m_cvar = get(name);
-            if (m_cvar == nullptr)
+            if (m_cvar != nullptr)
+            {
+                // Update params
+                m_cvar->name = name;
+                m_cvar->value = value;
+                m_cvar->flags = flags;
+                m_cvar->desc = desc;
+                m_cvar->has_min = has_min;
+                m_cvar->min_val = min_val;
+                m_cvar->has_max = has_max;
+                m_cvar->max_val = max_val;
+            }
+            else
                 m_cvar = add_exists(create_cvar(name, value, flags), desc, has_min, min_val, has_max, max_val);
             if (m_cvar != nullptr && !desc.empty())
             {

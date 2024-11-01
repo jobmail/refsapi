@@ -45,8 +45,11 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	g_mysql_mngr.start();
 #endif
 	r_bMapHasBuyZone = g_Tries.entities.find("func_buyzone") != g_Tries.entities.end();
+	
 	g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
 	g_RehldsHookchains->CreateFakeClient()->registerHook(CreateFakeClient_RH);
+	g_RehldsHookchains->ExecuteServerStringCmd()->registerHook(R_ExecuteServerStringCmd);
+
 	g_ReGameHookchains->CBasePlayer_Killed()->registerHook(CBasePlayer_Killed_RG);
 	g_ReGameHookchains->CSGameRules_CheckMapConditions()->registerHook(CSGameRules_CheckMapConditions_RG);
 	g_ReGameHookchains->CBasePlayer_AddPlayerItem()->registerHook(CBasePlayer_AddPlayerItem_RG);
@@ -70,8 +73,11 @@ void ServerDeactivate_Post()
 	// g_hookManager.Clear();
 	g_pFunctionTable->pfnSpawn = DispatchSpawn;
 	g_pFunctionTable->pfnKeyValue = KeyValue;
+	
 	g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
 	g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
+	g_RehldsHookchains->ExecuteServerStringCmd()->unregisterHook(R_ExecuteServerStringCmd);
+
 	g_ReGameHookchains->CBasePlayer_Killed()->unregisterHook(CBasePlayer_Killed_RG);
 	g_ReGameHookchains->CSGameRules_CheckMapConditions()->unregisterHook(CSGameRules_CheckMapConditions_RG);
 	g_ReGameHookchains->CBasePlayer_AddPlayerItem()->unregisterHook(CBasePlayer_AddPlayerItem_RG);
