@@ -35,3 +35,6 @@ inline void SET_LOCALINFO(const char *key, const char *value) {
 	char *ifbuf=GET_INFOKEYBUFFER(server);
 	SET_SERVER_KEYVALUE(ifbuf, key, value);
 }
+
+int UTIL_ReadFlags(const char* c);
+void UTIL_GetFlags(char* f, int a);
