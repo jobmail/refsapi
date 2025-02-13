@@ -44,6 +44,14 @@ void UTIL_ServerPrint(const char *fmt, ...)
 	SERVER_PRINT(string);
 }
 
+int UTIL_ReadFlags(const char* c) 
+{
+	int flags = 0;	
+	while (*c)
+		flags |= (1<<(*c++ - 'a'));
+	return flags;
+}
+
 void UTIL_GetFlags(char* f, int a)
 {
 	for (int i = 'a'; i <= 'z'; ++i)

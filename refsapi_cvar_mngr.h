@@ -13,6 +13,7 @@ typedef enum CVAR_TYPES_e
     CVAR_TYPE_NUM,
     CVAR_TYPE_FLT,
     CVAR_TYPE_STR,
+    CVAR_TYPE_FLG,
     // Count
     CVAR_TYPES_SIZE
 } CVAR_TYPES_t;
@@ -82,11 +83,11 @@ private:
     bool check_range(m_cvar_t *m_cvar)
     {
         // UTIL_ServerPrint("[DEBUG] check_range(): type = %d, name = <%s>, value = <%s>\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string);
-        if (m_cvar->type == CVAR_TYPE_NONE || m_cvar->type == CVAR_TYPE_STR)
+        if (m_cvar->type == CVAR_TYPE_NONE || m_cvar->type == CVAR_TYPE_STR || m_cvar->type == CVAR_TYPE_FLG)
             return true;
         // Is number?
         std::string s = m_cvar->cvar->string;
-        if (!is_number(s))
+        if (!is_number(s) && m_cvar->type != CVAR_TYPE_FLG)
         {
             // Fix wrong value for bind
             // UTIL_ServerPrint("[DEBUG] check_range(): wrong non-number value <%s>\n", s.c_str());
@@ -126,6 +127,9 @@ private:
             break;
         case CVAR_TYPE_STR:
             setAmxString(bind->ptr, cvar->string, bind->size);
+            break;
+        case CVAR_TYPE_FLG:
+            *bind->ptr = UTIL_ReadFlags(cvar->string);
         }
     }
     cvar_t *create_cvar(std::wstring name, std::wstring value, int flags = 0)
@@ -377,11 +381,15 @@ public:
                 result = amx_ftoc(m_cvar->cvar->value);
                 break;
             case CVAR_TYPE_STR:
-                if (!ptr_size)
-                    break;
-                std::string s = wstos(m_cvar->value);
-                result = std::min(ptr_size, s.size() + 1);
-                setAmxString(ptr, s.c_str(), result);
+                if (ptr_size)
+                {
+                    std::string s = wstos(m_cvar->value);
+                    result = std::min(ptr_size, s.size() + 1);
+                    setAmxString(ptr, s.c_str(), result);    
+                }
+                break;
+            case CVAR_TYPE_FLG:
+                result = UTIL_ReadFlags(wstos(m_cvar->value).c_str());
             }
         }
         return result;
@@ -409,6 +417,11 @@ public:
             break;
         case CVAR_TYPE_STR:
             direct_set(m_cvar->cvar, (char *)ptr);
+            break;
+        case CVAR_TYPE_FLG:
+            char flags_string[32];
+		    UTIL_GetFlags(flags_string, (int)*ptr);
+            direct_set(m_cvar->cvar, flags_string);
         }
     }
     void set(CVAR_TYPES_t type, std::wstring name, cell *ptr)

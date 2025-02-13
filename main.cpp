@@ -67,7 +67,8 @@ void ServerDeactivate_Post()
 	g_mysql_mngr.stop();
 	g_mysql_mngr.close_all();
 #endif
-	g_cvar_mngr.clear();
+	g_cvar_mngr.clear_all();
+
 	g_pEdicts = nullptr;
 	api_cfg.ServerDeactivate();
 	// g_hookManager.Clear();

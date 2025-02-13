@@ -316,6 +316,8 @@ public:
     }
     void free_query(m_query_t *q)
     {
+        if (q == nullptr)
+            return;
         if (q->result != nullptr)
         {
             DEBUG("free_query: FREE RESULT, q = %p", q);
@@ -528,9 +530,9 @@ public:
     }
     size_t add_connect(AMX *amx, int fwd, bool is_debug, std::string &db_host, std::string &db_user, std::string &db_pass, std::string &db_name, std::string &db_chrs, size_t timeout)
     {
-        // DEBUG("add_connect(): pid = %d, fwd = %d, host = <%s>, user = <%s>, pass = <%s>, name = <%s>, timeout = %d",
-        //     gettid(), fwd, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), timeout_ms
-        //);
+        DEBUG("add_connect(): pid = %d, fwd = %d, host = <%s>, user = <%s>, pass = <%s>, name = <%s>, timeout = %d",
+             gettid(), fwd, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), timeout
+        );
         prm_t prms;
         prms.amx = amx;
         prms.fwd = fwd;
