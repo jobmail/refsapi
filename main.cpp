@@ -91,7 +91,15 @@ void ServerDeactivate_Post()
 	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
 	g_Tries.authids.clear();
 	g_Tries.classnames.clear();
+	
+	// Free Vectors
+	for (auto it = g_Tries.entities.begin(); it != g_Tries.entities.end(); it++) {
+		it->second.clear();
+		it->second.shrink_to_fit();
+		//it->second.~vector();
+	}
 	g_Tries.entities.clear();
+	
 	g_Tries.names.clear();
 	g_Tries.wp_entities.clear();
 	for (int i_i = 0; i_i < MAX_PLAYERS + 1; i_i++)
