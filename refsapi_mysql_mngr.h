@@ -166,6 +166,7 @@ public:
                         auto t = &m_threads[key];
                         if (t->joinable())
                             t->join();
+                        //t->~thread();
                         num_threads--;
                         num_finished--;
                         m_threads.erase(key);

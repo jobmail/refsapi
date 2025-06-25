@@ -68,11 +68,11 @@ typedef cvar_hook_list_t::iterator cvar_hook_list_it;
 typedef struct cvar_mngr_s
 {
     cvar_list_t cvar_list;
-    plugin_cvar_t plugin;
+    plugin_cvar_t plugin; //////////
     p_cvar_t p_cvar;
-    cvar_bind_t bind_list;
+    cvar_bind_t bind_list; ////////
     cvar_hook_state_t hook_state;
-    cvar_hook_list_t cvar_hook_list;
+    cvar_hook_list_t cvar_hook_list; //////////
 } cvar_mngr_t;
 
 class cvar_mngr
@@ -312,6 +312,7 @@ public:
                 m_cvar->value = value;
                 m_cvar->flags = flags;
                 m_cvar->desc = desc;
+                m_cvar->type = CVAR_TYPE_NONE;
                 m_cvar->has_min = has_min;
                 m_cvar->min_val = min_val;
                 m_cvar->has_max = has_max;
@@ -466,11 +467,16 @@ public:
     {
         auto cvars_it = cvars.plugin.find(plugin->getId());
         // Plugin cvars exist?
-        if (cvars_it != cvars.plugin.end())
+        if (cvars_it != cvars.plugin.end()) {
             cvars_it->second.clear();
+        }
     }
     void clear_plugin_all()
     {
+        for (auto it = cvars.plugin.begin(); it != cvars.plugin.end(); it++) {
+            it->second.clear();
+            //it->second.~list();
+        }
         cvars.plugin.clear();
     }
     void clear_cvar_list()
@@ -483,10 +489,18 @@ public:
     }
     void clear_bind_list()
     {
+        for (auto it = cvars.bind_list.begin(); it != cvars.bind_list.end(); it++) {
+            it->second.clear();
+            //it->second.~list();
+        }
         cvars.bind_list.clear();
     }
     void clear_hook_list()
     {
+        for (auto it = cvars.cvar_hook_list.begin(); it != cvars.cvar_hook_list.end(); it++) {
+            it->second.clear();
+            //it->second.~list();
+        }
         cvars.cvar_hook_list.clear();
     }
     void clear_hook_state()
