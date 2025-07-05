@@ -7,13 +7,13 @@ size_t set_amx_string(cell *dest, const char *str, size_t max_len);
 
 class fmt
 {
-    const size_t size = 1024;
+    const size_t size = 4096;
     char *buff;
 
 public:
     fmt(char *fmt, ...)
     {
-        buff = new char[size];
+        buff = new char[size]();
         va_list arg_ptr;
         va_start(arg_ptr, fmt);
         Q_vsnprintf(buff, size - 1, fmt, arg_ptr);
@@ -33,13 +33,13 @@ public:
 
 class wfmt
 {
-    const size_t size = 1024;
+    const size_t size = 4096;
     wchar_t *buff;
 
 public:
     wfmt(wchar_t *fmt, ...)
     {
-        buff = new wchar_t[size];
+        buff = new wchar_t[size]();
         va_list arg_ptr;
         va_start(arg_ptr, fmt);
         std::vswprintf(buff, size - 1, fmt, arg_ptr);
@@ -107,10 +107,10 @@ inline std::wstring stows(const std::string &s)
     {
         std::wstring result;
         size_t len = s.size();
-        //UTIL_ServerPrint("[DEBUG] stows(): catch !!! str = %s, len = %d\n", s.c_str(), len);
+        // UTIL_ServerPrint("[DEBUG] stows(): catch !!! str = %s, len = %d\n", s.c_str(), len);
         if (len)
         {
-            result.reserve(len);
+            //result.reserve(len);
             for (size_t i = 0; i < len; i++)
                 result.push_back(s[i] & 0xFF);
         }
@@ -142,7 +142,7 @@ inline bool file_exists(const std::wstring &name)
     return (stat(wstos(name).c_str(), &buff) == 0);
 }
 
-inline void remove_chars(std::string &s, std::string chars = _TRIM_CHARS)
+inline std::string remove_chars(std::string &s, std::string chars = _TRIM_CHARS)
 {
     s.erase(std::remove_if(s.begin(), s.end(), [&](unsigned char ch)
                            {
@@ -151,6 +151,19 @@ inline void remove_chars(std::string &s, std::string chars = _TRIM_CHARS)
                 return true;
         return false; }),
             s.end());
+    return s;
+}
+
+inline std::wstring remove_chars(std::wstring &s, std::wstring chars = L"\r\t\n")
+{
+    s.erase(std::remove_if(s.begin(), s.end(), [&](wchar_t ch)
+                           {
+        for (auto& sub : chars)
+            if (ch == sub)
+                return true;
+        return false; }),
+            s.end());
+    return s;
 }
 
 inline void ltrim(std::string &s, std::string chars = _TRIM_CHARS)

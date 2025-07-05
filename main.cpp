@@ -45,7 +45,7 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	g_mysql_mngr.start();
 #endif
 	r_bMapHasBuyZone = g_Tries.entities.find("func_buyzone") != g_Tries.entities.end();
-	
+
 	g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
 	g_RehldsHookchains->CreateFakeClient()->registerHook(CreateFakeClient_RH);
 	g_RehldsHookchains->ExecuteServerStringCmd()->registerHook(R_ExecuteServerStringCmd);
@@ -56,6 +56,8 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	g_ReGameHookchains->CBasePlayer_RemovePlayerItem()->registerHook(CBasePlayer_RemovePlayerItem_RG);
 	g_ReGameHookchains->CBasePlayer_Spawn()->registerHook(CBasePlayer_Spawn_RG);
 	// g_ReGameHookchains->CreateWeaponBox()->registerHook(CreateWeaponBox_RG);
+
+	g_ReGameHookchains->CSGameRules_ChangeLevel()->registerHook(CSGameRules_ChangeLevel_RG, HC_PRIORITY_UNINTERRUPTABLE);
 
 	SET_META_RESULT(MRES_IGNORED);
 }
@@ -74,7 +76,7 @@ void ServerDeactivate_Post()
 	// g_hookManager.Clear();
 	g_pFunctionTable->pfnSpawn = DispatchSpawn;
 	g_pFunctionTable->pfnKeyValue = KeyValue;
-	
+
 	g_RehldsHookchains->SV_DropClient()->unregisterHook(SV_DropClient_RH);
 	g_RehldsHookchains->CreateFakeClient()->unregisterHook(CreateFakeClient_RH);
 	g_RehldsHookchains->ExecuteServerStringCmd()->unregisterHook(R_ExecuteServerStringCmd);
@@ -85,25 +87,36 @@ void ServerDeactivate_Post()
 	g_ReGameHookchains->CBasePlayer_RemovePlayerItem()->unregisterHook(CBasePlayer_RemovePlayerItem_RG);
 	g_ReGameHookchains->CBasePlayer_Spawn()->unregisterHook(CBasePlayer_Spawn_RG);
 	// g_ReGameHookchains->CreateWeaponBox()->unregisterHook(CreateWeaponBox_RG);
+
+	g_ReGameHookchains->CSGameRules_ChangeLevel()->unregisterHook(CSGameRules_ChangeLevel_RG);
+
 	//  CLEAR TRIES
 	r_bMapHasBuyZone = false;
 	memset(g_Clients, 0, sizeof(g_Clients));
 	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
 	g_Tries.authids.clear();
+	std::map<std::string, int>().swap(g_Tries.authids);
 	g_Tries.classnames.clear();
-	
+	std::map<int, std::string>().swap(g_Tries.classnames);
+
 	// Free Vectors
-	for (auto it = g_Tries.entities.begin(); it != g_Tries.entities.end(); it++) {
+	for (auto it = g_Tries.entities.begin(); it != g_Tries.entities.end(); it++)
+	{
 		it->second.clear();
 		it->second.shrink_to_fit();
-		//it->second.~vector();
 	}
 	g_Tries.entities.clear();
-	
+	std::map<std::string, std::vector<int>>().swap(g_Tries.entities);
+
 	g_Tries.names.clear();
+	std::map<std::string, int>().swap(g_Tries.names);
 	g_Tries.wp_entities.clear();
+	g_Tries.wp_entities.shrink_to_fit();
 	for (int i_i = 0; i_i < MAX_PLAYERS + 1; i_i++)
+	{
 		g_Tries.player_entities[i_i].clear();
+		g_Tries.player_entities[i_i].shrink_to_fit();
+	}
 	SET_META_RESULT(MRES_IGNORED);
 }
 
