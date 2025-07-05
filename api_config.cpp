@@ -18,7 +18,7 @@ void CAPI_Config::Init()
 	if (m_api_rehlds)
 	{
 		g_engfuncs.pfnServerPrint("[REFSAPI] ReHLDS API successfully initialized.\n");
-		g_RehldsHookchains->Cvar_DirectSet()->registerHook(Cvar_DirectSet_RH);
+		g_RehldsHookchains->Cvar_DirectSet()->registerHook(RF_Cvar_DirectSet_RH);
 	}
 	if (m_api_regame)
 	{

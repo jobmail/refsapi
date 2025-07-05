@@ -4,8 +4,8 @@
 
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
-extern void Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
-extern void CVarRegister_Post(cvar_t *pCvar);
+extern void RF_Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
+//extern void CVarRegister_Post(cvar_t *pCvar);
 
 typedef enum CVAR_TYPES_e
 {
@@ -50,19 +50,25 @@ typedef std::map<std::wstring, std::wstring> load_cvars_t;
 typedef std::map<std::wstring, m_cvar_t *> cvar_list_t;
 typedef cvar_list_t::iterator cvar_list_it;
 
-typedef std::map<int, std::list<m_cvar_t *>> plugin_cvar_t;
+typedef std::list<m_cvar_t *> list_m_cvar_t;
+
+typedef std::map<int, list_m_cvar_t> plugin_cvar_t;
 typedef plugin_cvar_t::iterator plugin_cvars_it;
 
 typedef std::map<cvar_t *, m_cvar_t *> p_cvar_t;
 typedef p_cvar_t::iterator p_cvar_it;
 
-typedef std::map<m_cvar_t *, std::list<ptr_bind_t>> cvar_bind_t;
+typedef std::list<ptr_bind_t> list_prt_bind_t;
+
+typedef std::map<m_cvar_t *, list_prt_bind_t> cvar_bind_t;
 typedef cvar_bind_t::iterator cvar_bind_it;
 
 typedef std::map<int, bool> cvar_hook_state_t;
 typedef cvar_hook_state_t::iterator cvar_hook_state_it;
 
-typedef std::map<cvar_t *, std::list<cvar_hook_state_it>> cvar_hook_list_t;
+typedef std::list<cvar_hook_state_it> list_cvar_hook_state_it;
+
+typedef std::map<cvar_t *, list_cvar_hook_state_it> cvar_hook_list_t;
 typedef cvar_hook_list_t::iterator cvar_hook_list_it;
 
 typedef struct cvar_mngr_s
@@ -188,14 +194,14 @@ public:
         {
             // if (strcmp(cvar->name, "mp_timeleft") != 0)
             //     UTIL_ServerPrint("[DEBUG] on_direct_set(): NOT BIND => type = %d, name = <%s>, string = <%s>, value = %f\n", m_cvar->type, cvar->name, cvar->string, cvar->value);
-            //   Save new value
+            // Save new value
             m_cvar->value = value;
             return;
         }
         // Check range
         if (!check_range(m_cvar))
             return;
-        //  Do event
+        // Do event
         on_change(m_cvar, value);
         // Save new value
         m_cvar->value = value;
@@ -212,7 +218,7 @@ public:
         }
         bool is_exist;
         ptr_bind_t ptr_bind;
-        std::list<ptr_bind_t> bind_list;
+        list_prt_bind_t bind_list;
         auto bind_it = cvars.bind_list.find(m_cvar);
         // Bind exists?
         if (is_exist = bind_it != cvars.bind_list.end())
@@ -386,7 +392,7 @@ public:
                 {
                     std::string s = wstos(m_cvar->value);
                     result = std::min(ptr_size, s.size() + 1);
-                    setAmxString(ptr, s.c_str(), result);    
+                    setAmxString(ptr, s.c_str(), result);
                 }
                 break;
             case CVAR_TYPE_FLG:
@@ -421,7 +427,7 @@ public:
             break;
         case CVAR_TYPE_FLG:
             char flags_string[32];
-		    UTIL_GetFlags(flags_string, (int)*ptr);
+            UTIL_GetFlags(flags_string, (int)*ptr);
             direct_set(m_cvar->cvar, flags_string);
         }
     }
@@ -467,41 +473,51 @@ public:
     {
         auto cvars_it = cvars.plugin.find(plugin->getId());
         // Plugin cvars exist?
-        if (cvars_it != cvars.plugin.end()) {
+        if (cvars_it != cvars.plugin.end())
+        {
             cvars_it->second.clear();
+            list_m_cvar_t().swap(cvars_it->second);
         }
     }
     void clear_plugin_all()
     {
-        for (auto it = cvars.plugin.begin(); it != cvars.plugin.end(); it++) {
+        for (auto it = cvars.plugin.begin(); it != cvars.plugin.end(); it++)
+        {
             it->second.clear();
-            //it->second.~list();
+            list_m_cvar_t().swap(it->second);
         }
         cvars.plugin.clear();
+        plugin_cvar_t().swap(cvars.plugin);
     }
     void clear_cvar_list()
     {
         cvars.cvar_list.clear();
+        cvar_list_t().swap(cvars.cvar_list);
     }
     void clear_pcvar_all()
     {
         cvars.p_cvar.clear();
+        p_cvar_t().swap(cvars.p_cvar);
     }
     void clear_bind_list()
     {
-        for (auto it = cvars.bind_list.begin(); it != cvars.bind_list.end(); it++) {
+        for (auto it = cvars.bind_list.begin(); it != cvars.bind_list.end(); it++)
+        {
             it->second.clear();
-            //it->second.~list();
+            list_prt_bind_t().swap(it->second);
         }
         cvars.bind_list.clear();
+        cvar_bind_t().swap(cvars.bind_list);
     }
     void clear_hook_list()
     {
-        for (auto it = cvars.cvar_hook_list.begin(); it != cvars.cvar_hook_list.end(); it++) {
+        for (auto it = cvars.cvar_hook_list.begin(); it != cvars.cvar_hook_list.end(); it++)
+        {
             it->second.clear();
-            //it->second.~list();
+            list_cvar_hook_state_it().swap(it->second);
         }
         cvars.cvar_hook_list.clear();
+        cvar_hook_list_t().swap(cvars.cvar_hook_list);
     }
     void clear_hook_state()
     {
@@ -509,6 +525,7 @@ public:
             if (h.first != -1)
                 g_amxxapi.UnregisterSPForward(h.first);
         cvars.hook_state.clear();
+        cvar_hook_state_t().swap(cvars.hook_state);
     }
     void clear()
     {

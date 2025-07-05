@@ -81,7 +81,7 @@ cell AMX_NATIVE_CALL rf_get_ent_by_class(AMX *amx, cell *params)
     else if (key.find(WP_CLASS_PREFIX) == 0 && key.length() > sizeof(WP_CLASS_PREFIX))
         return copy_entities(g_Tries.wp_entities, key, dest, max_size);
     // CHECK GLOBAL
-    else //if (g_Tries.entities.find(key) != g_Tries.entities.end())
+    else // if (g_Tries.entities.find(key) != g_Tries.entities.end())
         return copy_entities(g_Tries.entities[key], key, dest, max_size);
 }
 
@@ -127,7 +127,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     if (check_it_empty(plugin_cvars))
         return FALSE;
     // Sort list
-    //plugin_cvars->second.sort([](m_cvar_t *p1, m_cvar_t *p2)
+    // plugin_cvars->second.sort([](m_cvar_t *p1, m_cvar_t *p2)
     //                          { return p1->name < p2->name; }); // p1->first < p2->first
     g_cvar_mngr.sort(plugin_cvars);
     std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
@@ -227,7 +227,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                 // Is loaded cvar value?
                 need_replace = (load_cvars_it = load_cvars.find(m_cvar->name)) != load_cvars.end();
                 if (need_update)
-                    file << m_cvar->name << " \"" << (need_replace ? load_cvars_it->second : m_cvar->value) << "\"\n";
+                    file << m_cvar->name << " \"" << remove_chars(need_replace ? load_cvars_it->second : m_cvar->value) << "\"\n";
                 if (need_replace)
                 {
                     // Direct set
@@ -463,7 +463,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     if (!callback.empty())
     {
         // public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
-        //fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_STRING, FP_CELL, FP_ARRAY, FP_CELL, FP_CELL, FP_DONE);
+        // fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_STRING, FP_CELL, FP_ARRAY, FP_CELL, FP_CELL, FP_DONE);
         fwd = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_DONE);
         check_fwd_r(fwd, callback.c_str());
     }

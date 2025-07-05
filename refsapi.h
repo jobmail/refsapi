@@ -4,18 +4,18 @@
 // gets rid of annoying "deprecated conversion from string constant blah blah" warning
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
-#define MAX_PLAYERS 32
-#define DECIMAL_POINT '.'
-#define WP_CLASS_PREFIX "weapon_"
+#define MAX_PLAYERS                 32
+#define DECIMAL_POINT               '.'
+#define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN (sizeof(WP_CLASS_PREFIX) - 1)
-#define REFSAPI_CVAR "acs_refsapi_loaded"
+#define REFSAPI_CVAR                "acs_refsapi_loaded"
 #define check_it_empty(x) ((x)._M_node == nullptr)
 #define check_it_empty_r(x) \
     if (check_it_empty(x))  \
     return
 
-#define _QQ "\"'`"
-#define _TRIM_CHARS " \r\t\n"
+#define _QQ                         "\"'`"
+#define _TRIM_CHARS                 " \r\t\n"
 #define _COUNT(x) (size_t)(sizeof(x) / sizeof(cell))
 
 #define amx_ftoc(f) (*((cell *)&f))  /* float to cell */
@@ -95,8 +95,9 @@ CBaseEntity *CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem 
 qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem);
 CWeaponBox *CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo);
 void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer);
+void CSGameRules_ChangeLevel_RG(IReGameHook_CSGameRules_ChangeLevel *chain);
 
-void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char* cmd, cmd_source_t src, IGameClient* id);
+void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char *cmd, cmd_source_t src, IGameClient *id);
 void R_StartFrame_Post(void);
 void R_ClientPutInServer_Post(edict_t *p);
 void R_ClientDisconnect(edict_t *p);

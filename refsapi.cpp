@@ -24,7 +24,7 @@ g_RegUserMsg g_user_msg[] =
         {"TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false},
 };
 
-void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char* cmd, cmd_source_t src, IGameClient* client)
+void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char *cmd, cmd_source_t src, IGameClient *client)
 {
     if (src == src_client && !Q_stricmp(cmd, "status"))
     {
@@ -32,9 +32,10 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
         auto ip = client->GetNetChan()->GetRemoteAdr()->ip;
         UTIL_GetFlags(flags_str, g_amxxapi.GetPlayerFlags(ENTINDEX(client->GetEdict())));
         Q_snprintf(g_buff, sizeof(g_buff), "[ACS] Имя: %s\n[ACS] Стим: %s\n[ACS] IP: %d.%d.%d.%d\n[ACS] Флаги: %s\n", client->GetName(), GETPLAYERAUTHID(client->GetEdict()), ip[0], ip[1], ip[2], ip[3], flags_str);
-        //UTIL_ServerPrint("[DEBUG] R_ExecuteServerStringCmd(): id = %d, cmd = %s\n", client->GetId(), cmd);
+        // UTIL_ServerPrint("[DEBUG] R_ExecuteServerStringCmd(): id = %d, cmd = %s\n", client->GetId(), cmd);
         g_engfuncs.pfnClientPrintf(client->GetEdict(), print_console, g_buff);
-    } else
+    }
+    else
         chain->callNext(cmd, src, client);
 }
 
@@ -95,6 +96,15 @@ void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPl
     chain->callNext(pPlayer);
 }
 
+void CSGameRules_ChangeLevel_RG(IReGameHook_CSGameRules_ChangeLevel *chain)
+{
+#ifndef WITHOUT_SQL
+    while (g_mysql_mngr.block_changelevel.load())
+        std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
+#endif
+    chain->callNext();
+}
+
 qboolean CBasePlayer_RemovePlayerItem_RG(IReGameHook_CBasePlayer_RemovePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem)
 {
     auto origin = chain->callNext(pPlayer, pItem);
@@ -118,7 +128,7 @@ qboolean CBasePlayer_AddPlayerItem_RG(IReGameHook_CBasePlayer_AddPlayerItem *cha
     {
         auto id = pPlayer->entindex();
         auto index = pItem->entindex();
-        //int owner = ENTINDEX(pItem->pev->owner);
+        // int owner = ENTINDEX(pItem->pev->owner);
         vector_add(g_Tries.player_entities[id], index);
         // UTIL_ServerPrint"[DEBUG] AddPlayerItem_RG(): id = %d, entity = %d prev_owner = %d\n", id, index, owner);
         //  FIX OWNER
