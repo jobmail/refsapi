@@ -121,7 +121,6 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
         arg_folder
     };
     int result = FALSE;
-    // UTIL_ServerPrint("[DEBUG] rf_config(): START\n");
     auto plugin = findPluginFast(amx);
     auto plugin_cvars = g_cvar_mngr.get(plugin->getId());
     if (check_it_empty(plugin_cvars))

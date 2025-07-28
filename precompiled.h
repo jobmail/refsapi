@@ -1,5 +1,4 @@
 #pragma once
-
 //#define WITHOUT_SQL
 
 // C
@@ -54,9 +53,12 @@
 #include <ex_rehlds_api.h>
 
 // AmxModX API
+#include <amxxmodule.h>
 //#include "amxmodx.h"
 #include "CPlugin.h"
-#include <amxxmodule.h>
+//#include <CForward.h>
+#define AMX_H_INCLUDED
+#include <debugger.h>
 
 #include "info.h"
 #include "com_client.h"
@@ -64,7 +66,7 @@
 // Other
 #include <main.h>
 #include "api_config.h"
-#include "api_config.h"
+//#include "api_config.h"
 //#include "hook_manager.h"
 //#include "hook_callback.h"
 //#include "entity_callback_dispatcher.h"
@@ -81,6 +83,8 @@
 #include <signal.h>
 #include <poll.h>
 #include <mariadb/mysql.h>
+#define AMX_H_INCLUDED
+#include <debugger.h>
 #endif
 
 // Refs API
@@ -96,6 +100,7 @@
 #include "natives_refsapi.h"
 
 // ARENA FIX
-//asm(".symver fcntl,fcntl@@GLIBC_2.0");
+//const char interp_section[] __attribute__((section(".interp"))) = "/home/virus/dev/lib/glibc-2.23/ld-linux.so.2";
+//asm (".symver fcntl,fcntl@@GLIBC_2.0");
 //#include "force_link_glibc_2.9.h"
 //cmake ../ -DWITH_SSL=OFF -DCMAKE_TOOLCHAIN_FILE=../cmake/linux_x86_toolchain.cmake

@@ -491,6 +491,15 @@ public:
     }
     void clear_cvar_list()
     {
+        for (auto it = cvars.cvar_list.begin(); it != cvars.cvar_list.end(); it++)
+        {
+            // Free memory!!!!
+            if (it->second != nullptr)
+            {
+                delete it->second;
+                it->second = nullptr;
+            }
+        }
         cvars.cvar_list.clear();
         cvar_list_t().swap(cvars.cvar_list);
     }

@@ -24,6 +24,7 @@ bool OnMetaAttach()
 #ifndef WITHOUT_SQL
 	g_mysql_mngr.start_main();
 #endif
+
 	return true;
 }
 
@@ -31,11 +32,10 @@ void OnMetaDetach()
 {
 	// clear all hooks?
 	// g_hookManager.Clear();
-
+	if (api_cfg.hasReHLDS())
+		g_RehldsHookchains->Cvar_DirectSet()->unregisterHook(RF_Cvar_DirectSet_RH);
 	if (api_cfg.hasReGameDLL())
-	{
 		g_ReGameHookchains->InstallGameRules()->unregisterHook(&InstallGameRules);
-	}
 }
 
 void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
@@ -57,8 +57,8 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	g_ReGameHookchains->CBasePlayer_Spawn()->registerHook(CBasePlayer_Spawn_RG);
 	// g_ReGameHookchains->CreateWeaponBox()->registerHook(CreateWeaponBox_RG);
 
-	g_ReGameHookchains->CSGameRules_ChangeLevel()->registerHook(CSGameRules_ChangeLevel_RG, HC_PRIORITY_UNINTERRUPTABLE);
-
+	//g_ReGameHookchains->CSGameRules_ChangeLevel()->registerHook(CSGameRules_ChangeLevel_RG, HC_PRIORITY_UNINTERRUPTABLE);
+	
 	SET_META_RESULT(MRES_IGNORED);
 }
 
@@ -67,7 +67,6 @@ void ServerDeactivate_Post()
 	SERVER_PRINT("[DEBUG] SERVER_DEACTIVATED\n");
 #ifndef WITHOUT_SQL
 	g_mysql_mngr.stop();
-	g_mysql_mngr.close_all();
 #endif
 	g_cvar_mngr.clear_all();
 
@@ -87,8 +86,7 @@ void ServerDeactivate_Post()
 	g_ReGameHookchains->CBasePlayer_RemovePlayerItem()->unregisterHook(CBasePlayer_RemovePlayerItem_RG);
 	g_ReGameHookchains->CBasePlayer_Spawn()->unregisterHook(CBasePlayer_Spawn_RG);
 	// g_ReGameHookchains->CreateWeaponBox()->unregisterHook(CreateWeaponBox_RG);
-
-	g_ReGameHookchains->CSGameRules_ChangeLevel()->unregisterHook(CSGameRules_ChangeLevel_RG);
+	//g_ReGameHookchains->CSGameRules_ChangeLevel()->unregisterHook(CSGameRules_ChangeLevel_RG);
 
 	//  CLEAR TRIES
 	r_bMapHasBuyZone = false;

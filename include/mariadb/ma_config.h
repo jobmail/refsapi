@@ -28,6 +28,7 @@
 #define HAVE_SYS_UN_H 1
 #define HAVE_UNISTD_H 1
 #define HAVE_UCONTEXT_H 1
+/* #undef HAVE_BOOST_CONTEXT_H */
 
 /*
  * function definitions - processed in LibmysqlFunctions.txt 

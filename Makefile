@@ -4,13 +4,28 @@ METAMOD = include/metamod
 NAME = refsapi
 
 COMPILER = g++
+#g++
+#g++
 #clang++
 #g++
 
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
 LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
-	-s -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a
+	-s -m32 -ldl -lm -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -Wl,--as-needed -l:libmariadb.a -l:libssl.a -l:libcrypto.a
+#-l:libmariadb.a
+# 
+#-static-libgcc 
+#-l:libmariadb.a
+#-Wl,--as-needed 
+#-lmariadb -lssl -lcrypto
+#-l:libmariadb.a -l:libssl.a -l:libcrypto.a
+#-s
+#-static-libgcc -static-libstdc++ -lstdc++fs 
+# -l:libmariadb.a -l:libssl.a -l:libcrypto.a
+#-static-libgcc -lpthread
+# -lgcc_s
+# -Wl,-Bstatic -lgcc -Wl,-Bdynamic 
 #-static-libasan -static-libubsan
 #-l:libssl.a -l:libcrypto.a
 
@@ -67,7 +82,7 @@ LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -msse3 -fno-strict-aliasing -Wno-uninitialized -fpermissive -shared -flto -fPIC -pipe -pthread
+OPT_FLAGS = -O3 -mmmx -msse -msse2 -msse3 -msse4.2 -fno-strict-aliasing -Wno-parentheses -Wno-switch -Wno-uninitialized -fpermissive -shared -pipe -pthread
 # -funroll-loops -fomit-frame-pointer 
 # -fno-rtti
 #-fno-split-stack
@@ -83,7 +98,22 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -fno-stack-protector
+CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -g -flto=auto -fPIC
+# -fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions
+#-flto -fPIC 
+# -fPIC -msse4.2 -mavx 
+#-fno-rtti -fomit-frame-pointer
+#-fno-stack-protector -ffunction-sections -fdata-sections -fno-rtti -fomit-frame-pointer -fnon-call-exceptions
+#-fPIC
+#CFLAGS += -Wl,--gc-sections -D_FORTIFY_SOURCE=2 -DHAVE_STDINT_H -D__STDC_CONSTANT_MACROS
+#CFLAGS += -ffunction-sections -fdata-sections -fno-rtti -funroll-loops -fomit-frame-pointer
+
+#-g0 -fno-stack-protector -ffunction-sections -fdata-sections -fno-rtti -fomit-frame-pointer
+#-Wl,--gc-sections 
+#-ffunction-sections -fdata-sections -fno-rtti 
+#-fomit-frame-pointer
+#-fPIC -fno-exceptions -pipe
+#-funroll-loops -mmmx -msse -msse2 -mfpmath=sse 
 #-DWITHOUT_SQL
 #-DWITHOUT_SQL
 #-g3
