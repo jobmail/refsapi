@@ -95,9 +95,11 @@ CBaseEntity *CBasePlayer_GiveNamedItem_RG(IReGameHook_CBasePlayer_GiveNamedItem 
 qboolean CSGameRules_CanHavePlayerItem_RG(IReGameHook_CSGameRules_CanHavePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem);
 CWeaponBox *CreateWeaponBox_RG(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem *pItem, CBasePlayer *pPlayer, const char *model, Vector &v_origin, Vector &v_angels, Vector &v_velocity, float life_time, bool pack_ammo);
 void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPlayer);
-void CSGameRules_ChangeLevel_RG(IReGameHook_CSGameRules_ChangeLevel *chain);
+//void CSGameRules_ChangeLevel_RG(IReGameHook_CSGameRules_ChangeLevel *chain);
 
 void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char *cmd, cmd_source_t src, IGameClient *id);
+qboolean RF_CheckUserInfo_RH(IRehldsHook_SV_CheckUserInfo *chain, netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int iReconnectSlot, char *name);
+void CSGameRules_ClientUserInfoChanged_RG(IReGameHook_CSGameRules_ClientUserInfoChanged *chain, CBasePlayer *pPlayer, char *userinfo);
 void R_StartFrame_Post(void);
 void R_ClientPutInServer_Post(edict_t *p);
 void R_ClientDisconnect(edict_t *p);

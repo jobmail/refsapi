@@ -97,6 +97,20 @@ inline std::string wstos(wfmt s)
     return g_converter.to_bytes(s.c_str());
 }
 
+inline bool is_valid_utf8(char *str)
+{
+    bool result;
+    try
+    {
+        g_converter.from_bytes(str);
+    }
+    catch (...)
+    {
+        result = false;
+    }
+    return result;
+}
+
 inline std::wstring stows(const std::string &s)
 {
     try

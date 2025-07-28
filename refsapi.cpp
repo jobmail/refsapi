@@ -24,6 +24,23 @@ g_RegUserMsg g_user_msg[] =
         {"TeamInfo", &gmsgTeamInfo, Client_TeamInfo, false},
 };
 
+void CSGameRules_ClientUserInfoChanged_RG(IReGameHook_CSGameRules_ClientUserInfoChanged *chain, CBasePlayer *pPlayer, char *userinfo)
+{
+    if (is_valid_utf8(userinfo))
+        chain->callNext(pPlayer, userinfo);
+    else if (pPlayer != nullptr)
+    {
+        auto cl = clientByIndex(pPlayer->entindex());
+        if (cl->IsConnected())
+            g_RehldsFuncs->DropClient(cl, false, "Invalid userinfo");
+    }
+}
+
+qboolean RF_CheckUserInfo_RH(IRehldsHook_SV_CheckUserInfo *chain, netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int iReconnectSlot, char *name)
+{
+    return !is_valid_utf8(userinfo) || !is_valid_utf8(name) ? FALSE : chain->callNext(adr, userinfo, bIsReconnecting, iReconnectSlot, name);
+}
+
 void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char *cmd, cmd_source_t src, IGameClient *client)
 {
     if (src == src_client && !Q_stricmp(cmd, "status"))
@@ -37,6 +54,16 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
     }
     else
         chain->callNext(cmd, src, client);
+/*
+    if (src == src_command && !Q_stricmp(cmd, "changelevel"))
+    {
+        SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
+#ifndef WITHOUT_SQL
+        while (g_mysql_mngr.block_changelevel.load())
+            std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
+#endif
+    }
+*/
 }
 
 void R_StartFrame_Post(void)
@@ -96,14 +123,17 @@ void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPl
     chain->callNext(pPlayer);
 }
 
+/*
 void CSGameRules_ChangeLevel_RG(IReGameHook_CSGameRules_ChangeLevel *chain)
 {
 #ifndef WITHOUT_SQL
+    //SERVER_PRINT("[REFSAPI_SQL] *** CHANGELEVEL ***\n");
     while (g_mysql_mngr.block_changelevel.load())
         std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
 #endif
     chain->callNext();
 }
+*/
 
 qboolean CBasePlayer_RemovePlayerItem_RG(IReGameHook_CBasePlayer_RemovePlayerItem *chain, CBasePlayer *pPlayer, CBasePlayerItem *pItem)
 {

@@ -39,10 +39,10 @@ extern "C" {
 typedef char my_bool;
 typedef unsigned long long my_ulonglong;
 
-#ifdef STDCALL
+#if !defined(_WIN32)
+#if defined(STDCALL)
 #undef STDCALL
 #endif
-#if !defined(_WIN32)
 #define STDCALL
 #else
 #define STDCALL __stdcall
@@ -226,8 +226,9 @@ extern const char *SQLSTATE_UNKNOWN;
     MYSQL_OPT_MAX_ALLOWED_PACKET,
     MYSQL_OPT_NET_BUFFER_LENGTH,
     MYSQL_OPT_TLS_VERSION,
+    MYSQL_OPT_ZSTD_COMPRESSION_LEVEL,
 
-    /* MariaDB specific */
+    /* MariaDB-specific */
     MYSQL_PROGRESS_CALLBACK=5999,
     MYSQL_OPT_NONBLOCK,
     /* MariaDB Connector/C specific */
