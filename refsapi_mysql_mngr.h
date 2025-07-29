@@ -126,9 +126,9 @@ private:
         DEBUG("%s(): timeout = %d", __func__, timeout);
         do
             res = poll(&pfd, 1, timeout);
-        while ((!stop_threads || timeout_ms < 0) && res == -1 && errno == EINTR);
+        while (!stop_threads && res == -1 && errno == EINTR); //(!stop_threads || timeout_ms < 0)
         DEBUG("%s(): poll = %d", __func__, res);
-        if (res <= 0 || (stop_threads && timeout_ms >= 0))
+        if (res <= 0 || stop_threads) //(stop_threads && timeout_ms >= 0)
             return MYSQL_WAIT_TIMEOUT;
         int result_status = 0;
         if (pfd.revents & POLLIN)
@@ -174,7 +174,8 @@ public:
     {
         uint8 pri;
         std::thread::id key;
-        std::vector<m_query_list_t::iterator> finished;
+        std::vector<m_query_t *> finished;
+        // DEBUG("%s(): RUN QUERY", __func__);
         for (pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
         {
             for (auto it = m_queries[pri].begin(); it != m_queries[pri].end(); it++)
@@ -207,7 +208,7 @@ public:
                     }
                     else
                     {
-                        finished.push_back(it);
+                        finished.push_back(q);
                         // DEBUG("run_query(): cleaner, threads left = %d, num_threads = %d", m_threads.size(), num_threads.load());
                     }
                 }
@@ -227,9 +228,8 @@ public:
         }
         // CLEANER
         std::lock_guard lock(threads_mutex);
-        for (auto it : finished)
+        for (auto q : finished)
         {
-            auto q = it->second;
             DEBUG("%s(): free query = %p", __func__, q);
             free_query(q);
             m_queries[q->pri].erase(q->id);
@@ -410,7 +410,7 @@ public:
                 auto status = mysql_free_result_start(q->result);
                 while (status)
                 {
-                    status = wait_for_mysql(q->conn, status, -1 /* NoAbort */);
+                    status = wait_for_mysql(q->conn, status);
                     status = mysql_free_result_cont(q->result, status);
                 }
             }
@@ -424,7 +424,7 @@ public:
             auto status = mysql_close_start(q->conn);
             while (status)
             {
-                status = wait_for_mysql(q->conn, status, -1 /* NoAbort */);
+                status = wait_for_mysql(q->conn, status);
                 status = mysql_close_cont(q->conn, status);
             }
             q->conn = nullptr;
@@ -444,6 +444,12 @@ public:
     }
     cell query_str(m_query_t *q, cell *ret, cell *buff, size_t buff_len)
     {
+        if (q == nullptr || q->query.empty() || q->aborted || (stop_threads && q->async))
+        {
+            if (buff_len)
+                *buff = '\0';
+            return *ret = 0;
+        }
         if (buff_len)
             *ret = set_amx_string(buff, q->query.c_str(), buff_len);
         else
@@ -461,7 +467,11 @@ public:
     cell field_name(m_query_t *q, size_t offset, cell *ret, cell *buff, size_t buff_len)
     {
         if (q == nullptr || q->result == nullptr || q->row == nullptr || offset >= q->f_count || q->aborted || (stop_threads && q->async))
+        {
+            if (buff_len)
+                *buff = '\0';
             return *ret = 0;
+        }
         if (buff_len)
             *ret = set_amx_string(buff, q->result->fields[offset].name, buff_len);
         else
@@ -476,7 +486,11 @@ public:
     cell fetch_field(m_query_t *q, size_t offset, int mode, cell *ret, cell *buff, size_t buff_len)
     {
         if (q == nullptr || q->result == nullptr || q->row == nullptr || offset >= q->f_count || q->aborted || (stop_threads && q->async))
+        {
+            if (buff_len)
+                *buff = '\0';
             return *ret = 0;
+        }
         DEBUG("%s(): q = %p, async = %d, name = %s, type = %d, stop = %d", __func__, q, q->async, q->result->fields[offset].name, q->result->fields[offset].type, stop_threads.load());
         DEBUG("%s(): value = %s, offset = %d, mode = %d, ret = %p, buff = %p, len = %d", __func__, q->row[offset], offset, mode, ret, buff, buff_len);
         float val;
@@ -534,7 +548,7 @@ public:
             status = mysql_fetch_row_start(&q->row, q->result);
             while (status)
             {
-                status = wait_for_mysql(q->conn, status, -1 /* NoAbort */);
+                status = wait_for_mysql(q->conn, status);
                 status = mysql_fetch_row_cont(&q->row, q->result, status);
             }
         }
@@ -698,32 +712,20 @@ public:
     }
     void start()
     {
-        frame_mutex.try_lock();
-        fwd_mutex.try_lock();
+        //frame_mutex.lock();
+        //fwd_mutex.lock();
+        UTIL_ServerPrint("\n *** STATUS: m_frame = %u\n\n", m_frames);
         stop_threads = false;
     }
     void stop()
     {
-        abort();
-        m_conn_prms.clear();
-        prm_list_t().swap(m_conn_prms);
-        if (m_threads.size())
-            UTIL_ServerPrint("[REFSAPI_SQL] m_threads(%d) not empty! num_threads = %d, num_finished = %d\n", m_threads.size(), num_threads.load(), num_finished.load());
-        for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
-            if (m_queries[pri].size())
-                UTIL_ServerPrint("[REFSAPI_SQL] m_query[%d](%d) not empty!\n", pri, m_queries[pri].size());
-        while (m_threads.size() > 0)
-            std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
-        UTIL_ServerPrint("\n *** [REFSAPI_SQL] EMPTY! ***\n\n");
-    }
-    void abort()
-    {
+        stop_threads = true;
         /*
             Пробуем заблокировать frame_mutex, поскольку start_frame() и abort() запускаются rehlds,
             попасть на ситуацию с разблокированным frame_mutex на 1мкс в start_frame мы не должны...
             В теории, он должен быть заблокирован...
         */
-        UTIL_ServerPrint("\n *** STATUS: frame = %d, fwd = %d *** \n\n", frame_mutex.try_lock(), fwd_mutex.try_lock());
+        UTIL_ServerPrint("\n *** STATUS: m_frame = %u, frame = %d, fwd = %d *** \n\n", m_frames, frame_mutex.try_lock(), fwd_mutex.try_lock());
         threads_mutex.lock();
         for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
         {
@@ -736,11 +738,23 @@ public:
                 q->prms = prm_list_it{};
             }
         }
+        m_conn_prms.clear();
+        prm_list_t().swap(m_conn_prms);
         close_all();
-        stop_threads = true;
         fwd_mutex.unlock();
         frame_mutex.unlock();
         threads_mutex.unlock();
+        // STATUS
+        if (m_threads.size())
+            UTIL_ServerPrint("[REFSAPI_SQL] m_threads(%d) not empty! num_threads = %d, num_finished = %d\n", m_threads.size(), num_threads.load(), num_finished.load());
+        for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
+            if (m_queries[pri].size())
+                UTIL_ServerPrint("[REFSAPI_SQL] m_query[%d](%d) not empty!\n", pri, m_queries[pri].size());
+        /*
+        while (m_threads.size() > 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
+        UTIL_ServerPrint("\n *** [REFSAPI_SQL] EMPTY! ***\n\n");
+        */
     }
     double get_time()
     {
@@ -753,6 +767,7 @@ public:
         // По окончании работа предыдущего кадра frame_mutex должен быть заблокирован
         if (!stop_threads && has_threads && !frame_mutex.try_lock())
         {
+            // DEBUG("frame = %u", m_frames);
             // По окончании работы предыдущего кадра fwd_mutex должен быть разблокирован
             if (fwd_mutex.try_lock())
             {
