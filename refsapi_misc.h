@@ -4,6 +4,17 @@
 
 bool is_number(std::string &s);
 size_t set_amx_string(cell *dest, const char *str, size_t max_len);
+bool is_valid_utf8(const std::vector<uint8_t> &data);
+bool is_valid_utf8_simd(const std::vector<uint8_t> &data);
+bool is_valid_utf8_simd(const char *str, size_t length);
+bool is_valid_utf8_simd(char *str, size_t length);
+bool is_valid_utf8_simd(const char *str);
+std::wstring format_time(const std::chrono::system_clock::time_point &tp, const std::wstring format = L"%m/%d/%Y - %H:%M:%S");
+std::wstring cc(const std::wstring &str, bool with_slashes = false, wchar_t cc = L'\\');
+bool dir_exists(const std::wstring &path);
+bool is_mutex_locked(std::mutex &mutex);
+int safe_poll(struct pollfd *fds, nfds_t nfds, int timeout_ms);
+CPluginMngr::CPlugin * get_plugin(AMX *amx);
 
 class fmt
 {
@@ -14,14 +25,16 @@ public:
     fmt(char *fmt, ...)
     {
         buff = new char[size]();
+        if (fmt == nullptr)
+            return;
         va_list arg_ptr;
         va_start(arg_ptr, fmt);
-        Q_vsnprintf(buff, size - 1, fmt, arg_ptr);
+        vsnprintf(buff, size - 1, fmt, arg_ptr);
         va_end(arg_ptr);
     }
     ~fmt()
     {
-        if (buff != nullptr)
+        if (buff)
             delete buff;
         buff = nullptr;
     }
@@ -40,14 +53,24 @@ public:
     wfmt(wchar_t *fmt, ...)
     {
         buff = new wchar_t[size]();
-        va_list arg_ptr;
-        va_start(arg_ptr, fmt);
-        std::vswprintf(buff, size - 1, fmt, arg_ptr);
-        va_end(arg_ptr);
+        if (fmt == nullptr)
+            return;
+        try
+        {
+            va_list arg_ptr;
+            va_start(arg_ptr, fmt);
+            std::vswprintf(buff, size - 1, fmt, arg_ptr);
+            va_end(arg_ptr);
+        }
+        catch (...)
+        {
+            *buff = 0;
+            DEBUG("*** CRITICAL *** %s(): fmt = %s", __func__, fmt);
+        }
     }
     ~wfmt()
     {
-        if (buff != nullptr)
+        if (buff)
             delete buff;
         buff = nullptr;
     }
@@ -84,22 +107,44 @@ inline bool is_entity_intersects(const edict_t *pEdict_1, const edict_t *pEdict_
 
 inline std::string wstos(const wchar_t *s)
 {
-    return g_converter.to_bytes(s);
+    try
+    {
+        return g_converter.to_bytes(s);
+    }
+    catch (...)
+    {
+        return ""; 
+    }
 }
 
-inline std::string wstos(const std::wstring &s)
+inline std::string wstos(const std::wstring s)
 {
-    return g_converter.to_bytes(s);
+    try
+    {
+        return g_converter.to_bytes(s);
+    }
+    catch (...)
+    {
+        return ""; 
+    }
 }
 
 inline std::string wstos(wfmt s)
 {
-    return g_converter.to_bytes(s.c_str());
+    try
+    {
+        return g_converter.to_bytes(s.c_str());
+    }
+    catch (...)
+    {
+        return ""; 
+    }
 }
 
-inline bool is_valid_utf8(char *str)
+/* SIMD version used
+inline bool is_valid_utf8(const char *str)
 {
-    bool result;
+    bool result = true;
     try
     {
         g_converter.from_bytes(str);
@@ -110,8 +155,9 @@ inline bool is_valid_utf8(char *str)
     }
     return result;
 }
+*/
 
-inline std::wstring stows(const std::string &s)
+inline std::wstring stows(const std::string s)
 {
     try
     {
@@ -124,7 +170,7 @@ inline std::wstring stows(const std::string &s)
         // UTIL_ServerPrint("[DEBUG] stows(): catch !!! str = %s, len = %d\n", s.c_str(), len);
         if (len)
         {
-            //result.reserve(len);
+            // result.reserve(len);
             for (size_t i = 0; i < len; i++)
                 result.push_back(s[i] & 0xFF);
         }
@@ -153,75 +199,39 @@ inline double roundd(double value, int precision = -6)
 inline bool file_exists(const std::wstring &name)
 {
     struct stat buff;
-    return (stat(wstos(name).c_str(), &buff) == 0);
+    return name.empty() ? false : (stat(wstos(name).c_str(), &buff) == 0);
 }
 
 inline std::string remove_chars(std::string &s, std::string chars = _TRIM_CHARS)
 {
-    s.erase(std::remove_if(s.begin(), s.end(), [&](unsigned char ch)
-                           {
-        for (auto& sub : chars)
-            if (ch == sub)
-                return true;
-        return false; }),
-            s.end());
+    s.erase(std::remove_if(s.begin(), s.end(), [&](unsigned char ch) { return chars.find(ch) != std::string::npos; }), s.end());
     return s;
 }
 
 inline std::wstring remove_chars(std::wstring &s, std::wstring chars = L"\r\t\n")
 {
-    s.erase(std::remove_if(s.begin(), s.end(), [&](wchar_t ch)
-                           {
-        for (auto& sub : chars)
-            if (ch == sub)
-                return true;
-        return false; }),
-            s.end());
+    s.erase(std::remove_if(s.begin(), s.end(), [&](wchar_t ch) { return chars.find(ch) != std::wstring::npos; }), s.end());
     return s;
 }
 
 inline void ltrim(std::string &s, std::string chars = _TRIM_CHARS)
 {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch)
-                                    {
-        for (auto& sub : chars)
-            if (ch == sub)
-                return false;
-        return true; }));
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch) { return chars.find(ch) == std::string::npos; }));
 }
 
-inline void ltrim(std::wstring &s, std::string chars = _TRIM_CHARS)
+inline void ltrim(std::wstring &s, std::wstring chars = _TRIM_CHARS_L)
 {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char ch)
-                                    {
-        for (auto& sub : chars)
-            if (ch == sub)
-                return false;
-        return true; }));
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](wchar_t ch) { return chars.find(ch) == std::wstring::npos; }));
 }
 
 inline void rtrim(std::string &s, std::string chars = _TRIM_CHARS)
 {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch)
-                         {
-        for (auto& sub : chars)
-            if (ch == sub)
-                return false;
-        return true; })
-                .base(),
-            s.end());
+    s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch) { return chars.find(ch) == std::string::npos; }).base(), s.end());
 }
 
-inline void rtrim(std::wstring &s, std::string chars = _TRIM_CHARS)
+inline void rtrim(std::wstring &s, std::wstring chars = _TRIM_CHARS_L)
 {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char ch)
-                         {
-        for (auto& sub : chars)
-            if (ch == sub)
-                return false;
-        return true; })
-                .base(),
-            s.end());
+    s.erase(std::find_if(s.rbegin(), s.rend(), [&](wchar_t ch) { return chars.find(ch) == std::wstring::npos; }).base(), s.end());
 }
 
 inline void rtrim_zero(std::string &s)
@@ -229,10 +239,7 @@ inline void rtrim_zero(std::string &s)
     auto it = std::find(s.rbegin(), s.rend(), '.');
     if (it == s.rend())
         return;
-    s.erase(std::find_if(s.rbegin(), it, [&](unsigned char ch)
-                         { return ch != '0'; })
-                .base(),
-            s.end());
+    s.erase(std::find_if(s.rbegin(), it, [&](unsigned char ch) { return ch != '0'; }).base(), s.end());
 }
 
 inline std::string rtrim_zero_c(std::string s)
@@ -247,7 +254,7 @@ inline void trim(std::string &s, std::string chars = _TRIM_CHARS)
     ltrim(s, chars);
 }
 
-inline void trim(std::wstring &s, std::string chars = _TRIM_CHARS)
+inline void trim(std::wstring &s, std::wstring chars = _TRIM_CHARS_L)
 {
     rtrim(s, chars);
     ltrim(s, chars);
@@ -259,7 +266,7 @@ inline std::string ltrim_c(std::string s, std::string chars = _TRIM_CHARS)
     return s;
 }
 
-inline std::wstring ltrim_c(std::wstring s, std::string chars = _TRIM_CHARS)
+inline std::wstring ltrim_c(std::wstring s, std::wstring chars = _TRIM_CHARS_L)
 {
     ltrim(s, chars);
     return s;
@@ -271,7 +278,7 @@ inline std::string rtrim_c(std::string s, std::string chars = _TRIM_CHARS)
     return s;
 }
 
-inline std::wstring rtrim_c(std::wstring s, std::string chars = _TRIM_CHARS)
+inline std::wstring rtrim_c(std::wstring s, std::wstring chars = _TRIM_CHARS_L)
 {
     rtrim(s, chars);
     return s;
@@ -283,7 +290,7 @@ inline std::string trim_c(std::string s, std::string chars = _TRIM_CHARS)
     return s;
 }
 
-inline std::wstring trim_c(std::wstring s, std::string chars = _TRIM_CHARS)
+inline std::wstring trim_c(std::wstring s, std::wstring chars = _TRIM_CHARS_L)
 {
     trim(s, chars);
     return s;
@@ -322,7 +329,7 @@ inline int rm_quote(std::wstring &s)
 {
     int result = 0;
     bool f[2];
-    for (auto &ch : _QQ)
+    for (auto &ch : _QQ_L)
     {
         f[0] = f[1] = 0;
         if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
@@ -357,7 +364,7 @@ inline std::string rm_quote_c(std::string &s)
 
 inline std::wstring rm_quote_c(std::wstring &s)
 {
-    for (auto &ch : _QQ)
+    for (auto &ch : _QQ_L)
     {
         if (s.front() == ch && s.back() == ch)
         {

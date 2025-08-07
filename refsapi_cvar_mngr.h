@@ -170,15 +170,15 @@ private:
     }
 
 public:
-    bool need_update(load_cvars_t &load_cvars, plugin_cvars_it plugin_cvars)
+    bool need_update(load_cvars_t &load_cvars, list_m_cvar_t *list_cvar)
     {
         // UTIL_ServerPrint("[DEBUG] need_update(): plugin_cvars = %d, load_cvars = %d\n", plugin_cvars->second.size(), load_cvars.size());
-        for (auto m_cvar : plugin_cvars->second)
+        for (auto m_cvar : *list_cvar)
         {
             if (load_cvars.find(m_cvar->name) == load_cvars.end())
                 return true;
         }
-        return plugin_cvars->second.size() == 0 || plugin_cvars->second.size() != load_cvars.size();
+        return list_cvar->size() == 0 || list_cvar->size() != load_cvars.size();
     }
     void on_direct_set(cvar_t *cvar, std::wstring value)
     {
@@ -344,11 +344,11 @@ public:
         }
         return nullptr;
     }
-    plugin_cvars_it get(int plugin_id)
+    list_m_cvar_t* get(int plugin_id)
     {
         auto plugin_cvars = cvars.plugin.find(plugin_id);
         // Plugin cvars exist?
-        return plugin_cvars != cvars.plugin.end() ? plugin_cvars : plugin_cvars_it{};
+        return plugin_cvars != cvars.plugin.end() ? &plugin_cvars->second : nullptr;
     }
     m_cvar_t *get(cvar_t *cvar)
     {
@@ -373,12 +373,14 @@ public:
         }
         return nullptr;
     }
-    cell get(CVAR_TYPES_t type, m_cvar_t *m_cvar, cell *ptr, size_t ptr_size)
+    cell get(CVAR_TYPES_t type, m_cvar_t *m_cvar, cell *ptr, size_t ptr_len)
     {
+        DEBUG("%s(): type = %d, m_cvar = %p, ptr = %p, size = %u", __func__, type, m_cvar, ptr, ptr_len);
         cell result = 0;
         // Cvar exists?
         if (m_cvar != nullptr)
         {
+            DEBUG("%s(): name = %s, value = %s, cvar = %p, value = %f", __func__, wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), m_cvar->cvar, m_cvar->cvar->value);
             switch (type)
             {
             case CVAR_TYPE_NUM:
@@ -388,10 +390,10 @@ public:
                 result = amx_ftoc(m_cvar->cvar->value);
                 break;
             case CVAR_TYPE_STR:
-                if (ptr_size)
+                if (ptr_len)
                 {
                     std::string s = wstos(m_cvar->value);
-                    result = std::min(ptr_size, s.size() + 1);
+                    result = std::min(ptr_len, s.size());
                     setAmxString(ptr, s.c_str(), result);
                 }
                 break;
@@ -401,9 +403,10 @@ public:
         }
         return result;
     }
-    cell get(CVAR_TYPES_t type, std::wstring name, cell *ptr, size_t ptr_size)
+    cell get(CVAR_TYPES_t type, std::wstring name, cell *ptr, size_t ptr_len)
     {
-        return get(type, get(name), ptr, ptr_size);
+        DEBUG("%s(): type = %d, name = %s, ptr = %x, size = %u", __func__, type, wstos(name).c_str(), ptr, ptr_len);
+        return get(type, get(name), ptr, ptr_len);
     }
     void direct_set(cvar_t *cvar, const char *value)
     {
@@ -463,10 +466,9 @@ public:
             hook_state_it->second = is_enable;
         return result;
     }
-    void sort(plugin_cvars_it plugin_cvars)
+    void sort(list_m_cvar_t * list_cvar)
     {
-        auto list = &plugin_cvars->second;
-        list->sort([](m_cvar_t *p1, m_cvar_t *p2)
+        list_cvar->sort([](m_cvar_t *p1, m_cvar_t *p2)
                    { return p1->name.compare(p2->name) <= 0; });
     }
     void clear_plugin(CPluginMngr::CPlugin *plugin)

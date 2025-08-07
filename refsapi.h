@@ -1,25 +1,41 @@
 #pragma once
 
 #include "precompiled.h"
+#ifdef DEBUG
+    #define DEBUG(...)  debug(__VA_ARGS__)    
+#else
+    #ifdef  NDEBUG
+        #define DEBUG(...) ((void) 0)
+    #else
+    #define DEBUG(...)   debug(__VA_ARGS__)
+    #endif
+#endif
+
 // gets rid of annoying "deprecated conversion from string constant blah blah" warning
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
 #define MAX_PLAYERS                 32
+#define MAX_LOG_BUFFER_SIZE         8192
+#define MAX_LOG_STR_SIZE            16384
+#define MAX_LOG_WORKERS             4
+#define MAX_LOG_MIN_INTERVAL        100U
+#define MAX_LOG_MAX_INTERVAL        15000U
 #define DECIMAL_POINT               '.'
 #define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN (sizeof(WP_CLASS_PREFIX) - 1)
 #define REFSAPI_CVAR                "acs_refsapi_loaded"
-#define check_it_empty(x) ((x)._M_node == nullptr)
-#define check_it_empty_r(x) \
-    if (check_it_empty(x))  \
-    return
-
 #define _QQ                         "\"'`"
-#define _TRIM_CHARS                 " \r\t\n"
+#define _QQ_L                       L"\"'`"
+#define _TRIM_CHARS                 " \r\t\n\b\a"
+#define _TRIM_CHARS_L               L" \r\t\n\b\a"
+#define _BAD_PATH_CHARS             " \\,?`'\"~!@#$%^&*(){}[]-=\r\t\n\b\a"
+#define _BAD_PATH_CHARS_L           L" \\,?`'\"~!@#$%^&*(){}[]-=\r\t\n\b\a"
 #define _COUNT(x) (size_t)(sizeof(x) / sizeof(cell))
 
 #define amx_ftoc(f) (*((cell *)&f))  /* float to cell */
 #define amx_ctof(c) (*((float *)&c)) /* cell to float */
+
+#define gettid()                    std::this_thread::get_id()
 
 typedef void (*funEventCall)(void *);
 
@@ -37,7 +53,6 @@ typedef enum TEAMS_e
 
 struct g_RegUserMsg
 {
-
     const char *name;
     int *id;
     funEventCall func;
@@ -46,7 +61,6 @@ struct g_RegUserMsg
 
 struct sTries
 {
-
     std::map<std::string, int> names;
     std::map<std::string, int> authids;
     std::map<std::string, std::vector<cell>> entities; // all entities
@@ -75,6 +89,7 @@ extern int mState;
 extern int gmsgTeamInfo;
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 extern const std::locale _LOCALE;
+extern std::mutex std_mutex;
 
 extern funEventCall modMsgsEnd[MAX_REG_MSGS];
 extern funEventCall modMsgs[MAX_REG_MSGS];
@@ -82,6 +97,9 @@ extern funEventCall modMsgs[MAX_REG_MSGS];
 extern void (*function)(void *);
 extern void (*endfunction)(void *);
 
+void debug(const char *fmt, ...);
+
+//bool R_ValidateCommand(IRehldsHook_ValidateCommand *chain, const char* cmd, cmd_source_t src, IGameClient *client);
 edict_t *CreateFakeClient_RH(IRehldsHook_CreateFakeClient *chain, const char *netname);
 void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool crash, const char *format);
 // edict_t* ED_Alloc_RH(IRehldsHook_ED_Alloc* chain);

@@ -18,3 +18,5 @@
     }
 
 void RegisterNatives_Misc();
+
+inline CPluginMngr::CPlugin *findPluginFast(AMX *amx) { return (CPluginMngr::CPlugin *)(amx->userdata[UD_FINDPLUGIN]); }

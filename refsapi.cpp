@@ -10,10 +10,14 @@ cvar_mngr g_cvar_mngr;
 #ifndef WITHOUT_SQL
 mysql_mngr g_mysql_mngr;
 #endif
+#ifndef WITHOUT_LOG
+log_mngr g_log_mngr;
+#endif
 recoil_mngr g_recoil_mngr;
 sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
 std::wstring_convert<convert_type, wchar_t> g_converter;
+std::mutex std_mutex;
 funEventCall modMsgsEnd[MAX_REG_MSGS];
 funEventCall modMsgs[MAX_REG_MSGS];
 void (*function)(void *);
@@ -26,44 +30,61 @@ g_RegUserMsg g_user_msg[] =
 
 void CSGameRules_ClientUserInfoChanged_RG(IReGameHook_CSGameRules_ClientUserInfoChanged *chain, CBasePlayer *pPlayer, char *userinfo)
 {
-    if (is_valid_utf8(userinfo))
+    DEBUG("*** change userinfo = %s", userinfo);
+    // UTIL_ServerPrint("[DEBUG] *** userinfo = %s\n", userinfo);
+    if (is_valid_utf8_simd(userinfo))
         chain->callNext(pPlayer, userinfo);
     else if (pPlayer != nullptr)
     {
         auto cl = clientByIndex(pPlayer->entindex());
         if (cl->IsConnected())
-            g_RehldsFuncs->DropClient(cl, false, "Invalid userinfo");
+            g_RehldsFuncs->DropClient(cl, false, "[REFSAPI] Invalid userinfo");
     }
 }
 
 qboolean RF_CheckUserInfo_RH(IRehldsHook_SV_CheckUserInfo *chain, netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int iReconnectSlot, char *name)
 {
-    return !is_valid_utf8(userinfo) || !is_valid_utf8(name) ? FALSE : chain->callNext(adr, userinfo, bIsReconnecting, iReconnectSlot, name);
+    DEBUG("*** check userinfo = %s", userinfo);
+    // UTIL_ServerPrint("\n[DEBUG] **** check userinfo = %s, name = %s\n\n", userinfo, name);
+    return !is_valid_utf8_simd(userinfo) ? FALSE : chain->callNext(adr, userinfo, bIsReconnecting, iReconnectSlot, name);
 }
+
+/*
+bool R_ValidateCommand(IRehldsHook_ValidateCommand *chain, const char* cmd, cmd_source_t src, IGameClient *client)
+{
+    std::string str = cmd;
+    if (str.find("changelevel") != std::string::npos)
+    {
+        UTIL_ServerPrint("CMD = %s\n", cmd);
+        assert(false);
+    }
+    return chain->callNext(cmd, src, client);
+}
+*/
 
 void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char *cmd, cmd_source_t src, IGameClient *client)
 {
-    if (src == src_client && !Q_stricmp(cmd, "status"))
+    if (src == src_client && !strcmp(cmd, "status"))
     {
         char flags_str[32];
         auto ip = client->GetNetChan()->GetRemoteAdr()->ip;
         UTIL_GetFlags(flags_str, g_amxxapi.GetPlayerFlags(ENTINDEX(client->GetEdict())));
-        Q_snprintf(g_buff, sizeof(g_buff), "[ACS] Имя: %s\n[ACS] Стим: %s\n[ACS] IP: %d.%d.%d.%d\n[ACS] Флаги: %s\n", client->GetName(), GETPLAYERAUTHID(client->GetEdict()), ip[0], ip[1], ip[2], ip[3], flags_str);
+        int len = snprintf(g_buff, sizeof(g_buff), "[ACS] Имя: %s\n[ACS] Стим: %s\n[ACS] IP: %d.%d.%d.%d\n[ACS] Флаги: %s\n", client->GetName(), GETPLAYERAUTHID(client->GetEdict()), ip[0], ip[1], ip[2], ip[3], flags_str);
         // UTIL_ServerPrint("[DEBUG] R_ExecuteServerStringCmd(): id = %d, cmd = %s\n", client->GetId(), cmd);
-        g_engfuncs.pfnClientPrintf(client->GetEdict(), print_console, g_buff);
+        if (len >= 0)
+            g_engfuncs.pfnClientPrintf(client->GetEdict(), print_console, g_buff);
+        return;
     }
-    else
-        chain->callNext(cmd, src, client);
-/*
-    if (src == src_command && !Q_stricmp(cmd, "changelevel"))
+    if (src == src_command && !strcmp(cmd, "changelevel"))
     {
         SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
 #ifndef WITHOUT_SQL
+        //g_mysql_mngr.stop();
         while (g_mysql_mngr.block_changelevel.load())
             std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
 #endif
     }
-*/
+    chain->callNext(cmd, src, client);
 }
 
 void R_StartFrame_Post(void)
@@ -508,4 +529,22 @@ bool get_user_buyzone(const edict_t *p)
         }
     }
     return result;
+}
+
+void debug(const char *fmt, ...)
+{
+    if (fmt == nullptr)
+        return;
+    std::lock_guard lock(std_mutex);
+    char str[1024]{0};
+    va_list arg_ptr;
+    static std::string f;
+    f = fmt;
+    f = "[DEBUG] " + f + "\n";
+    va_start(arg_ptr, fmt);
+    int len = vsnprintf(str, sizeof(str), f.c_str(), arg_ptr);
+    va_end(arg_ptr);
+    if (len < 0)
+        return;
+    SERVER_PRINT(str);
 }

@@ -19,14 +19,15 @@ void CAPI_Config::Init()
 	{
 		g_engfuncs.pfnServerPrint("[REFSAPI] ReHLDS API successfully initialized.\n");
 		g_RehldsHookchains->Cvar_DirectSet()->registerHook(RF_Cvar_DirectSet_RH);
-		//g_RehldsHookchains->SV_CheckUserInfo()->registerHook(RF_CheckUserInfo_RH, HC_PRIORITY_UNINTERRUPTABLE);
+		g_RehldsHookchains->SV_CheckUserInfo()->registerHook(RF_CheckUserInfo_RH, HC_PRIORITY_UNINTERRUPTABLE);
 	}
 	if (m_api_regame)
 	{
 		g_engfuncs.pfnServerPrint("[REFSAPI] ReGAME API successfully initialized.\n");
 		g_ReGameHookchains->InstallGameRules()->registerHook(&InstallGameRules);
-		//g_ReGameHookchains->CSGameRules_ClientUserInfoChanged()->registerHook(CSGameRules_ClientUserInfoChanged_RG, HC_PRIORITY_UNINTERRUPTABLE);
+		g_ReGameHookchains->CSGameRules_ClientUserInfoChanged()->registerHook(CSGameRules_ClientUserInfoChanged_RG, HC_PRIORITY_UNINTERRUPTABLE);
 	}
+
 	cvar_t *pCvar = CVAR_GET_POINTER(REFSAPI_CVAR);
 	if (pCvar == nullptr)
 	{

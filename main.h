@@ -17,6 +17,7 @@ extern enginefuncs_t* g_pengfuncsTable;
 extern DLL_FUNCTIONS *g_pFunctionTable;
 
 void OnAmxxAttach();
+void OnAmxxDetach();
 bool OnMetaAttach();
 void OnMetaDetach();
 

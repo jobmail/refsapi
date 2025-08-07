@@ -12,7 +12,8 @@ COMPILER = g++
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
 LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
-	-s -m32 -ldl -lm -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -Wl,--as-needed -l:libmariadb.a -l:libssl.a -l:libcrypto.a
+	-s -m32 -ldl -lm -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -Wl,--as-needed -l:libmariadb.a
+#-l:libssl.a -l:libcrypto.a
 #-l:libmariadb.a
 # 
 #-static-libgcc 
@@ -82,7 +83,7 @@ LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -mmmx -msse -msse2 -msse3 -msse4.2 -fno-strict-aliasing -Wno-parentheses -Wno-switch -Wno-uninitialized -fpermissive -shared -pipe -pthread
+OPT_FLAGS = -O3 -mmmx -msse -msse2 -msse3 -msse4.2 -fno-strict-aliasing -Wno-parentheses -Wno-int-to-pointer-cast -Wno-switch -Wno-uninitialized -fpermissive -shared -pipe -pthread
 # -funroll-loops -fomit-frame-pointer 
 # -fno-rtti
 #-fno-split-stack
@@ -90,7 +91,7 @@ OPT_FLAGS = -O3 -mmmx -msse -msse2 -msse3 -msse4.2 -fno-strict-aliasing -Wno-par
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
 INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
-        -I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude -Iinclude/mariadb \
+        -I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude -Iinclude/mariadb -I/usr/lib/gcc/i686-linux-gnu/9/include/ \
         -Iinclude/amxmodx -Iinclude/amxmodx/public -Iinclude/amxmodx/amtl -Iinclude/amxmodx/third_party/hashing -Icommon
 		
 #-I/usr/include/mariadb
@@ -98,7 +99,13 @@ INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -g -flto=auto -fPIC
+CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -g \
+	-fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions -flto=auto -fPIC -D_GLIBCXX_DEBUG
+#-DNDEBUG
+#-D_GLIBCXX_DEBUG
+#-DNDEBUG
+# -DWITHOUT_LOG
+# -DWITHOUT_SQL
 # -fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions
 #-flto -fPIC 
 # -fPIC -msse4.2 -mavx 
@@ -114,7 +121,7 @@ CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -g -
 #-fomit-frame-pointer
 #-fPIC -fno-exceptions -pipe
 #-funroll-loops -mmmx -msse -msse2 -mfpmath=sse 
-#-DWITHOUT_SQL
+
 #-DWITHOUT_SQL
 #-g3
 #-fsanitize=undefined

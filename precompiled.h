@@ -88,16 +88,22 @@
 #endif
 
 // Refs API
+#include <immintrin.h>
 #include "sdk_util.h"
 #include "refsapi.h"
 #include "refsapi_misc.h"
+
+#include "natives_helper.h"
+#include "natives_refsapi.h"
+
 #include "refsapi_cvar_mngr.h"
 #include "refsapi_recoil_mngr.h"
 #ifndef WITHOUT_SQL
 #include "refsapi_mysql_mngr.h"
 #endif
-#include "natives_helper.h"
-#include "natives_refsapi.h"
+#ifndef WITHOUT_LOG
+#include "refsapi_log_mngr.h"
+#endif
 
 // ARENA FIX
 //const char interp_section[] __attribute__((section(".interp"))) = "/home/virus/dev/lib/glibc-2.23/ld-linux.so.2";
