@@ -26,7 +26,7 @@ static amxx_module_info_s g_ModuleInfo =
 		"refsapi"};
 
 // Storage for the requested functions
-amxxapi_t g_amxxapi;
+amxxapi_t g_amxxapi{0};
 
 static struct funcreq_t
 {
@@ -181,18 +181,22 @@ NOINLINE void AMXX_Log(const char *fmt, ...)
 	char msg[2048];
 	va_list arglst;
 	va_start(arglst, fmt);
-	vsnprintf(msg, sizeof msg, fmt, arglst);
+	vsnprintf(msg, sizeof(msg) - 1, fmt, arglst);
 	va_end(arglst);
+	msg[sizeof(msg) - 1] = 0;
 	g_amxxapi.Log("[%s] %s", g_ModuleInfo.logtag, msg);
 }
 
 NOINLINE void AMXX_LogError(AMX *amx, int err, const char *fmt, ...)
 {
 	char msg[2048];
+	if (amx == nullptr || fmt == nullptr)
+	return;
 	va_list arglst;
 	va_start(arglst, fmt);
 	vsnprintf(msg, sizeof msg, fmt, arglst);
 	va_end(arglst);
+	msg[sizeof(msg) - 1] = 0;
 	g_amxxapi.LogError(amx, err, "[%s] %s", g_ModuleInfo.logtag, msg);
 }
 
