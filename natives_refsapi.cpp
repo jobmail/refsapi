@@ -715,6 +715,24 @@ cell AMX_NATIVE_CALL rf_sql_free(AMX *amx, cell *params)
 #endif
 
 #ifndef WITHOUT_LOG
+// native rf_log_config(const path[] = "", const name[] = "", log_level = -1, prefix_mode = 2);
+cell AMX_NATIVE_CALL rf_log_config(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_path,
+        arg_name,
+        arg_log_level,
+        arg_prefix_mode,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    std::string path, name;
+    path = getAmxString(amx, params[arg_path], g_buff);
+    name = getAmxString(amx, params[arg_name], g_buff);
+    return g_log_mngr.add_config(amx, stows(path), stows(name), params[arg_log_level], params[arg_prefix_mode]);
+}
+
 // native rf_log(const log_level, const fmt[], any:...);
 cell AMX_NATIVE_CALL rf_log(AMX *amx, cell *params)
 {
@@ -724,7 +742,7 @@ cell AMX_NATIVE_CALL rf_log(AMX *amx, cell *params)
         arg_log_level,
         arg_fmt,
     };
-    DEBUG("%s(): from %s, START => log_level = %d, level = %d", __func__, findPluginFast(amx)->getName(), g_log_mngr.get_log_level(amx), params[arg_log_level]);
+    DEBUG("%s(): amx = %p, from %s, START => log_level = %d, level = %d", __func__, amx, findPluginFast(amx)->getName(), g_log_mngr.get_log_level(amx), params[arg_log_level]);
     if (!(g_log_mngr.get_log_level(amx) & params[arg_log_level]))
         return FALSE;
     int len;
@@ -774,6 +792,7 @@ AMX_NATIVE_INFO Misc_Natives[] = {
 #endif
 #ifndef WITHOUT_LOG
     {"rf_log", rf_log},
+    {"rf_log_config", rf_log_config},
 #endif
     {nullptr, nullptr}};
 

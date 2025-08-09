@@ -9,7 +9,7 @@ plugin_info_t Plugin_info =
 	{
 		META_INTERFACE_VERSION,				  // ifvers
 		"RefsAPI",							  // name
-		"1.0.6.7",							  // version
+		"1.0.7",							  // version
 		__DATE__,							  // date
 		"Refresh",							  // author
 		"https://github.com/jobmail/refsapi", // url
@@ -53,6 +53,7 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	DEBUG("Check is_valid_utf8(%s) = %d", "\xC3\x28", is_valid_utf8_simd("\xC3\x28"));
 	DEBUG("Check is_valid_utf8(%s) = %d", "\xED\xA0\x80", is_valid_utf8_simd("\xED\xA0\x80"));
 	DEBUG("Check is_valid_utf8(%s) = %d\n", "\xFF\xFF\xFF\x20\x00", is_valid_utf8_simd("\xFF\xFF\xFF\x20\x00"));
+	cpu_test();
 
 	GET_HOOK_TABLES(PLID, &g_pengfuncsTable, nullptr, nullptr);
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));

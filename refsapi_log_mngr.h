@@ -71,21 +71,24 @@ public:
     void writer_thread(buffer_t *buff, const size_t local_batch_size)
     {
         buffer_t local_batch;
-        AMX *amx_prev;
-        file_t *file = nullptr;
+        AMX *amx_prev = nullptr;
+        file_t *file;
         data_t it;
         DEBUG("%s(): START", __func__);
         local_batch.reserve(local_batch_size);
         std::sort(buff->begin(), buff->end(), [](const data_t &a, const data_t &b) {
-            return a.amx >= b.amx && a.time >= b.time && a.seq > b.seq; 
+            return a.amx >= b.amx && a.time > b.time; 
         });
         size_t skip_count = 0;
         while (buff->size())
         {
-            if (file == nullptr || it.amx != amx_prev)
+            if (amx_prev == nullptr || it.amx != amx_prev)
             {
+                DEBUG("%s(): 1", __func__);
                 it = buff->back();
+                DEBUG("%s(): 2", __func__);
                 file = open_file(it.amx);
+                DEBUG("%s(): 3", __func__);
                 if (file == nullptr)
                 {
                     buff->pop_back();
@@ -196,7 +199,7 @@ public:
         data.time = std::chrono::system_clock::now();
         data.str.swap(str);
         buffer.push_back(data);
-        DEBUG("%s(): push to buffer: plugin = %s, str = %s", __func__, findPluginFast(amx)->getName(), wstos(data.str).c_str());
+        DEBUG("%s(): push to buffer: amx = %p, plugin = %p, str = %s", __func__, amx, findPluginFast(amx), wstos(data.str).c_str());
     }
     int get_log_level(AMX *amx)
     {
@@ -218,12 +221,9 @@ public:
     {
         if (amx == nullptr)
             return false;
-        auto plugin = findPluginFast(amx);
-        if (plugin == nullptr || !plugin->isValid())
-        {
-            AMXX_LogError(amx, AMX_ERR_NATIVE, "%s(): invalid plugin detected!", __func__);
+        auto plugin = get_plugin(amx);
+        if (plugin == nullptr)
             return false;
-        }
         path = log_root + L'/' + log_game + L'/' + (path.empty() ? log_path : path);
         remove_chars(path, _BAD_PATH_CHARS_L);
         rtrim(path, L" /");
@@ -292,6 +292,7 @@ public:
         file->name = path + L'/' + name;
         file->log_level = log_level;
         file->prefix_mode = prefix_mode;
+        DEBUG("%s(): plugin = %p, filename(%x) = %s", __func__, plugin, flags, wstos(file->name).c_str());
         try
         {
             file->s = new std::wfstream(wstos(file->name).c_str(), flags);
@@ -303,7 +304,7 @@ public:
         }
         if (file == nullptr || file->s == nullptr || !file->s->is_open())
         {
-            AMXX_LogError(amx, AMX_ERR_NATIVE, "%s(): plugin = %s, can't open file %s", __func__, plugin->getName(), wstos(file->name).c_str());
+            AMXX_LogError(amx, AMX_ERR_NATIVE, "%s(): plugin = %p, can't open file %s", __func__, plugin, wstos(file->name).c_str());
             return nullptr;
         }
         file->s->imbue(_LOCALE);
@@ -322,8 +323,10 @@ public:
         DEBUG("%s(): START, plugin = %p", __func__, plugin);
         if ((file = get_file(amx)) == nullptr)
         {
+            /*
             if (plugin == nullptr)
                 return nullptr;
+            */
             plugin_prm_t prm;
             if (!get_config(amx, prm, path, name, log_level, prefix_mode))
                 return nullptr;
@@ -331,7 +334,7 @@ public:
             auto flags = file_exists(filename) ? std::ios::in | std::ios::out | std::ios::binary | std::ios::app : std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc;
             DEBUG("%s(): create file(%x) = %s", __func__, flags, wstos(filename).c_str());
             file = create_file(amx, prm.path, prm.name, flags, prm.log_level, prm.prefix_mode);
-            DEBUG("%s(): plugin = %s, file = %s, is_exist = %d, is_open = %d", __func__, plugin->getName(), wstos(file->name).c_str(), file_exists(file->name), file->s->is_open());
+            DEBUG("%s(): plugin = %p, file = %s, is_exist = %d, is_open = %d", __func__, plugin, wstos(file->name).c_str(), file_exists(file->name), file->s->is_open());
         } else
             file->m.lock();
         return file;
@@ -361,7 +364,7 @@ public:
     void close_file(AMX *amx, file_t *file)
     {
         DEBUG("%s(): START", __func__);
-        DEBUG("%s(): amx = %p, plugin = %s, file = %s", __func__, amx, findPluginFast(amx)->getName(), wstos(file->name).c_str());
+        DEBUG("%s(): amx = %p, plugin = %p, file = %s", __func__, amx, findPluginFast(amx), wstos(file->name).c_str());
         file->m.lock();
         std::lock_guard lock(data_mutex);
         auto it = std::find(files.begin(), files.end(), file);
@@ -385,7 +388,7 @@ public:
         while (get_num_threads() > 0)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-            std::lock_guard lock_2(data_mutex);
+        std::lock_guard lock_2(data_mutex);
         for (auto p : plugins)
         {
             plugin_prm_t prm;
