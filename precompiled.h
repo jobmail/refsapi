@@ -105,6 +105,8 @@
 #include "refsapi_log_mngr.h"
 #endif
 
+#include <cpuid.h>
+
 // ARENA FIX
 //const char interp_section[] __attribute__((section(".interp"))) = "/home/virus/dev/lib/glibc-2.23/ld-linux.so.2";
 //asm (".symver fcntl,fcntl@@GLIBC_2.0");

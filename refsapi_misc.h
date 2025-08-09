@@ -4,17 +4,33 @@
 
 bool is_number(std::string &s);
 size_t set_amx_string(cell *dest, const char *str, size_t max_len);
+
+bool is_valid_utf8(const uint8_t *data, size_t size);
 bool is_valid_utf8(const std::vector<uint8_t> &data);
+bool is_valid_utf8(const char *str);
+bool is_valid_utf8(const std::string &str);
+bool is_valid_utf8(char *str, size_t length);
+bool is_valid_utf8(const char *str, size_t length);
+
+bool is_valid_utf8_simd(const uint8_t *data, size_t size);
 bool is_valid_utf8_simd(const std::vector<uint8_t> &data);
+bool is_valid_utf8_simd(const char *str);
+bool is_valid_utf8_simd(const std::string &str);
 bool is_valid_utf8_simd(const char *str, size_t length);
 bool is_valid_utf8_simd(char *str, size_t length);
-bool is_valid_utf8_simd(const char *str);
-std::wstring format_time(const std::chrono::system_clock::time_point &tp, const std::wstring format = L"%m/%d/%Y - %H:%M:%S");
+
+std::wstring format_time(const std::chrono::system_clock::time_point &tp, const std::wstring format = L"%d/%m/%Y - %H:%M:%S");
 std::wstring cc(const std::wstring &str, bool with_slashes = false, wchar_t cc = L'\\');
 bool dir_exists(const std::wstring &path);
 bool is_mutex_locked(std::mutex &mutex);
 int safe_poll(struct pollfd *fds, nfds_t nfds, int timeout_ms);
 CPluginMngr::CPlugin * get_plugin(AMX *amx);
+bool amx_allot(AMX *amx, int cells, cell *amx_addr, cell **phys_addr);
+double timespec_diff(const struct timespec *start, const struct timespec *end);
+void checkCPUFeatures();
+void cpu_test();
+int64_t cpu_benchmark();
+std::string get_cpu_name();
 
 class fmt
 {

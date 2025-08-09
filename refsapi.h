@@ -82,6 +82,8 @@ typedef std::codecvt_utf8<wchar_t> convert_type;
 
 extern bool r_bMapHasBuyZone;
 extern char g_buff[4096];
+extern bool g_SSE4_ENABLE;
+
 extern sClients g_Clients[MAX_PLAYERS + 1];
 extern sTries g_Tries;
 extern cell g_PlayersNum[6];

@@ -100,7 +100,8 @@ BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
 CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -g \
-	-fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions -flto=auto -fPIC -D_GLIBCXX_DEBUG
+	-fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions -flto=auto -fPIC -DNDEBUG
+# -D_GLIBCXX_DEBUG
 #-DNDEBUG
 #-D_GLIBCXX_DEBUG
 #-DNDEBUG

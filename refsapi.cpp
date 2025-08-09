@@ -5,6 +5,8 @@ int m_state;
 int g_PlayersNum[6];
 bool r_bMapHasBuyZone;
 char g_buff[4096];
+bool g_SSE4_ENABLE;
+
 const std::locale _LOCALE = std::locale("ru_RU.UTF-8");
 cvar_mngr g_cvar_mngr;
 #ifndef WITHOUT_SQL
@@ -32,7 +34,7 @@ void CSGameRules_ClientUserInfoChanged_RG(IReGameHook_CSGameRules_ClientUserInfo
 {
     DEBUG("*** change userinfo = %s", userinfo);
     // UTIL_ServerPrint("[DEBUG] *** userinfo = %s\n", userinfo);
-    if (is_valid_utf8_simd(userinfo))
+    if ((g_SSE4_ENABLE ? is_valid_utf8_simd(userinfo) : is_valid_utf8(userinfo)))
         chain->callNext(pPlayer, userinfo);
     else if (pPlayer != nullptr)
     {
@@ -46,7 +48,7 @@ qboolean RF_CheckUserInfo_RH(IRehldsHook_SV_CheckUserInfo *chain, netadr_t *adr,
 {
     DEBUG("*** check userinfo = %s", userinfo);
     // UTIL_ServerPrint("\n[DEBUG] **** check userinfo = %s, name = %s\n\n", userinfo, name);
-    return !is_valid_utf8_simd(userinfo) ? FALSE : chain->callNext(adr, userinfo, bIsReconnecting, iReconnectSlot, name);
+    return !(g_SSE4_ENABLE ? is_valid_utf8_simd(userinfo) : is_valid_utf8(userinfo)) ? FALSE : chain->callNext(adr, userinfo, bIsReconnecting, iReconnectSlot, name);
 }
 
 /*
@@ -75,13 +77,27 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
             g_engfuncs.pfnClientPrintf(client->GetEdict(), print_console, g_buff);
         return;
     }
-    if (src == src_command && !strcmp(cmd, "changelevel"))
+    else if (src == src_command && !strcmp(cmd, "cpu"))
+    {
+        cpu_test();
+        return;
+    }
+    else if (src == src_command && !strcmp(cmd, "changelevel"))
     {
         SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
 #ifndef WITHOUT_SQL
         //g_mysql_mngr.stop();
         while (g_mysql_mngr.block_changelevel.load())
             std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
+#endif
+    }
+    else if (src == src_command && !strcmp(cmd, "stats"))
+    {
+#ifndef WITHOUT_SQL
+        int len = snprintf(g_buff, sizeof(g_buff), "\n[REFSAPI_SQL] FPS = %.1f, frame_delay = %.3f, frame_rate = %d (%d), query_nums = %" PRIu64 "\n\n",
+            g_mysql_mngr.frame_delay > 0.0 ? 1000.0 / g_mysql_mngr.frame_delay : 0.0, g_mysql_mngr.frame_delay, g_mysql_mngr.frame_rate, g_mysql_mngr.frame_rate_max, g_mysql_mngr.m_query_nums.load());
+        if (len >= 0)
+            SERVER_PRINT(g_buff);
 #endif
     }
     chain->callNext(cmd, src, client);

@@ -101,11 +101,10 @@ class mysql_mngr
     std::atomic<bool> stop_main;
     std::atomic<bool> stop_threads;
     std::mutex frame_mutex, threads_mutex, fwd_mutex, conn_mutex;
-    std::mutex prms_mutex;
-    std::atomic<uint64> m_query_nums;
+    std::mutex prms_mutex;    
     std::vector<MYSQL *> conns;
     time_point_t _time_0;
-    uint64 m_frames;
+    struct timespec frame_curr, frame_prev;
     std::atomic<bool> frame_exec;
 
 private:
@@ -134,15 +133,6 @@ private:
         DEBUG("%s(): conn = %p", __func__, conn);
         if (conn == nullptr)
             return false;
-        /*
-        int res = mysql_ping(conn);
-        if (res != 0)
-        {
-            DEBUG("%s(): PING = %d, connection lost!", __func__, res);
-            conn = nullptr;
-            return false;
-        }
-        */
         DEBUG("%s(): conn = %p, valid!", __func__, conn);
         return true;
     }
@@ -150,6 +140,7 @@ private:
     {
         DEBUG("%s-%s(): threads = %d (%d), m_frames = %u, stop = %d", from, __func__, (num_threads - num_finished), m_threads.size(), m_frames, stop_threads.load());
         DEBUG("%s-%s(): frame_lock = %d, fwd_lock = %d, thr_lock = %d, frame_exec = %d", from, __func__, is_mutex_locked(frame_mutex), is_mutex_locked(fwd_mutex), is_mutex_locked(threads_mutex), frame_exec.load());
+        DEBUG("%s-%s(): delay = %f, rate = %d (%d)", from, __func__, frame_delay, frame_rate, frame_rate_max);
         for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
             if (m_queries[pri].size())
                 DEBUG("%s(): m_query[%d](%d)", __func__, pri, m_queries[pri].size());
@@ -214,8 +205,60 @@ private:
         if (*db_chrs != '\0')
             mysql_set_character_set(conn, db_chrs);
     }
+        void frame_forward(m_query_t *q)
+    {
+        DEBUG("%s(): START", __func__);
+        bool repeat = false;
+        // Prepare array
+        cell *error_tmp, *data_tmp, error_param, data_param;
+        size_t total_size = 0;
+        DEBUG("%s(): FRAME_WAITLOCK", __func__);
+        dump(__func__);
+        frame_mutex.lock();
+        frame_exec = true;
+        do
+        {
+            auto f = q->prms.fwd;
+            DEBUG("%s(): FRAME_LOCKED !!!, amx = %p, fwd = %d", __func__, f.amx, f.id);
+            if (stop_threads || q->finished || q->aborted || (!q->successful && q->retry_count < QUERY_RETRY_COUNT)
+                || f.amx == nullptr  || get_plugin(f.amx) == nullptr || f.id == -1)
+                break;
+            DEBUG("%s(): EXEC AMXX FORWARD = %d, is_debug = %d, failstate = %d, err = %d, query = %p, time = %f (%f / %f / %f), error = %s",
+                  __func__, f.id, f.is_debug, q->failstate, q->err, q, q->queuetime, q->time_create, q->time_start, q->time_end, q->error.c_str());
+            // Callback error
+            if (amx_allot(f.amx, q->error.size() + 1, &error_param, &error_tmp))
+            {
+                total_size += (q->error.size() + 1) << 2;
+                setAmxString(error_tmp, q->error.c_str(), q->error.size());
+                // Callback data
+                if (amx_allot(f.amx, q->data_size, &data_param, &data_tmp))
+                {
+                    Q_memcpy(data_tmp, q->data, q->data_size << 2);
+                    total_size += q->data_size << 2;
+                    // public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
+                    int ret = g_amxxapi.ExecuteForward(f.id, q->failstate, q, error_param, q->err, data_param, q->data_size, amx_ftoc(q->queuetime));
+                    DEBUG("%s(): AFTER FORWARD, fix = %d, hea = %p, param = %p, size = %d (%d)",
+                        __func__, f.amx->hea > data_param, f.amx->hea, data_param, f.amx->hea - error_param, total_size);
+                }
+                // Fix heap
+                if ((f.amx->hea - error_param) == total_size)
+                    f.amx->hea = error_param;
+                else
+                    AMXX_LogError(f.amx, AMX_ERR_NATIVE, "%s(): can't fix amx->hea, possible memory leak!", __func__);
+            }
+        } while (0);
+        fwd_mutex.unlock();
+        if (stop_threads)
+            frame_mutex.unlock();
+        frame_exec = false;
+    }
 
 public:
+    uint64 m_frames;
+    double frame_delay;
+    size_t frame_rate, frame_rate_max;
+    std::atomic<uint64> m_query_nums;
+
     std::atomic<bool> block_changelevel;
     void main()
     {
@@ -244,7 +287,7 @@ public:
                     {
                         key = q->tid;
                         auto it = m_threads.find(key);
-                        // Check if the threads have already been cleared == nullptr
+                        // Check if the threads have already been cleared
                         if (it != m_threads.end())
                         {
                             finished_threads.push_back(it->second);
@@ -261,7 +304,7 @@ public:
                         q->started = false;
                         q->finished = false;
                     }
-                    else if (!q->async || q->finished || (!q->started && q->aborted)) //!stop_threads && (...)
+                    else if (!q->async || q->finished || (!q->started && q->aborted))
                         finished_queries.push_back(q);
                 }
                 else if (!stop_threads && q->async && !q->started && !q->aborted && threads_count() < (max_threads << (MAX_QUERY_PRIORITY - q->pri)))
@@ -318,83 +361,14 @@ public:
         if (q->successful = exec_async_query(q, pid))
             get_result(q, false);
         q->queuetime = (q->time_end = get_time()) - q->time_start;
-        DEBUG("%s(): pid = %p, start = %f, end = %f, time = %f, successful = %d, stop = %d", __func__, pid, q->time_start, q->time_end, q->queuetime, q->successful.load(), stop_threads.load());
+        DEBUG("%s(): pid = %p, start = %f, end = %f, time = %f, successful = %d, stop = %d",
+            __func__, pid, q->time_start, q->time_end, q->queuetime, q->successful.load(), stop_threads.load());
         frame_forward(q);
         q->finished = true;
         threads_mutex.lock();
         num_finished++;
         threads_mutex.unlock();
         DEBUG("%s(): pid = %p, END, num_finished = %d", __func__, pid, num_finished.load());
-    }
-    void frame_forward(m_query_t *q)
-    {
-        DEBUG("%s(): START", __func__);
-        bool repeat = false;
-        // size_t repeat_count = 0;
-        // Prepare array
-        cell *error_tmp, *data_tmp, error_param, data_param;
-        size_t total_size = 0;
-        DEBUG("%s(): FRAME_WAITLOCK", __func__);
-        dump(__func__);
-        frame_mutex.lock();
-        frame_exec = true;
-        do
-        {
-            auto f = q->prms.fwd;
-            DEBUG("%s(): FRAME_LOCKED !!!, amx = %p, fwd = %d", __func__, f.amx, f.id);
-            if (stop_threads || q->finished || q->aborted || (!q->successful && q->retry_count < QUERY_RETRY_COUNT) || f.amx == nullptr || f.id == -1)
-                break;
-            auto plugin = get_plugin(f.amx);
-            repeat = plugin == nullptr;
-            if (!repeat && f.is_debug)
-            {
-                Debugger *pDebugger = (Debugger *)f.amx->userdata[UD_DEBUGGER];
-                if (!(repeat = pDebugger == nullptr))
-                {
-                    auto m_len = pDebugger->m_pCalls.length();
-                    auto m_top = pDebugger->m_Top;
-                    if ((repeat = m_top >= 0))
-                        AMXX_LogError(f.amx, AMX_ERR_NATIVE, "%s(): Fucking AMXX-debugger in trace! m_top = %d, m_len = %d", __func__, m_top, m_len);
-                    // auto true_sleep = [&]() { ++repeat_count; std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL)); return true; };
-                    // std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
-                    // pDebugger->Reset();
-                }
-            }
-            DEBUG("%s(): EXEC AMXX FORWARD = %d, is_debug = %d, failstate = %d, err = %d, query = %p, time = %f (%f / %f / %f), error = %s",
-                  __func__, f.id, f.is_debug, q->failstate, q->err, q, q->queuetime, q->time_create, q->time_start, q->time_end, q->error.c_str());
-            // Callback error
-            if (!repeat && g_amxxapi.amx_Allot(f.amx, q->error.size() + 1, &error_param, &error_tmp) == AMX_ERR_NONE)
-            {
-                total_size += (q->error.size() + 1) << 2;
-                setAmxString(error_tmp, q->error.c_str(), q->error.size());
-                // Callback data
-                if (g_amxxapi.amx_Allot(f.amx, q->data_size, &data_param, &data_tmp) == AMX_ERR_NONE)
-                {
-                    Q_memcpy(data_tmp, q->data, q->data_size << 2);
-                    total_size += q->data_size << 2;
-                    // public QueryHandler(failstate, Handle:query, error[], errnum, data[], size, Float:queuetime);
-                    int ret = g_amxxapi.ExecuteForward(f.id, q->failstate, q, error_param, q->err, data_param, q->data_size, amx_ftoc(q->queuetime));
-                    // int ret = g_amxxapi.ExecuteForward(fwd, failstate, q, q->error.c_str(), err, g_amxxapi.PrepareCellArray(data, data_size), data_size, amx_ftoc(queuetime));
-                    DEBUG("%s(): AFTER FORWARD, fix = %d, hea = %p, param = %p, size = %d (%d)", __func__, f.amx->hea > data_param, f.amx->hea, data_param, f.amx->hea - error_param, total_size);
-                }
-                // Repeat query
-                //else
-                //    q->successful = false;
-                // Fix heap
-                if ((f.amx->hea - error_param) >= total_size)
-                    f.amx->hea = error_param;
-                else
-                    AMXX_LogError(f.amx, AMX_ERR_NATIVE, "%s(): can't fix amx->hea, possible memory leak!", __func__);
-            }
-            // Repeat query
-            //else
-            //    q->successful = false;
-        } while (0);
-        fwd_mutex.unlock();
-        // [&]() { std::this_thread::sleep_for(std::chrono::microseconds(10)); frame_mutex.unlock(); return true; });
-        if (stop_threads)
-            frame_mutex.unlock();
-        frame_exec = false;
     }
     m_query_t *prepare_query(MYSQL *conn, const char *query, bool async = false, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 0, size_t conn_id = 0, cell *data = nullptr, size_t data_size = 0)
     {
@@ -774,8 +748,7 @@ public:
     }
     size_t add_connect(AMX *amx, int id, bool is_debug, std::string &db_host, std::string &db_user, std::string &db_pass, std::string &db_name, std::string &db_chrs, size_t timeout)
     {
-        DEBUG("%s(): pid = %p, fwd = %d, host = %s, user = %s, pass = %s, name = %s, timeout = %d",
-              __func__, gettid(), id, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), timeout);
+        DEBUG("%s(): pid = %p, fwd = %d, host = %s, user = %s, pass = %s, name = %s, timeout = %d", __func__, gettid(), id, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), timeout);
         prm_t prms;
         prms.fwd.amx = amx;
         prms.fwd.id = id;
@@ -821,19 +794,10 @@ public:
     }
     void start()
     {
-#ifndef NON_BLOCKING_FRAME
         DEBUG("%s(): LOCK FRAME", __func__);
         frame_mutex.lock();
         DEBUG("%s(): UNLOCK FWD", __func__);
         fwd_mutex.unlock();
-#else   
-        DEBUG("%s(): LOCK FRAME", __func__);
-        frame_mutex.lock();
-        DEBUG("%s(): LOCK FWD", __func__);
-        fwd_mutex.lock();
-        DEBUG("%s(): UNLOCK FWD", __func__);
-        fwd_mutex.unlock();
-#endif
         _time_0 = std::chrono::system_clock::now();
         DEBUG("*** STATUS: m_frame = %u", m_frames);
         dump(__func__);
@@ -842,46 +806,17 @@ public:
     void stop()
     {
         stop_threads = true;
-#ifndef NON_BLOCKING_FRAME
+        m_frames =
+            frame_prev.tv_sec =
+                frame_prev.tv_nsec = 0;
+        frame_delay = 0.0;
         if (!frame_mutex.try_lock() && frame_exec || frame_exec)
             fwd_mutex.lock();
         else 
             fwd_mutex.try_lock();
-        
-        /*
-        DEBUG("%s(): LOCK FWD", __func__);
-        fwd_mutex.lock();
-        DEBUG("%s(): UNLOCK FRAME", __func__);
-        frame_mutex.unlock();
-        */
-#else
-        DEBUG("%s(): TRY_LOCK FRAME", __func__);
-        dump(__func__);
-        if (!frame_mutex.try_lock())
-        {
-            DEBUG("%s(): LOCK FWD1", __func__);
-            fwd_mutex.lock();
-            DEBUG("%s(): UNLOCK FRAME1", __func__);
-            frame_mutex.unlock();
-            DEBUG("%s(): LOCK FRAME1", __func__);
-            frame_mutex.lock();    
-        }
-        else
-        {
-            DEBUG("%s(): TRY_LOCK FWD", __func__);
-            dump(__func__);
-            if (!stop_threads)
-                fwd_mutex.lock();
-            else
-                fwd_mutex.try_lock();
-        }
-        // ALL LOCKED!
-#endif
         DEBUG("%s(): LOCK THREAD", __func__);
         threads_mutex.lock();
         for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
-        {
-            
             for (auto &it : m_queries[pri])
             {
                 auto q = it.second;
@@ -890,45 +825,22 @@ public:
                 q->conn_id = 0;
                 q->prms.fwd.id = -1;
             }
-        }
+        DEBUG("%s(): UNLOCK THREAD", __func__);
         threads_mutex.unlock();
+        DEBUG("%s(): UNLOCK FRAME", __func__);
         frame_mutex.unlock();
-
+        DEBUG("%s(): CLOSE ALL", __func__);
         close_all();
-        
         prms_mutex.lock();
         m_conn_prms.clear();
         prm_list_t().swap(m_conn_prms);
         prms_mutex.unlock();
-
-        DEBUG("%s(): UNLOCK THREAD", __func__);
-#ifndef NON_BLOCKING_FRAME
-        ///
-#else
-        DEBUG("%s(): UNLOCK FWD2", __func__);
-        fwd_mutex.unlock();
-        DEBUG("%s(): UNLOCK FRAME2", __func__);
-        frame_mutex.unlock();
-#endif
         // STATUS
         if (m_threads.size())
             DEBUG("[REFSAPI_SQL] m_threads(%d) not empty! num_threads = %d, num_finished = %d\n", m_threads.size(), num_threads.load(), num_finished.load());
         for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
             if (m_queries[pri].size())
                 DEBUG("[REFSAPI_SQL] m_query[%d](%d) not empty!\n", pri, m_queries[pri].size());
-        //threads_mutex.unlock();
-#ifndef NON_BLOCKING_FRAME
-        //
-#else
-        /*
-        while (has_threads())
-        {
-            DEBUG("%s(): WAIT", __func__);
-            std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL * 1000));
-        }
-        DEBUG("\n *** [REFSAPI_SQL] EMPTY! ***\n\n");
-        */
-#endif
     }
     double get_time()
     {
@@ -943,37 +855,36 @@ public:
     }
     void start_frame()
     {
-#ifdef NON_BLOCKING_FRAME
-        if (!stop_threads && threads_count() > 0 && fwd_mutex.try_lock() && !frame_mutex.try_lock())
+        if (stop_threads)
+            return;
+        if (!(m_frames % 1000))
         {
-            //fwd_mutex.unlock();
-            DEBUG("%s(): <<<<<<<< UNLOCK FRAME >>>>>>>>", __func__);
+            clock_gettime(CLOCK_MONOTONIC, &frame_curr);
+            if (frame_prev.tv_sec >= 0 && frame_prev.tv_nsec > 0)
+            {
+                auto delay = timespec_diff(&frame_prev, &frame_curr);
+                if (frame_delay > 0.0) {
+                    auto k1 = delay > frame_delay ? 25.0 * abs(frame_delay - delay) / (frame_delay + delay) : 1.0;
+                    auto k2 = frame_delay > 1.0 ? frame_delay : 1.0;
+                    frame_rate = std::round(1.0 + k1 * k2);
+                    if (frame_rate > frame_rate_max)
+                        frame_rate_max = frame_rate;
+                }
+                frame_delay = (frame_delay + delay) / 2.0;
+            }
+            frame_prev = frame_curr;
             dump(__func__);
-            frame_mutex.unlock();
-            DEBUG("%s(): <<<<<<<< FRAME STATUS >>>>>>>>", __func__);
-            dump(__func__);
-            //fwd_mutex.lock();
-#else
-        if (!stop_threads && threads_count() > 0 && !frame_mutex.try_lock() && !frame_exec) // && !frame_mutex.try_lock() && fwd_mutex.try_lock())//if (!stop_threads && threads_count() > 0 && fwd_mutex.try_lock() && !frame_mutex.try_lock())
+        }
+        // Check frame
+        if (threads_count() > 0 && !(m_frames % frame_rate) && !frame_mutex.try_lock() && !frame_exec) // && !frame_mutex.try_lock() && fwd_mutex.try_lock())//if (!stop_threads && threads_count() > 0 && fwd_mutex.try_lock() && !frame_mutex.try_lock())
         {
             if (fwd_mutex.try_lock())
             {
                 frame_mutex.unlock();
-                fwd_mutex.lock();
+                //fwd_mutex.lock();
             }
             else
                 fwd_mutex.unlock();
-            /*
-            frame_mutex.unlock();
-            fwd_mutex.lock();
-            fwd_mutex.unlock();
-            */
-#endif
-        }
-
-        if (!(m_frames % 1000))
-        {
-            dump(__func__);
         }
         m_frames++;
     }
@@ -981,10 +892,13 @@ public:
     {
         stop_main = false;
         stop_threads = true;
-        m_query_nums = 0;
-        num_threads = 0;
-        num_finished = 0;
-        m_frames = 0;
+        m_frames =
+            m_query_nums =
+                num_threads =
+                    num_finished = 0;
+        frame_delay = 0.0;
+        frame_rate =
+            frame_rate_max = 1;
         max_threads = clamp(std::thread::hardware_concurrency() >> 1, 1U, 4U);
     }
     ~mysql_mngr()
