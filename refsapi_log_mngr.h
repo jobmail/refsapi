@@ -149,9 +149,9 @@ public:
     }
     bool write_to_disk()
     {
-        DEBUG("%s(): START", __func__);
         if (!buffer.empty())
         {
+            DEBUG("%s(): START", __func__);
             DEBUG("%s(): buffer_size = %d, num_threads = %d, num_finished = %d, max_threads = %d, num_productivity = %d", __func__, buffer.size(), num_threads.load(), num_finished.load(), max_writer_threads, num_productivity);
             std::lock_guard lock(thread_mutex);
             if (get_num_threads() >= max_writer_threads)
@@ -172,8 +172,8 @@ public:
             assert(t != nullptr);
             m_threads.emplace(t->get_id(), t);
             num_threads++;
+            DEBUG("%s(): END", __func__);
         }
-        DEBUG("%s(): END", __func__);
         return true;
     }
     void write_file(AMX *amx, char *str)

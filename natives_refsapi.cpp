@@ -767,7 +767,7 @@ cell AMX_NATIVE_CALL rf_set_timer(AMX *amx, cell *params)
         arg_repeat,
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
-    return g_timer_mngr.add_timer(amx, g_timer_mngr.create_forward(amx, getAmxString(amx, params[arg_callback], g_buff)),
+    return g_timer_mngr.add_timer(amx, getAmxString(amx, params[arg_callback], g_buff),
         amx_ctof(params[arg_delay_sec]), params[arg_timer_id], getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_flags], params[arg_repeat]);
 }
 // native rf_remove_timer(const group_id);
@@ -779,7 +779,7 @@ cell AMX_NATIVE_CALL rf_remove_timer(AMX *amx, cell *params)
         arg_group_id,
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
-    return g_timer_mngr.remove_timer(params[arg_group_id]);
+    return g_timer_mngr.remove_timers(params[arg_group_id]);
 }
 // native rf_remove_timer_id(const timer_id);
 cell AMX_NATIVE_CALL rf_remove_timer_id(AMX *amx, cell *params)

@@ -2,6 +2,15 @@
 
 #ifndef WITHOUT_TIMER
 
+/*
+#ifdef NDEBUG
+    #ifdef DEBUG
+        #undef DEBUG
+    #endif
+    #define DEBUG(...)  debug(__VA_ARGS__)    
+#endif
+*/
+
 typedef enum TIMER_FLAGS_e
 {
     TIMER_FLAG_NONE,
@@ -62,32 +71,39 @@ class timer_mngr
     m_timer_queue_t m_timer_queue;
     callback_t m_callbacks;
     std::condition_variable cv, cv2;
-    std::mutex loop_mutex, timer_mutex, frame_mutex, fwd_mutex, callback_mutex;
+    std::mutex loop_mutex, timer_mutex, frame_mutex, fwd_mutex;//, callback_mutex;
     struct timespec frame_curr, frame_prev;
 
 private:
+    void push_to_queue(tm_t &t)
+    {
+        m_timer_queue.push(t);
+        DEBUG("%s(): add to queue: timer_id = %u, group_id = %u, queue_size = %d", __func__, t.id, t.group_id, m_timer_queue.size());
+    }
     void build_queue()
     {
         m_timer_queue_t().swap(m_timer_queue);
         if (stop_timer)
             return;
         // Build new queue
+        DEBUG("%s(): BUILD", __func__);
         std::lock_guard lock_1(timer_mutex);
         for (auto it : m_timers)
         {
-            auto timers = &it.second;
-            for (auto t = timers->begin(); t != timers->end(); t++)
-                m_timer_queue.push(*t);
+            auto tm = &it.second;
+            for (auto t = tm->begin(); t != tm->end(); t++)
+                push_to_queue(*t);
         }
         // Clear loop
-        std::lock_guard lock_2(loop_mutex);
+        //std::lock_guard lock_2(loop_mutex);
         stop_loop = false;
+        DEBUG("%s(): BUILD, queue_size = %d", __func__, m_timer_queue.size());
     }
     void stop(bool all_timers = false)
     {
         // Send signal
         {
-            std::lock_guard lock(loop_mutex);
+            //std::lock_guard lock(loop_mutex);
             stop_loop = true;
             if (all_timers)
                 stop_timer = true;
@@ -112,6 +128,7 @@ private:
     }
     tm_t* get_timer_by_id(size_t id)
     {
+        DEBUG("%s(): BEGIN", __func__);
         tm_t *result = nullptr;
         for (auto it : m_timers)
         {
@@ -132,16 +149,35 @@ private:
     }
     timer_it get_timer_by_id(size_t group_id, size_t id)
     {
+        DEBUG("%s(): BEGIN", __func__);
         auto timers = &m_timers[group_id];
         return std::find_if(timers->begin(), timers->end(),
             [id](const tm_t &t) {
                 return t.id == id;
             });
     }
+    void remove_data_timer(tm_t &t)
+    {
+        DEBUG("%s(): timer_id = %u, group_id = %u, data = %p, size = %d", __func__, t.id, t.group_id, t.data, t.data_size);
+        if (t.data == nullptr)
+            return;
+        delete t.data;
+        t.data = nullptr;
+        t.data_size = 0;
+    }
+    void remove_data_all_timers(m_timer_t *tm)
+    {
+        DEBUG("%s(): BEGIN", __func__);
+        for (auto t = tm->begin(); t != tm->end(); t++)
+            remove_data_timer(*t);
+    }
     void remove_timer_by_id(size_t group_id, size_t id)
     {
+        DEBUG("%s: timer_id = %u, group_id = %u", __func__, id, group_id);
         std::lock_guard lock(timer_mutex);
-        m_timers[group_id].remove_if([&](const tm_t &t) {
+        m_timers[group_id].remove_if([&](tm_t &t) {
+            if (t.id == id)
+                remove_data_timer(t);
             return t.id == id;
         });
     }
@@ -149,12 +185,12 @@ private:
     {
         DEBUG("%s(): remove all timers", __func__);
         // Remove timers
-        std::lock_guard lock(timer_mutex);
         for (auto it : m_timers)
         {
-            auto timers = &it.second;
-            timers->clear();
-            m_timer_t().swap(*timers);
+            auto tm = &it.second;
+            remove_data_all_timers(tm);
+            tm->clear();
+            m_timer_t().swap(*tm);
         }
         m_timers.clear();
         m_timers_t().swap(m_timers);
@@ -167,31 +203,37 @@ public:
     std::atomic<size_t> m_timer_nums;
     std::atomic<bool> stop_main, frame_exec, has_frame;
     std::atomic<bool> stop_loop, stop_timer;
+    float total_std;
 
-    bool remove_timer(size_t group_id)
+    bool remove_timers(size_t group_id)
     {
-        {
-            std::lock_guard lock(timer_mutex);
-            auto it = m_timers.find(group_id);
-            if (it == m_timers.end())
-                return false;
-            auto t = &it->second;
-            t->clear();
-            m_timer_t().swap(*t);
-        }
+        std::lock_guard lock(timer_mutex);
+        auto it = m_timers.find(group_id);
+        if (it == m_timers.end())
+            return false;
+        auto tm = &it->second;
+        remove_data_all_timers(tm);
+        tm->clear();
+        m_timer_t().swap(*tm);
         stop();
         return true;
     }
     bool remove_timer_by_id(size_t id)
     {
         bool result;
+        std::lock_guard lock(timer_mutex);
+        for (auto it : m_timers)
         {
-            std::lock_guard lock(timer_mutex);
-            for (auto it : m_timers)
-                it.second.remove_if([&](const tm_t &t) {
-                    result |= t.id == id;
-                    return t.id == id;
-                });
+            auto tm = &it.second;
+            for (auto t = tm->begin(); t != tm->end(); t++)
+                if (t->id == id)
+                {
+                    result = true;
+                    remove_data_timer(*t);
+                    tm->erase(t);
+                    if (!tm->size())
+                        m_timer_t().swap(*tm);
+                }
         }
         stop();
         return result;
@@ -204,15 +246,18 @@ public:
     bool timer_exists_by_id(size_t id)
     {
         bool result;
-        std::lock_guard lock(timer_mutex);
-        for (auto it : m_timers)
         {
-            auto timers = &it.second;
-            if ((result = std::find_if(timers->begin(), timers->end(), [&](const tm_t &t) {
-                    return t.id == id;
-                }) != timers->end()))
-            break;
+            std::lock_guard lock(timer_mutex);
+            for (auto it : m_timers)
+            {
+                auto timers = &it.second;
+                if ((result = std::find_if(timers->begin(), timers->end(), [&](const tm_t &t) {
+                        return t.id == id;
+                    }) != timers->end()))
+                break;
+            }
         }
+        stop();
         return result;
     }
     bool change_timer_by_id(size_t id, float delay_sec, int flags, size_t repeat)
@@ -231,9 +276,11 @@ public:
         stop();
         return true;
     }
-    bool add_timer(AMX *amx, int fwd_id, float delay_sec, size_t group_id, cell *data, size_t data_size, int flags, size_t repeat)
+    bool add_timer(AMX *amx, std::string name, float delay_sec, size_t group_id, cell *data, size_t data_size, int flags, size_t repeat)
     {
-        DEBUG("%s(): amx = %p, fwd = %d, delay = %f, group_id = %u, data = %p, size = %u, flags = %d, repeat = %u", __func__, amx, fwd_id, delay_sec, group_id, data, data_size, flags, repeat);
+        DEBUG("%s(): timer_id = %u, group_id = %u, name = %s, delay = %f", __func__, m_timer_nums.load(), group_id, name.c_str(), delay_sec);
+        DEBUG("%s(): data = %p, size = %u, flags = %d, repeat = %u", __func__, data, data_size, flags, repeat);
+        auto fwd_id = create_forward(amx, name.c_str());
         if (amx == nullptr || fwd_id == -1)
             return false;
         tm_t t;
@@ -241,7 +288,7 @@ public:
         t.fwd.amx = amx;
         t.fwd.id = fwd_id;
         t.group_id = group_id;
-        t.delay_sec = std::clamp(delay_sec, 0.001f, 9999.999f);
+        t.delay_sec = std::clamp(delay_sec, 0.005f, 9999.999f);
         t.time = std::chrono::steady_clock::now() + std::chrono::milliseconds((int64_t)(std::round(1000.0f * t.delay_sec)));
         t.data_size = clamp(data_size, 1U, 4096U);
         t.data = new cell[t.data_size]{0};
@@ -251,7 +298,6 @@ public:
         t.repeat = repeat;
         // Add timer
         {
-            DEBUG("%s(): add timer", __func__);
             std::lock_guard lock(timer_mutex);
             auto it = m_timers.find(group_id);
             if (it != m_timers.end())
@@ -261,6 +307,7 @@ public:
             }
             else
                 m_timers[group_id].push_back(t);
+            DEBUG("%s(): group_id = %d, timer_count = %d", __func__, group_id, m_timers[group_id].size());
         }
         stop();
         return t.id;
@@ -285,9 +332,10 @@ public:
                     auto it = m_timers.find(group_id);
                     if (it != m_timers.end())
                     {
-                        auto timers = &it->second;
-                        timers->clear();
-                        m_timer_t().swap(*timers);
+                        auto tm = &it->second;
+                        remove_data_all_timers(tm);
+                        tm->clear();
+                        m_timer_t().swap(*tm);
                         stop();
                     }
                 }
@@ -297,13 +345,14 @@ public:
     int create_forward(AMX *amx, std::string callback)
     {
         int fwd_id;
-        std::lock_guard lock(callback_mutex);
-        auto it = m_callbacks.find(callback);
+        //std::lock_guard lock(callback_mutex);
+        auto callback_hash = callback + "_" + std::to_string(reinterpret_cast<uintptr_t>(amx));
+        auto it = m_callbacks.find(callback_hash);
         if (it == m_callbacks.end())
         {
-            // public TimerCallback(const group_id, const data[], const data_size, const repeat);
-            fwd_id = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_DONE);
-            m_callbacks.insert({ callback, fwd_id });
+            // public TimerCallback(const group_id, const data[], const data_size, const repeat, const timer_id);
+            fwd_id = g_amxxapi.RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_DONE);
+            m_callbacks.insert({ callback_hash, fwd_id });
         }
         else
             fwd_id = it->second;
@@ -315,7 +364,7 @@ public:
         fwd_mutex.unlock();
         // Send signal
         {
-            std::lock_guard lock(loop_mutex);
+            //std::lock_guard lock(loop_mutex);
             stop_timer = false;
             stop_loop = true;
         }
@@ -335,7 +384,7 @@ public:
         remove_all_timers();
         // Remove callbacks
         {
-            std::lock_guard lock(callback_mutex);
+            //std::lock_guard lock(callback_mutex);
             m_callbacks.clear();
             callback_t().swap(m_callbacks);
         }
@@ -346,15 +395,27 @@ public:
     }
     void exec_forward(tm_t &t)
     {
+        int ret = 0;
         // Exec frame
         has_frame = true;
         frame_mutex.lock();
         frame_exec = true;
-
-        DEBUG("%s(): BEGIN", __func__);
-
+        auto repeat = [&](float &std) {
+                if (!m_timer_queue.size())
+                    return false;
+                t = m_timer_queue.top();
+                auto curr_time = std::chrono::steady_clock::now();
+                if (t.time > curr_time)
+                    return false;
+                float std_delay = std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - t.time).count() / 1000.0;
+                std += std_delay;
+                DEBUG("%s(): execute timer_id = %u, group_id = %u, init_delay = %f, std_delay = %f", __func__, t.id, t.group_id, t.delay_sec, std_delay);
+                m_timer_queue.pop();
+                return true;
+            };
+        do
         {
-            //std::lock_guard lock(fwd_mutex);
+            DEBUG("%s(): BEGIN, timer_id = %u, group_id = %u, init_delay = %f", __func__, t.id, t.group_id, t.delay_sec);
             auto f = t.fwd;
             // Prepare array
             cell *data_tmp, data_param;
@@ -362,45 +423,41 @@ public:
             // Callback error
             if (amx_allot(f.amx, t.data_size, &data_param, &data_tmp))
             {
+                assert(t.data != nullptr);
                 Q_memcpy(data_tmp, t.data, t.data_size << 2);
                 total_size += t.data_size << 2;
-                // public TimerCallback(const group_id, const data[], const data_size, const repeat);
-                int ret = g_amxxapi.ExecuteForward(f.id, t.group_id, data_param, t.data_size, t.repeat);
+                // public TimerCallback(const group_id, const data[], const data_size, const repeat, const timer_id);
+                ret = g_amxxapi.ExecuteForward(f.id, t.group_id, data_param, t.data_size, t.repeat, t.id);
                 // Fix heap
                 if ((f.amx->hea - data_param) == total_size)
                     f.amx->hea = data_param;
                 else
                     AMXX_LogError(f.amx, AMX_ERR_NATIVE, "%s(): can't fix amx->hea, possible memory leak!", __func__);
             }
-
-            DEBUG("%s(): END", __func__);
-
-            fwd_mutex.unlock();
-
-            has_frame = false;
-            frame_exec = false;
-            //cv2.notify_one();
-        }
-
-        // Check repeat or loop?
-        if ((t.flags & TIMER_FLAG_LOOP) || ((t.flags & TIMER_FLAG_REPEAT) && t.repeat > 1))
-        {
-            {
-                std::lock_guard lock(timer_mutex);
-                auto tm = get_timer_by_id(t.group_id, t.id);
-                if ((t.flags & TIMER_FLAG_RELATIVE))
-                    tm->time = std::chrono::steady_clock::now() + std::chrono::milliseconds((int64_t)std::round(1000.0f * t.delay_sec));
-                else
-                    tm->time += std::chrono::milliseconds((int64_t)std::round(1000.0f * t.delay_sec));
-                if ((t.flags & TIMER_FLAG_REPEAT))
-                    tm->repeat--;
-                else
-                    tm->repeat++;
+            DEBUG("%s(): END, timer_id = %u, group_id = %u, init_delay = %f", __func__, t.id, t.group_id, t.delay_sec);
+            // Check repeat or loop?
+            if (!ret && ((t.flags & TIMER_FLAG_LOOP) || ((t.flags & TIMER_FLAG_REPEAT) && t.repeat > 1)))
+            {   
+                {
+                    std::lock_guard lock(timer_mutex);
+                    auto tm = get_timer_by_id(t.group_id, t.id);
+                    if ((t.flags & TIMER_FLAG_RELATIVE))
+                        tm->time = std::chrono::steady_clock::now() + std::chrono::milliseconds((int64_t)std::round(1000.0f * t.delay_sec));
+                    else
+                        tm->time += std::chrono::milliseconds((int64_t)std::round(1000.0f * t.delay_sec));
+                    if ((t.flags & TIMER_FLAG_REPEAT))
+                        tm->repeat--;
+                    else
+                        tm->repeat++;
+                    push_to_queue(*tm);
+                }
             }
-            stop();
-        }
-        else
-            remove_timer_by_id(t.group_id, t.id);
+            else
+                remove_timer_by_id(t.group_id, t.id);
+        } while (!ret && repeat(total_std));
+        fwd_mutex.unlock();
+        has_frame = false;
+        frame_exec = false;
     }
     void start_frame()
     {
@@ -420,7 +477,7 @@ public:
                 frame_delay = (frame_delay + delay) / 2.0;
             }
             frame_prev = frame_curr;
-            dump(__func__);
+            //dump(__func__);
         }
         // Check frame
         if (has_frame && !(frames_count % frame_rate) && !frame_mutex.try_lock() && !frame_exec)
@@ -436,46 +493,6 @@ public:
             }
             else
                 fwd_mutex.unlock();
-
-            /*
-            std::unique_lock<std::mutex> lock(fwd_mutex, std::defer_lock);
-
-            if (lock.try_lock())
-            {
-                frame_mutex.unlock();
-                std::this_thread::yield();
-                DEBUG("%s(): UNLOCK TIMER FRAME = %lld", __func__, frames_count);
-                cv2.wait_for(lock, std::chrono::milliseconds((uint64_t)std::round(100.0 * frame_delay * 1000.0)), [&]{ return !frame_exec; });
-                DEBUG("%s(): UNLOCK TIMER FORWARD = %lld", __func__, frames_count);
-                if (frame_exec)
-                    dump(__func__);
-                assert(!frame_exec);
-            }
-            else
-                lock.unlock();
-            
-            if (fwd_mutex.try_lock())
-            {
-                frame_mutex.unlock();
-                std::this_thread::yield();
-
-                DEBUG("%s(): UNLOCK TIMER FRAME = %lld", __func__, frames_count);
-
-                std::unique_lock<std::mutex> lock(fwd_mutex);
-                cv2.wait_for(lock, std::chrono::milliseconds((uint64_t)std::round(100.0 * frame_delay * 1000.0)), [&]{ return !frame_exec; });
-                if (frame_exec)
-                    dump(__func__);
-                assert(!frame_exec);
-
-                DEBUG("%s(): UNLOCK TIMER FORWARD = %lld", __func__, frames_count);
-                
-                //while (!fwd_mutex.try_lock())
-                //    std::this_thread::yield();
-                
-            }
-            else
-                fwd_mutex.unlock();
-            */
         }
         frames_count++;
     }
@@ -485,7 +502,7 @@ public:
         while (!stop_main)
         {
             build_queue();
-            while (m_timer_queue.size()) //!stop_timer && 
+            while (m_timer_queue.size())
             {
                 DEBUG("%s(): queue_size = %d", __func__, m_timer_queue.size());
                 auto t = m_timer_queue.top();
@@ -493,16 +510,18 @@ public:
                 if (t.time > curr_time)
                 {
                     auto delay_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t.time - std::chrono::steady_clock::now()).count();
-                    DEBUG("%s(): timer delay = %lld, init_delay = %f", __func__, delay_ms, t.delay_sec);
+                    DEBUG("%s(): set delay = %lld, timer_id = %u, group_id = %u, init_delay = %f", __func__, delay_ms, t.id, t.group_id, t.delay_sec);
                     std::unique_lock<std::mutex> lock(loop_mutex);
                     cv.wait_for(lock, std::chrono::milliseconds(delay_ms), [&] { return stop_timer || stop_loop; });
                 }
                 if (stop_timer || stop_loop)
                     break;
-                DEBUG("%s(): execute timer", __func__);
+                float std_delay = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t.time).count() / 1000.0;
+                total_std += std_delay;
+                DEBUG("%s(): execute timer_id = %u, group_id = %u, init_delay = %f, std_delay = %f", __func__, t.id, t.group_id, t.delay_sec, std_delay);
                 // Timer start
-                exec_forward(t);
                 m_timer_queue.pop();
+                exec_forward(t);
             }
             if (!stop_timer && stop_loop)
                 continue;
@@ -515,6 +534,7 @@ public:
     }
     timer_mngr()
     {
+        total_std = 0.0f;
         stop_timer = 
             stop_loop = 
                 stop_main = false;
@@ -534,6 +554,15 @@ public:
         delete main_thread;
     }
 };
+
+/*
+#ifdef NDEBUG
+    #ifdef DEBUG
+        #undef DEBUG
+    #endif    
+    #define DEBUG(...) ((void) 0)
+#endif
+*/
 
 extern timer_mngr g_timer_mngr;
 #endif

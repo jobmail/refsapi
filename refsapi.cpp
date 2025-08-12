@@ -97,9 +97,13 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
     else if (src == src_command && !strcmp(cmd, "stats"))
     {
 #ifndef WITHOUT_SQL
-        int len = snprintf(g_buff, sizeof(g_buff), "\n[REFSAPI_SQL] FPS = %.1f, frame_delay = %.3f, frame_rate = %d (%d), query_nums = %" PRIu64 "\n\n",
-            g_mysql_mngr.frame_delay > 0.0 ? 1000.0 / g_mysql_mngr.frame_delay : 0.0, g_mysql_mngr.frame_delay, g_mysql_mngr.frame_rate, g_mysql_mngr.frame_rate_max, g_mysql_mngr.m_query_nums.load());
-        if (len >= 0)
+        if (snprintf(g_buff, sizeof(g_buff), "\n[REFSAPI_SQL] FPS = %.1f, frame_delay = %.3f, frame_rate = %d (%d), query_nums = %" PRIu64 "\n",
+            g_mysql_mngr.frame_delay > 0.0 ? 1000.0 / g_mysql_mngr.frame_delay : 0.0, g_mysql_mngr.frame_delay, g_mysql_mngr.frame_rate, g_mysql_mngr.frame_rate_max, g_mysql_mngr.m_query_nums.load()) >= 0)
+            SERVER_PRINT(g_buff);
+#endif
+#ifndef WITHOUT_TIMER
+        if (snprintf(g_buff, sizeof(g_buff), "[REFSAPI_TIMER] std_delay = %.6f, timer_nums = %u\n",
+            g_timer_mngr.total_std > 0.0f ? g_timer_mngr.total_std / g_timer_mngr.m_timer_nums : 0.0f, g_timer_mngr.m_timer_nums.load()) >= 0)
             SERVER_PRINT(g_buff);
 #endif
     }
