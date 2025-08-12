@@ -875,7 +875,7 @@ public:
                 frame_delay = (frame_delay + delay) / 2.0;
             }
             frame_prev = frame_curr;
-            dump(__func__);
+            //dump(__func__);
         }
         // Check frame
         if (threads_count() > 0 && !(frames_count % frame_rate) && !frame_mutex.try_lock() && !frame_exec)
