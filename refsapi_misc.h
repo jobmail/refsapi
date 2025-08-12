@@ -3,7 +3,7 @@
 #include "refsapi.h"
 
 bool is_number(std::string &s);
-size_t set_amx_string(cell *dest, const char *str, size_t max_len);
+size_t set_amx_string(cell *dest, const char *str, size_t max_size);
 
 bool is_valid_utf8(const uint8_t *data, size_t size);
 bool is_valid_utf8(const std::vector<uint8_t> &data);

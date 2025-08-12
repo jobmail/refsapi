@@ -26,7 +26,6 @@ typedef struct fwd_prm_s
 {
     int id;
     AMX *amx;
-    bool is_debug;
 } fwd_prms_t;
 
 typedef struct sql_prm_s
@@ -56,7 +55,7 @@ typedef f_names_t::iterator f_names_it;
 
 typedef struct m_query_s
 {
-    uint64 id;
+    uint64_t id;
     std::thread::id tid;
     uint8 pri;
     size_t conn_id;
@@ -86,7 +85,7 @@ typedef struct m_query_s
     size_t f_count;
 } m_query_t;
 
-typedef std::map<uint64, m_query_t *> m_query_list_t;
+typedef std::map<uint64_t, m_query_t *> m_query_list_t;
 typedef m_query_list_t::iterator m_query_list_it;
 
 class mysql_mngr
@@ -105,7 +104,7 @@ class mysql_mngr
     std::vector<MYSQL *> conns;
     time_point_t _time_0;
     struct timespec frame_curr, frame_prev;
-    std::atomic<bool> frame_exec;
+    std::condition_variable cv2;
 
 private:
     bool is_valid_conn(m_query_t *q)
@@ -138,12 +137,12 @@ private:
     }
     void dump(const char *from)
     {
-        DEBUG("%s-%s(): threads = %d (%d), m_frames = %u, stop = %d", from, __func__, (num_threads - num_finished), m_threads.size(), m_frames, stop_threads.load());
+        DEBUG("%s-%s(): threads = %d (%d), frames_count = %lld, stop = %d", from, __func__, (num_threads - num_finished), m_threads.size(), frames_count, stop_threads.load());
         DEBUG("%s-%s(): frame_lock = %d, fwd_lock = %d, thr_lock = %d, frame_exec = %d", from, __func__, is_mutex_locked(frame_mutex), is_mutex_locked(fwd_mutex), is_mutex_locked(threads_mutex), frame_exec.load());
         DEBUG("%s-%s(): delay = %f, rate = %d (%d)", from, __func__, frame_delay, frame_rate, frame_rate_max);
-        for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
-            if (m_queries[pri].size())
-                DEBUG("%s(): m_query[%d](%d)", __func__, pri, m_queries[pri].size());
+        //for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
+        //    if (m_queries[pri].size())
+        //        DEBUG("%s(): m_query[%d](%d)", __func__, pri, m_queries[pri].size());
     }
     int wait_for_mysql(m_query_t *q, int status)
     {
@@ -205,7 +204,7 @@ private:
         if (*db_chrs != '\0')
             mysql_set_character_set(conn, db_chrs);
     }
-        void frame_forward(m_query_t *q)
+    void frame_forward(m_query_t *q)
     {
         DEBUG("%s(): START", __func__);
         bool repeat = false;
@@ -214,22 +213,24 @@ private:
         size_t total_size = 0;
         DEBUG("%s(): FRAME_WAITLOCK", __func__);
         dump(__func__);
+        cv2.notify_one();
         frame_mutex.lock();
         frame_exec = true;
         do
         {
+            //std::lock_guard lock(fwd_mutex);
             auto f = q->prms.fwd;
             DEBUG("%s(): FRAME_LOCKED !!!, amx = %p, fwd = %d", __func__, f.amx, f.id);
             if (stop_threads || q->finished || q->aborted || (!q->successful && q->retry_count < QUERY_RETRY_COUNT)
                 || f.amx == nullptr  || get_plugin(f.amx) == nullptr || f.id == -1)
                 break;
-            DEBUG("%s(): EXEC AMXX FORWARD = %d, is_debug = %d, failstate = %d, err = %d, query = %p, time = %f (%f / %f / %f), error = %s",
-                  __func__, f.id, f.is_debug, q->failstate, q->err, q, q->queuetime, q->time_create, q->time_start, q->time_end, q->error.c_str());
+            DEBUG("%s(): EXEC AMXX FORWARD = %d, failstate = %d, err = %d, query = %p, time = %f (%f / %f / %f), error = %s",
+                  __func__, f.id, q->failstate, q->err, q, q->queuetime, q->time_create, q->time_start, q->time_end, q->error.c_str());
             // Callback error
             if (amx_allot(f.amx, q->error.size() + 1, &error_param, &error_tmp))
             {
                 total_size += (q->error.size() + 1) << 2;
-                setAmxString(error_tmp, q->error.c_str(), q->error.size());
+                set_amx_string(error_tmp, q->error.c_str(), q->error.size() + 1);
                 // Callback data
                 if (amx_allot(f.amx, q->data_size, &data_param, &data_tmp))
                 {
@@ -248,16 +249,20 @@ private:
             }
         } while (0);
         fwd_mutex.unlock();
+        
+        frame_exec = false;
+        //cv2.notify_one();
+
         if (stop_threads)
             frame_mutex.unlock();
-        frame_exec = false;
     }
 
 public:
-    uint64 m_frames;
+    uint64_t frames_count;
     double frame_delay;
     size_t frame_rate, frame_rate_max;
-    std::atomic<uint64> m_query_nums;
+    std::atomic<uint64_t> m_query_nums;
+    std::atomic<bool> frame_exec;
 
     std::atomic<bool> block_changelevel;
     void main()
@@ -365,9 +370,7 @@ public:
             __func__, pid, q->time_start, q->time_end, q->queuetime, q->successful.load(), stop_threads.load());
         frame_forward(q);
         q->finished = true;
-        threads_mutex.lock();
         num_finished++;
-        threads_mutex.unlock();
         DEBUG("%s(): pid = %p, END, num_finished = %d", __func__, pid, num_finished.load());
     }
     m_query_t *prepare_query(MYSQL *conn, const char *query, bool async = false, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 0, size_t conn_id = 0, cell *data = nullptr, size_t data_size = 0)
@@ -518,9 +521,9 @@ public:
             return 1;
         }
         if (buff_len)
-            *ret = set_amx_string(buff, q->query.c_str(), buff_len);
+            *ret = set_amx_string(buff, q->query.c_str(), buff_len + 1);
         else
-            set_amx_string(ret, q->query.c_str(), RF_MAX_FIELD_SIZE - 1);
+            set_amx_string(ret, q->query.c_str(), RF_MAX_FIELD_SIZE);
         return 1;
     }
     cell affected_rows(m_query_t *q)
@@ -545,9 +548,9 @@ public:
         }
         auto name = q->result->fields[offset].name;
         if (buff_len)
-            *ret = set_amx_string(buff, name, buff_len);
+            *ret = set_amx_string(buff, name, buff_len + 1);
         else
-            set_amx_string(ret, name, RF_MAX_FIELD_NAME - 1);
+            set_amx_string(ret, name, RF_MAX_FIELD_NAME);
         return 1;
     }
     cell fetch_field(m_query_t *q, const char *f_name, int mode, cell *ret, cell *buff, size_t buff_len)
@@ -603,7 +606,7 @@ public:
                 *ret = amx_ftoc(val);
                 break;
             default:
-                set_amx_string(ret, f, RF_MAX_FIELD_SIZE - 1);
+                set_amx_string(ret, f, RF_MAX_FIELD_SIZE);
                 break;
             }
             break;
@@ -616,9 +619,9 @@ public:
             break;
         default:
             if (mode == FT_STR)
-                set_amx_string(ret, f, RF_MAX_FIELD_SIZE - 1);
+                set_amx_string(ret, f, RF_MAX_FIELD_SIZE);
             else if (buff_len)
-                *ret = set_amx_string(buff, f, buff_len);
+                *ret = set_amx_string(buff, f, buff_len + 1);
             break;
         }
         DEBUG("%s(): ret = %d", __func__, *ret);
@@ -684,7 +687,7 @@ public:
             conn_mutex.unlock();
         }
         *err = mysql_errno(conn);
-        setAmxString(error, mysql_error(conn), error_size);
+        set_amx_string(error, mysql_error(conn), error_size);
         return ret;
     }
     bool async_connect(m_query_t *q)
@@ -746,13 +749,12 @@ public:
             mysql_close(it);
         }
     }
-    size_t add_connect(AMX *amx, int id, bool is_debug, std::string &db_host, std::string &db_user, std::string &db_pass, std::string &db_name, std::string &db_chrs, size_t timeout)
+    size_t add_connect(AMX *amx, int fwd_id, std::string &db_host, std::string &db_user, std::string &db_pass, std::string &db_name, std::string &db_chrs, size_t timeout)
     {
-        DEBUG("%s(): pid = %p, fwd = %d, host = %s, user = %s, pass = %s, name = %s, timeout = %d", __func__, gettid(), id, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), timeout);
+        DEBUG("%s(): pid = %p, fwd = %d, host = %s, user = %s, pass = %s, name = %s, timeout = %d", __func__, gettid(), fwd_id, db_host.c_str(), db_user.c_str(), db_pass.c_str(), db_name.c_str(), timeout);
         prm_t prms;
         prms.fwd.amx = amx;
-        prms.fwd.id = id;
-        prms.fwd.is_debug = is_debug;
+        prms.fwd.id = fwd_id;
         size_t pos = db_host.find(':');
         prms.sql.db_host = pos == std::string::npos ? db_host : db_host.substr(0, pos++);
         prms.sql.db_port = pos == std::string::npos ? 3306 : atoi(db_host.substr(pos, db_host.size() - pos).c_str());
@@ -764,7 +766,7 @@ public:
         prms_mutex.lock();
         m_conn_prms.push_back(prms);
         prms_mutex.unlock();
-        DEBUG("%s(): conn = %d, is_debug = %d", __func__, m_conn_prms.size(), is_debug);
+        DEBUG("%s(): conn = %d", __func__, m_conn_prms.size());
         return m_conn_prms.size();
     }
     bool get_connect(size_t conn_id, prm_t &p)
@@ -799,14 +801,14 @@ public:
         DEBUG("%s(): UNLOCK FWD", __func__);
         fwd_mutex.unlock();
         _time_0 = std::chrono::system_clock::now();
-        DEBUG("*** STATUS: m_frame = %u", m_frames);
+        DEBUG("*** STATUS: m_frame = %u", frames_count);
         dump(__func__);
         stop_threads = false;
     }
     void stop()
     {
         stop_threads = true;
-        m_frames =
+        frames_count =
             frame_prev.tv_sec =
                 frame_prev.tv_nsec = 0;
         frame_delay = 0.0;
@@ -857,7 +859,7 @@ public:
     {
         if (stop_threads)
             return;
-        if (!(m_frames % 1000))
+        if (!(frames_count % 1000))
         {
             clock_gettime(CLOCK_MONOTONIC, &frame_curr);
             if (frame_prev.tv_sec >= 0 && frame_prev.tv_nsec > 0)
@@ -865,8 +867,8 @@ public:
                 auto delay = timespec_diff(&frame_prev, &frame_curr);
                 if (frame_delay > 0.0) {
                     auto k1 = delay > frame_delay ? 25.0 * abs(frame_delay - delay) / (frame_delay + delay) : 1.0;
-                    auto k2 = frame_delay > 1.0 ? frame_delay : 1.0;
-                    frame_rate = std::round(1.0 + k1 * k2);
+                    auto k2 = frame_delay > 1.0 ? 2.0 * frame_delay : 1.0;
+                    frame_rate = (frame_rate + (uint8_t)std::round(1.0 + k1 + k2)) / 2;
                     if (frame_rate > frame_rate_max)
                         frame_rate_max = frame_rate;
                 }
@@ -876,23 +878,66 @@ public:
             dump(__func__);
         }
         // Check frame
-        if (threads_count() > 0 && !(m_frames % frame_rate) && !frame_mutex.try_lock() && !frame_exec) // && !frame_mutex.try_lock() && fwd_mutex.try_lock())//if (!stop_threads && threads_count() > 0 && fwd_mutex.try_lock() && !frame_mutex.try_lock())
+        if (threads_count() > 0 && !(frames_count % frame_rate) && !frame_mutex.try_lock() && !frame_exec)
         {
             if (fwd_mutex.try_lock())
             {
                 frame_mutex.unlock();
-                //fwd_mutex.lock();
+                DEBUG("%s(): UNLOCK FRAME = %lld", __func__, frames_count);
+                while (!fwd_mutex.try_lock())
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                //    std::this_thread::yield();
+                //DEBUG("%s(): UNLOCK FORWARD = %lld", __func__, frames_count);
             }
             else
                 fwd_mutex.unlock();
+            
+            /*
+            std::unique_lock<std::mutex> lock(fwd_mutex, std::defer_lock);
+            if (lock.try_lock())
+            {
+                frame_mutex.unlock();
+                std::this_thread::yield();
+                DEBUG("%s(): UNLOCK FRAME = %lld", __func__, frames_count);
+                cv2.wait_for(lock, std::chrono::milliseconds((uint64_t)std::round(100.0 * frame_delay * 1000.0)), [&]{ return !frame_exec; });
+                DEBUG("%s(): UNLOCK FORWARD = %lld", __func__, frames_count);
+                if (frame_exec)
+                    dump(__func__);
+                assert(!frame_exec);
+            }
+            else
+                lock.unlock();
+
+            if (fwd_mutex.try_lock())
+            {
+
+                frame_mutex.unlock();
+                std::this_thread::yield();
+
+                DEBUG("%s(): UNLOCK FRAME = %lld", __func__, frames_count);
+
+                cv2.wait_for(lock, std::chrono::milliseconds((uint64_t)std::round(100.0 * frame_delay * 1000.0)), [&]{ return !frame_exec; });
+                if (frame_exec)
+                    dump(__func__);
+                assert(!frame_exec);
+
+                DEBUG("%s(): UNLOCK FORWARD = %lld", __func__, frames_count);
+
+                //while (!fwd_mutex.try_lock())
+                //    std::this_thread::yield();
+                
+            }
+            else
+                fwd_mutex.unlock();
+            */
         }
-        m_frames++;
+        frames_count++;
     }
     mysql_mngr()
     {
         stop_main = false;
         stop_threads = true;
-        m_frames =
+        frames_count =
             m_query_nums =
                 num_threads =
                     num_finished = 0;

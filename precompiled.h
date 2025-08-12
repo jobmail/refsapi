@@ -104,6 +104,10 @@
 #ifndef WITHOUT_LOG
 #include "refsapi_log_mngr.h"
 #endif
+#ifndef WITHOUT_TIMER
+#include "refsapi_timer_mngr.h"
+#endif
+
 
 #include <cpuid.h>
 

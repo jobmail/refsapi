@@ -471,7 +471,6 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
     int fwd = -1;
-    auto plugin = findPluginFast(amx);
     std::string callback, db_host, db_user, db_pass, db_name, db_chrs;
     callback = getAmxString(amx, params[arg_callback], g_buff);
     if (!callback.empty())
@@ -486,7 +485,7 @@ cell AMX_NATIVE_CALL rf_sql_tuple(AMX *amx, cell *params)
     db_pass = getAmxString(amx, params[arg_db_pass], g_buff);
     db_name = getAmxString(amx, params[arg_db_name], g_buff);
     db_chrs = getAmxString(amx, params[arg_db_chrs], g_buff);
-    return g_mysql_mngr.add_connect(amx, fwd, plugin->isDebug(), db_host, db_user, db_pass, db_name, db_chrs, params[arg_timeout]);
+    return g_mysql_mngr.add_connect(amx, fwd, db_host, db_user, db_pass, db_name, db_chrs, params[arg_timeout]);
 }
 
 // native Handle:rf_sql_connect(Handle:tuple, &err_num, error[], error_size);
@@ -752,6 +751,85 @@ cell AMX_NATIVE_CALL rf_log(AMX *amx, cell *params)
 }
 #endif
 
+#ifndef WITHOUT_TIMER
+// native rf_set_timer(const Float:delay_s, const callback[] = "", const group_id = 0, data[] = "", data_size = 0, TIMER_FLAGS:flags = TIMER_FLAG_ONCE, repeat = 0);
+cell AMX_NATIVE_CALL rf_set_timer(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_delay_sec,
+        arg_callback,
+        arg_timer_id,
+        arg_data,
+        arg_data_size,
+        arg_flags,
+        arg_repeat,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    return g_timer_mngr.add_timer(amx, g_timer_mngr.create_forward(amx, getAmxString(amx, params[arg_callback], g_buff)),
+        amx_ctof(params[arg_delay_sec]), params[arg_timer_id], getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_flags], params[arg_repeat]);
+}
+// native rf_remove_timer(const group_id);
+cell AMX_NATIVE_CALL rf_remove_timer(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_group_id,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    return g_timer_mngr.remove_timer(params[arg_group_id]);
+}
+// native rf_remove_timer_id(const timer_id);
+cell AMX_NATIVE_CALL rf_remove_timer_id(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_timer_id,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    return g_timer_mngr.remove_timer_by_id(params[arg_timer_id]);
+}
+// native rf_timer_exists(const group_id);
+cell AMX_NATIVE_CALL rf_timer_exists(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_group_id,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    return g_timer_mngr.timer_exists(params[arg_group_id]);
+}
+// native rf_timer_id_exists(const timer_id);
+cell AMX_NATIVE_CALL rf_timer_id_exists(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_timer_id,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    return g_timer_mngr.timer_exists_by_id(params[arg_timer_id]);
+}
+// native rf_change_timer_id(const timer_id, const Float:delay_sec, const TIMER_FLAGS:flags = TIMER_FLAG_NONE, const repeat = 0);
+cell AMX_NATIVE_CALL rf_change_timer_id(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_timer_id,
+        arg_delay_sec,
+        arg_flags,
+        arg_repeat,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    return g_timer_mngr.change_timer_by_id(params[arg_timer_id], amx_ctof(params[arg_delay_sec]), params[arg_flags], params[arg_repeat]);
+}
+#endif
+
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
     {"rf_get_user_weapons", rf_get_user_weapons},
@@ -793,6 +871,14 @@ AMX_NATIVE_INFO Misc_Natives[] = {
 #ifndef WITHOUT_LOG
     {"rf_log", rf_log},
     {"rf_log_config", rf_log_config},
+#endif
+#ifndef WITHOUT_TIMER
+    {"rf_set_timer", rf_set_timer},
+    {"rf_remove_timer", rf_remove_timer},
+    {"rf_remove_timer_id", rf_remove_timer_id},
+    {"rf_timer_exists", rf_timer_exists},
+    {"rf_timer_id_exists", rf_timer_id_exists},
+    {"rf_change_timer_id", rf_change_timer_id},
 #endif
     {nullptr, nullptr}};
 

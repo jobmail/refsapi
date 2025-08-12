@@ -27,12 +27,12 @@ bool is_number(std::string &s)
     return it == s.end();
 }
 
-size_t set_amx_string(cell *dest, const char *str, size_t max_len)
+size_t set_amx_string(cell *dest, const char *str, size_t max_size)
 {
     size_t count = 0;
-    if (dest && max_len)
+    if (dest && max_size)
     {
-        while (str && *str && ++count < max_len)
+        while (str && *str && ++count < max_size)
             *dest++ = (cell)*str++;
         *dest = 0;
     }
