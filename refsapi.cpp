@@ -15,6 +15,9 @@ mysql_mngr g_mysql_mngr;
 #ifndef WITHOUT_LOG
 log_mngr g_log_mngr;
 #endif
+#ifndef WITHOUT_TIMER
+timer_mngr g_timer_mngr;
+#endif
 recoil_mngr g_recoil_mngr;
 sClients g_Clients[MAX_PLAYERS + 1];
 sTries g_Tries;
@@ -105,9 +108,15 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
 
 void R_StartFrame_Post(void)
 {
+
 #ifndef WITHOUT_SQL
     g_mysql_mngr.start_frame();
 #endif
+
+#ifndef WITHOUT_TIMER
+	g_timer_mngr.start_frame();
+#endif
+
     RETURN_META(MRES_IGNORED);
 }
 
@@ -244,6 +253,9 @@ void R_ClientDisconnect(edict_t *p)
 {
     // UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
     Client_Disconnected(p, false, 0);
+#ifndef WITHOUT_TIMER
+    g_timer_mngr.on_client_disconnected(p);
+#endif
     RETURN_META(MRES_IGNORED);
 }
 

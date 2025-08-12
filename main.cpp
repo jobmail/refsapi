@@ -87,6 +87,11 @@ void ServerDeactivate_Post()
 #ifndef WITHOUT_LOG
 	g_log_mngr.close_all();
 #endif
+#ifndef WITHOUT_TIMER
+	g_timer_mngr.stop_all();
+#endif
+
+
 	g_pEdicts = nullptr;
 	api_cfg.ServerDeactivate();
 	// g_hookManager.Clear();

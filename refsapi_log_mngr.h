@@ -108,6 +108,7 @@ public:
             write(file, local_batch);
             if (!buff->size() || it.amx != amx_prev)
                 file->m.unlock();
+            std::this_thread::sleep_for(std::chrono::milliseconds((uint64_t)std::round(50.0 * batch_size / local_batch_size)));
         }
         assert(skip_count == 0);
         DEBUG("%s(): DONE", __func__);

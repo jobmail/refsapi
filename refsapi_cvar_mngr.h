@@ -5,7 +5,7 @@
 extern std::wstring_convert<convert_type, wchar_t> g_converter;
 
 extern void RF_Cvar_DirectSet_RH(IRehldsHook_Cvar_DirectSet *chain, cvar_t *var, const char *value);
-//extern void CVarRegister_Post(cvar_t *pCvar);
+// extern void CVarRegister_Post(cvar_t *pCvar);
 
 typedef enum CVAR_TYPES_e
 {
@@ -132,7 +132,7 @@ private:
             *bind->ptr = amx_ftoc(cvar->value);
             break;
         case CVAR_TYPE_STR:
-            setAmxString(bind->ptr, cvar->string, bind->size);
+            set_amx_string(bind->ptr, cvar->string, bind->size);
             break;
         case CVAR_TYPE_FLG:
             *bind->ptr = UTIL_ReadFlags(cvar->string);
@@ -344,7 +344,7 @@ public:
         }
         return nullptr;
     }
-    list_m_cvar_t* get(int plugin_id)
+    list_m_cvar_t *get(int plugin_id)
     {
         auto plugin_cvars = cvars.plugin.find(plugin_id);
         // Plugin cvars exist?
@@ -377,6 +377,7 @@ public:
     {
         DEBUG("%s(): type = %d, m_cvar = %p, ptr = %p, size = %u", __func__, type, m_cvar, ptr, ptr_len);
         cell result = 0;
+        std::string s;
         // Cvar exists?
         if (m_cvar != nullptr)
         {
@@ -390,12 +391,9 @@ public:
                 result = amx_ftoc(m_cvar->cvar->value);
                 break;
             case CVAR_TYPE_STR:
-                if (ptr_len)
-                {
-                    std::string s = wstos(m_cvar->value);
-                    result = std::min(ptr_len, s.size());
-                    setAmxString(ptr, s.c_str(), result);
-                }
+                s = wstos(m_cvar->value);
+                result = std::min(ptr_len, s.size());
+                set_amx_string(ptr, s.c_str(), result + 1);
                 break;
             case CVAR_TYPE_FLG:
                 result = UTIL_ReadFlags(wstos(m_cvar->value).c_str());
@@ -466,10 +464,10 @@ public:
             hook_state_it->second = is_enable;
         return result;
     }
-    void sort(list_m_cvar_t * list_cvar)
+    void sort(list_m_cvar_t *list_cvar)
     {
         list_cvar->sort([](m_cvar_t *p1, m_cvar_t *p2)
-                   { return p1->name.compare(p2->name) <= 0; });
+                        { return p1->name.compare(p2->name) <= 0; });
     }
     void clear_plugin(CPluginMngr::CPlugin *plugin)
     {
