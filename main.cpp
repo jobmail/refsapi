@@ -58,6 +58,10 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 	g_mysql_mngr.block_changelevel = false;
 #endif
 
+#ifndef WITHOUT_LOG
+	g_log_mngr.start();
+#endif
+
 	r_bMapHasBuyZone = g_Tries.entities.find("func_buyzone") != g_Tries.entities.end();
 
 	g_RehldsHookchains->SV_DropClient()->registerHook(SV_DropClient_RH);
@@ -79,6 +83,17 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 void ServerDeactivate_Post()
 {
 	SERVER_PRINT("[DEBUG] SERVER_DEACTIVATED\n");
+
+	// Clear ngrams
+	for (auto &it : g_cache_ngrams)
+	{
+		auto ngram = &it.second;
+		ngram->clear();
+		ngram_t().swap(*ngram);
+	}
+	g_cache_ngrams.clear();
+	ngrams_t().swap(g_cache_ngrams);
+
 #ifndef WITHOUT_SQL
 	g_mysql_mngr.block_changelevel = true;
 	g_mysql_mngr.stop();

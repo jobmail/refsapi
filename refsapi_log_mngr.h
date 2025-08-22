@@ -16,6 +16,7 @@ typedef struct file_s
 } file_t;
 
 typedef std::chrono::_V2::system_clock::time_point time_point_t;
+typedef std::chrono::_V2::steady_clock::time_point steady_point_t;
 
 typedef struct data_s
 {
@@ -84,11 +85,8 @@ public:
         {
             if (amx_prev == nullptr || it.amx != amx_prev)
             {
-                DEBUG("%s(): 1", __func__);
                 it = buff->back();
-                DEBUG("%s(): 2", __func__);
                 file = open_file(it.amx);
-                DEBUG("%s(): 3", __func__);
                 if (file == nullptr)
                 {
                     buff->pop_back();
@@ -108,11 +106,14 @@ public:
             write(file, local_batch);
             if (!buff->size() || it.amx != amx_prev)
                 file->m.unlock();
-            std::this_thread::sleep_for(std::chrono::milliseconds((uint64_t)std::round(50.0 * batch_size / local_batch_size)));
+            if (!stop_threads)
+                std::this_thread::sleep_for(std::chrono::microseconds((uint64_t)std::round(15000.0 * batch_size / local_batch_size)));
         }
         assert(skip_count == 0);
         DEBUG("%s(): DONE", __func__);
+        assert(buff != nullptr);
         delete buff;
+        buff = nullptr;
         std::lock_guard lock(thread_mutex);
         m_finished.push_back(gettid());
         num_finished++;
@@ -185,7 +186,7 @@ public:
     {
         DEBUG("%s(): START", __func__);
         plugin_prm_t prm;
-        if (amx == nullptr || !get_config(amx, prm))
+        if (get_plugin(amx) == nullptr || !get_config(amx, prm))
             return;
         std::lock_guard lock(buffer_mutex);
         if (buffer.size() >= MAX_LOG_BUFFER_SIZE)
@@ -220,8 +221,6 @@ public:
     }
     bool add_config(AMX *amx, std::wstring path = L"", std::wstring name = L"", int log_level = -1, uint8 prefix_mode = 2)
     {
-        if (amx == nullptr)
-            return false;
         auto plugin = get_plugin(amx);
         if (plugin == nullptr)
             return false;
@@ -282,8 +281,8 @@ public:
     {
         DEBUG("%s(): START, amx = %p", __func__, amx);
         file_t *file = nullptr;
-        CPluginMngr::CPlugin *plugin;
-        if (amx == nullptr || (plugin = get_plugin(amx)) == nullptr || path.empty() || name.empty() || flags == std::ios::openmode(0))
+        auto plugin = get_plugin(amx);
+        if (path.empty() || name.empty() || flags == std::ios::openmode(0))
             return nullptr;
         DEBUG("%s(): START, plugin = %p", __func__, plugin);
         // Create FILE
@@ -300,6 +299,7 @@ public:
         }
         catch (...)
         {
+            assert(file != nullptr);
             delete file;
             file = nullptr;
         }
@@ -353,7 +353,9 @@ public:
             file->s = nullptr;
         }
         delete file;
+        file = nullptr;
     }
+    /*
     void close_file(AMX *amx)
     {
         DEBUG("%s(): START", __func__);
@@ -362,12 +364,13 @@ public:
             return;
         close_file(amx, file);
     }
+    */
     void close_file(AMX *amx, file_t *file)
     {
         DEBUG("%s(): START", __func__);
         DEBUG("%s(): amx = %p, plugin = %p, file = %s", __func__, amx, findPluginFast(amx), wstos(file->name).c_str());
         file->m.lock();
-        std::lock_guard lock(data_mutex);
+        //std::lock_guard lock(data_mutex);
         auto it = std::find(files.begin(), files.end(), file);
         if (it != files.end())
         {
@@ -383,7 +386,7 @@ public:
     {
         DEBUG("%s(): START", __func__);
         std::lock_guard lock_1(buffer_mutex);
-
+        stop_threads = true;
         write_to_disk();
         // Wait for writing...
         while (get_num_threads() > 0)
@@ -414,24 +417,30 @@ public:
         plugin_prms_t().swap(plugin_prms);
         DEBUG("%s(): END", __func__);
     }
+    void start()
+    {
+        DEBUG("%s(): START LOG", __func__);
+        stop_threads = false;
+    }
     file_t* get_file(AMX *amx)
     {
         DEBUG("%s(): START", __func__);
         file_t *file = nullptr;
-        data_mutex.lock();
+        std::lock_guard lock(data_mutex);
+        //data_mutex.lock();
         auto it = plugins.find(amx);
         if (it != plugins.end())
         {
             file = it->second;
             assert(file != nullptr);
             if (file->s && file->s->is_open() && !file_exists(file->name)) {
-                data_mutex.unlock();
+                //data_mutex.unlock();
                 close_file(amx, file);
                 file = nullptr;
                 DEBUG("%s(): REOPEN", __func__);
             }
         }
-        data_mutex.unlock();
+        //data_mutex.unlock();
         DEBUG("%s(): END, file = %p", __func__, file);
         return file;
     }
@@ -492,6 +501,7 @@ public:
     }
     log_mngr(const size_t interval = 5000, const size_t batch = 100, const uint8 threads = 0)
     {
+        stop_threads = true;
         num_threads =
             num_finished = 0;
         m_sequence = 0;
