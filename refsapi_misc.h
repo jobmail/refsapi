@@ -4,6 +4,7 @@
 
 bool is_number(std::string &s);
 size_t set_amx_string(cell *dest, const char *str, size_t max_size);
+uint64_t get_next_id(std::atomic<uint64_t> &counter);
 
 bool is_valid_utf8(const uint8_t *data, size_t size);
 bool is_valid_utf8(const std::vector<uint8_t> &data);
@@ -12,18 +13,19 @@ bool is_valid_utf8(const std::string &str);
 bool is_valid_utf8(char *str, size_t length);
 bool is_valid_utf8(const char *str, size_t length);
 
+#ifdef __SSE4_2__
 bool is_valid_utf8_simd(const uint8_t *data, size_t size);
 bool is_valid_utf8_simd(const std::vector<uint8_t> &data);
 bool is_valid_utf8_simd(const char *str);
 bool is_valid_utf8_simd(const std::string &str);
 bool is_valid_utf8_simd(const char *str, size_t length);
 bool is_valid_utf8_simd(char *str, size_t length);
+#endif
 
 std::wstring format_time(const std::chrono::system_clock::time_point &tp, const std::wstring format = L"%d/%m/%Y - %H:%M:%S");
 std::wstring cc(const std::wstring &str, bool with_slashes = false, wchar_t cc = L'\\');
 bool dir_exists(const std::wstring &path);
 bool is_mutex_locked(std::mutex &mutex);
-int safe_poll(struct pollfd *fds, nfds_t nfds, int timeout_ms);
 CPluginMngr::CPlugin * get_plugin(AMX *amx);
 bool amx_allot(AMX *amx, int cells, cell *amx_addr, cell **phys_addr);
 double timespec_diff(const struct timespec *start, const struct timespec *end);
@@ -31,6 +33,10 @@ void checkCPUFeatures();
 void cpu_test();
 int64_t cpu_benchmark();
 std::string get_cpu_name();
+void get_thread_info(bool boost = false);
+bool set_thread_priority(std::thread *t, int pri = 0);
+//int safe_poll(struct pollfd *fds, nfds_t nfds, int timeout_ms);
+float similarity_score(const std::wstring &nick1, const std::wstring &nick2, const float lcs_threshold = 0.7f, const float k_lev = 0.6f, const float k_tan = 0.3f, const float k_lcs = 0.1f);
 
 class fmt
 {

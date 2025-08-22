@@ -7,6 +7,7 @@ bool r_bMapHasBuyZone;
 char g_buff[4096];
 bool g_SSE4_ENABLE;
 
+ngrams_t g_cache_ngrams;
 const std::locale _LOCALE = std::locale("ru_RU.UTF-8");
 cvar_mngr g_cvar_mngr;
 #ifndef WITHOUT_SQL
@@ -37,7 +38,12 @@ void CSGameRules_ClientUserInfoChanged_RG(IReGameHook_CSGameRules_ClientUserInfo
 {
     DEBUG("*** change userinfo = %s", userinfo);
     // UTIL_ServerPrint("[DEBUG] *** userinfo = %s\n", userinfo);
+#ifdef __SSE4_2__
     if ((g_SSE4_ENABLE ? is_valid_utf8_simd(userinfo) : is_valid_utf8(userinfo)))
+#else
+    if (is_valid_utf8(userinfo))
+#endif
+    
         chain->callNext(pPlayer, userinfo);
     else if (pPlayer != nullptr)
     {
@@ -47,11 +53,35 @@ void CSGameRules_ClientUserInfoChanged_RG(IReGameHook_CSGameRules_ClientUserInfo
     }
 }
 
+size_t check_nick_imitation(const size_t id, const float threshold, const float lcs_threshold, const float k_lev, const float k_tan, const float k_lcs)
+{
+    if (is_valid_index(id))
+    {
+        auto cl = clientByIndex(id);
+        std::wstring name = stows(cl->GetName());
+        for (size_t i = gpGlobals->maxClients; i > 0; i--)
+        {
+            if (i == id)
+                continue;
+            cl = clientByIndex(i);
+            if (!cl->IsConnected())
+                continue;
+            if ((float)similarity_score(name, stows(cl->GetName())) >= threshold)
+                return i;
+        }
+    }
+    return 0;
+}
+
 qboolean RF_CheckUserInfo_RH(IRehldsHook_SV_CheckUserInfo *chain, netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int iReconnectSlot, char *name)
 {
     DEBUG("*** check userinfo = %s", userinfo);
     // UTIL_ServerPrint("\n[DEBUG] **** check userinfo = %s, name = %s\n\n", userinfo, name);
+#ifdef __SSE4_2__
     return !(g_SSE4_ENABLE ? is_valid_utf8_simd(userinfo) : is_valid_utf8(userinfo)) ? FALSE : chain->callNext(adr, userinfo, bIsReconnecting, iReconnectSlot, name);
+#else
+    return !is_valid_utf8(userinfo) ? FALSE : chain->callNext(adr, userinfo, bIsReconnecting, iReconnectSlot, name);
+#endif
 }
 
 /*
@@ -66,6 +96,18 @@ bool R_ValidateCommand(IRehldsHook_ValidateCommand *chain, const char* cmd, cmd_
     return chain->callNext(cmd, src, client);
 }
 */
+
+void R_ChangeLevel(const char* s1, const char* s2)
+{
+    SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
+    DEBUG("%s(): s1 = %s, s2 = %s", __func__, s1, s2);
+    /*
+    #ifndef WITHOUT_SQL
+        while (g_mysql_mngr.block_changelevel.load())
+            std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
+    #endif
+    */
+}
 
 void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char *cmd, cmd_source_t src, IGameClient *client)
 {
@@ -88,22 +130,24 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
     else if (src == src_command && !strcmp(cmd, "changelevel"))
     {
         SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
+        /*
 #ifndef WITHOUT_SQL
-        //g_mysql_mngr.stop();
         while (g_mysql_mngr.block_changelevel.load())
             std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
 #endif
+        */
     }
     else if (src == src_command && !strcmp(cmd, "stats"))
     {
 #ifndef WITHOUT_SQL
-        if (snprintf(g_buff, sizeof(g_buff), "\n[REFSAPI_SQL] FPS = %.1f, frame_delay = %.3f, frame_rate = %d (%d), query_nums = %" PRIu64 "\n",
-            g_mysql_mngr.frame_delay > 0.0 ? 1000.0 / g_mysql_mngr.frame_delay : 0.0, g_mysql_mngr.frame_delay, g_mysql_mngr.frame_rate, g_mysql_mngr.frame_rate_max, g_mysql_mngr.m_query_nums.load()) >= 0)
+        if (snprintf(g_buff, sizeof(g_buff), "\n[REFSAPI] FPS = %.1f, frame_delay = %.3f, frame_rate = %d (%d), threads = %d/%d(%d), query_nums = %lld\n",
+            g_mysql_mngr.frame_delay > 0.0 ? 1000.0 / g_mysql_mngr.frame_delay : 0.0, g_mysql_mngr.frame_delay, g_mysql_mngr.frame_rate, g_mysql_mngr.frame_rate_max,
+            g_mysql_mngr.num_threads.load(), g_mysql_mngr.num_finished.load(), g_mysql_mngr.m_threads.size(), g_mysql_mngr.m_query_nums.load()) >= 0)
             SERVER_PRINT(g_buff);
 #endif
 #ifndef WITHOUT_TIMER
-        if (snprintf(g_buff, sizeof(g_buff), "[REFSAPI_TIMER] std_delay = %.6f, timer_nums = %u\n",
-            g_timer_mngr.total_std > 0.0f ? g_timer_mngr.total_std / g_timer_mngr.m_timer_nums : 0.0f, g_timer_mngr.m_timer_nums.load()) >= 0)
+        if (snprintf(g_buff, sizeof(g_buff), "[REFSAPI] std_delay = %.6f, frame_rate = %d (%d), timer_nums = %lld\n",
+            g_timer_mngr.total_std > 0.0 ? g_timer_mngr.total_std / g_timer_mngr.m_timer_nums : 0.0, g_timer_mngr.frame_rate, g_timer_mngr.frame_rate_max, g_timer_mngr.m_timer_nums.load()) >= 0)
             SERVER_PRINT(g_buff);
 #endif
     }
@@ -565,18 +609,20 @@ bool get_user_buyzone(const edict_t *p)
 
 void debug(const char *fmt, ...)
 {
+    static std::string f;
     if (fmt == nullptr)
         return;
     std::lock_guard lock(std_mutex);
-    char str[1024]{0};
+    char str[1014]{0};
     va_list arg_ptr;
-    static std::string f;
-    f = fmt;
-    f = "[DEBUG] " + f + "\n";
     va_start(arg_ptr, fmt);
-    int len = vsnprintf(str, sizeof(str), f.c_str(), arg_ptr);
+    int len = vsnprintf(str, sizeof(str), fmt, arg_ptr);
     va_end(arg_ptr);
     if (len < 0)
         return;
-    SERVER_PRINT(str);
+    //////////////////////////////////////////////////
+    //AMXX_Log(str);
+    f = str;
+    f = "[DEBUG] " + f + "\n";
+    SERVER_PRINT(f.c_str());
 }

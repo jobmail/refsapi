@@ -8,7 +8,7 @@ enginefuncs_t g_EngineFunctionsTable =
 		NULL,					  // pfnModelIndex()
 		NULL,					  // pfnModelFrames()
 		NULL,					  // pfnSetSize()
-		NULL,					  // pfnChangeLevel()
+		R_ChangeLevel,			  // pfnChangeLevel()
 		NULL,					  // pfnGetSpawnParms()
 		NULL,					  // pfnSaveSpawnParms()
 		NULL,					  // pfnVecToYaw()

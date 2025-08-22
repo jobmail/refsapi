@@ -779,7 +779,7 @@ cell AMX_NATIVE_CALL rf_remove_timer(AMX *amx, cell *params)
         arg_group_id,
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
-    return g_timer_mngr.remove_timers(params[arg_group_id]);
+    return g_timer_mngr.remove_timers(amx, params[arg_group_id]);
 }
 // native rf_remove_timer_id(const timer_id);
 cell AMX_NATIVE_CALL rf_remove_timer_id(AMX *amx, cell *params)
@@ -790,7 +790,7 @@ cell AMX_NATIVE_CALL rf_remove_timer_id(AMX *amx, cell *params)
         arg_timer_id,
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
-    return g_timer_mngr.remove_timer_by_id(params[arg_timer_id]);
+    return g_timer_mngr.remove_timer_by_id(amx, params[arg_timer_id]);
 }
 // native rf_timer_exists(const group_id);
 cell AMX_NATIVE_CALL rf_timer_exists(AMX *amx, cell *params)
@@ -801,7 +801,7 @@ cell AMX_NATIVE_CALL rf_timer_exists(AMX *amx, cell *params)
         arg_group_id,
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
-    return g_timer_mngr.timer_exists(params[arg_group_id]);
+    return g_timer_mngr.timer_exists(amx, params[arg_group_id]);
 }
 // native rf_timer_id_exists(const timer_id);
 cell AMX_NATIVE_CALL rf_timer_id_exists(AMX *amx, cell *params)
@@ -812,7 +812,7 @@ cell AMX_NATIVE_CALL rf_timer_id_exists(AMX *amx, cell *params)
         arg_timer_id,
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
-    return g_timer_mngr.timer_exists_by_id(params[arg_timer_id]);
+    return g_timer_mngr.timer_exists_by_id(amx, params[arg_timer_id]);
 }
 // native rf_change_timer_id(const timer_id, const Float:delay_sec, const TIMER_FLAGS:flags = TIMER_FLAG_NONE, const repeat = 0);
 cell AMX_NATIVE_CALL rf_change_timer_id(AMX *amx, cell *params)
@@ -826,9 +826,48 @@ cell AMX_NATIVE_CALL rf_change_timer_id(AMX *amx, cell *params)
         arg_repeat,
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
-    return g_timer_mngr.change_timer_by_id(params[arg_timer_id], amx_ctof(params[arg_delay_sec]), params[arg_flags], params[arg_repeat]);
+    return g_timer_mngr.change_timer_by_id(amx, params[arg_timer_id], amx_ctof(params[arg_delay_sec]), params[arg_flags], params[arg_repeat]);
 }
 #endif
+
+// native rf_check_nick_imitation(const id, const Float:threshold = 0.9, const Float:lcs_threshold = 0.7, const Float:k_lev = 0.6, const Float:k_tan = 0.3, const Float:k_lcs = 0.1);
+cell AMX_NATIVE_CALL rf_check_nick_imitation(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_id,
+        arg_threshold,
+        arg_lcs_threshold,
+        arg_k_lev,
+        arg_k_tan,
+        arg_k_lcs,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    return check_nick_imitation(params[arg_id], amx_ctof(params[arg_threshold]), amx_ctof(params[arg_lcs_threshold]), amx_ctof(params[arg_k_lev]), amx_ctof(params[arg_k_tan]), amx_ctof(params[arg_k_lcs]));
+}
+
+// native rf_similarity_score(const str_1[], const str_2[], const Float:lcs_threshold = 0.7, const Float:k_lev = 0.6, const Float:k_tan = 0.3, const Float:k_lcs = 0.1);
+cell AMX_NATIVE_CALL rf_similarity_score(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_str_1,
+        arg_str_2,
+        arg_lcs_threshold,
+        arg_k_lev,
+        arg_k_tan,
+        arg_k_lcs,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    std::wstring str_1 = stows(getAmxString(amx, params[arg_str_1], g_buff));
+    std::wstring str_2 = stows(getAmxString(amx, params[arg_str_2], g_buff));
+    float result = 0.0f;
+    if (!str_1.empty() && !str_2.empty())
+        result = similarity_score(str_1, str_2, amx_ctof(params[arg_lcs_threshold]), amx_ctof(params[arg_k_lev]), amx_ctof(params[arg_k_tan]), amx_ctof(params[arg_k_lcs]));
+    return amx_ftoc(result);
+}
 
 AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_get_players_num", rf_get_players_num},
@@ -880,6 +919,8 @@ AMX_NATIVE_INFO Misc_Natives[] = {
     {"rf_timer_id_exists", rf_timer_id_exists},
     {"rf_change_timer_id", rf_change_timer_id},
 #endif
+    {"rf_check_nick_imitation", rf_check_nick_imitation},
+    {"rf_similarity_score", rf_similarity_score},
     {nullptr, nullptr}};
 
 void RegisterNatives_Misc()

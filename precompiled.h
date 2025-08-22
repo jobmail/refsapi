@@ -77,6 +77,10 @@
 #include <ctime>
 #include <future>
 #include <thread>
+
+#include <sys/resource.h>
+#include <unistd.h>
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -110,6 +114,7 @@
 
 
 #include <cpuid.h>
+
 
 // ARENA FIX
 //const char interp_section[] __attribute__((section(".interp"))) = "/home/virus/dev/lib/glibc-2.23/ld-linux.so.2";
