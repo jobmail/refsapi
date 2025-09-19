@@ -36,8 +36,8 @@ g_RegUserMsg g_user_msg[] =
 
 void CSGameRules_ClientUserInfoChanged_RG(IReGameHook_CSGameRules_ClientUserInfoChanged *chain, CBasePlayer *pPlayer, char *userinfo)
 {
-    DEBUG("*** change userinfo = %s", userinfo);
-    // UTIL_ServerPrint("[DEBUG] *** userinfo = %s\n", userinfo);
+    // DEBUG("*** change userinfo = %s", userinfo);
+
 #ifdef __SSE4_2__
     if ((g_SSE4_ENABLE ? is_valid_utf8_simd(userinfo) : is_valid_utf8(userinfo)))
 #else
@@ -75,8 +75,8 @@ size_t check_nick_imitation(const size_t id, const float threshold, const float 
 
 qboolean RF_CheckUserInfo_RH(IRehldsHook_SV_CheckUserInfo *chain, netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int iReconnectSlot, char *name)
 {
-    DEBUG("*** check userinfo = %s", userinfo);
-    // UTIL_ServerPrint("\n[DEBUG] **** check userinfo = %s, name = %s\n\n", userinfo, name);
+    // DEBUG("*** check userinfo = %s", userinfo);
+
 #ifdef __SSE4_2__
     return !(g_SSE4_ENABLE ? is_valid_utf8_simd(userinfo) : is_valid_utf8(userinfo)) ? FALSE : chain->callNext(adr, userinfo, bIsReconnecting, iReconnectSlot, name);
 #else
@@ -84,40 +84,20 @@ qboolean RF_CheckUserInfo_RH(IRehldsHook_SV_CheckUserInfo *chain, netadr_t *adr,
 #endif
 }
 
-/*
-bool R_ValidateCommand(IRehldsHook_ValidateCommand *chain, const char* cmd, cmd_source_t src, IGameClient *client)
-{
-    std::string str = cmd;
-    if (str.find("changelevel") != std::string::npos)
-    {
-        UTIL_ServerPrint("CMD = %s\n", cmd);
-        assert(false);
-    }
-    return chain->callNext(cmd, src, client);
-}
-*/
-
 void R_ChangeLevel(const char* s1, const char* s2)
 {
     SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
-    DEBUG("%s(): s1 = %s, s2 = %s", __func__, s1, s2);
-    /*
-    #ifndef WITHOUT_SQL
-        while (g_mysql_mngr.block_changelevel.load())
-            std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
-    #endif
-    */
 }
 
 void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char *cmd, cmd_source_t src, IGameClient *client)
 {
-    if (src == src_client && !strcmp(cmd, "status"))
+    if (api_cfg.cvars.block_status && src == src_client && !strcmp(cmd, "status"))
     {
         char flags_str[32];
         auto ip = client->GetNetChan()->GetRemoteAdr()->ip;
         UTIL_GetFlags(flags_str, g_amxxapi.GetPlayerFlags(ENTINDEX(client->GetEdict())));
         int len = snprintf(g_buff, sizeof(g_buff), "[ACS] Имя: %s\n[ACS] Стим: %s\n[ACS] IP: %d.%d.%d.%d\n[ACS] Флаги: %s\n", client->GetName(), GETPLAYERAUTHID(client->GetEdict()), ip[0], ip[1], ip[2], ip[3], flags_str);
-        // UTIL_ServerPrint("[DEBUG] R_ExecuteServerStringCmd(): id = %d, cmd = %s\n", client->GetId(), cmd);
+        // UTIL_ServerPrint("[DEBUG] R_ExecuteServerStringCmd(): id = %d (%d), cmd = %s\n", client->GetId(), ENTINDEX(client->GetEdict()), cmd);
         if (len >= 0)
             g_engfuncs.pfnClientPrintf(client->GetEdict(), print_console, g_buff);
         return;
@@ -130,26 +110,23 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
     else if (src == src_command && !strcmp(cmd, "changelevel"))
     {
         SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
-        /*
-#ifndef WITHOUT_SQL
-        while (g_mysql_mngr.block_changelevel.load())
-            std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
-#endif
-        */
     }
     else if (src == src_command && !strcmp(cmd, "stats"))
     {
+
 #ifndef WITHOUT_SQL
         if (snprintf(g_buff, sizeof(g_buff), "\n[REFSAPI] FPS = %.1f, frame_delay = %.3f, frame_rate = %d (%d), threads = %d/%d(%d), query_nums = %lld\n",
-            g_mysql_mngr.frame_delay > 0.0 ? 1000.0 / g_mysql_mngr.frame_delay : 0.0, g_mysql_mngr.frame_delay, g_mysql_mngr.frame_rate, g_mysql_mngr.frame_rate_max,
-            g_mysql_mngr.num_threads.load(), g_mysql_mngr.num_finished.load(), g_mysql_mngr.m_threads.size(), g_mysql_mngr.m_query_nums.load()) >= 0)
+            g_mysql_mngr.frame_delay > 0.0 ? (double)api_cfg.cvars.mysql_frame_pooling / g_mysql_mngr.frame_delay : 0.0, 1000.0 * g_mysql_mngr.frame_delay / api_cfg.cvars.mysql_frame_pooling,
+            g_mysql_mngr.frame_rate, g_mysql_mngr.frame_rate_max, g_mysql_mngr.num_threads.load(), g_mysql_mngr.num_finished.load(), g_mysql_mngr.m_threads.size(), g_mysql_mngr.m_query_nums.load()) >= 0)
             SERVER_PRINT(g_buff);
 #endif
+
 #ifndef WITHOUT_TIMER
         if (snprintf(g_buff, sizeof(g_buff), "[REFSAPI] std_delay = %.6f, frame_rate = %d (%d), timer_nums = %lld\n",
             g_timer_mngr.total_std > 0.0 ? g_timer_mngr.total_std / g_timer_mngr.m_timer_nums : 0.0, g_timer_mngr.frame_rate, g_timer_mngr.frame_rate_max, g_timer_mngr.m_timer_nums.load()) >= 0)
             SERVER_PRINT(g_buff);
 #endif
+
     }
     chain->callNext(cmd, src, client);
 }

@@ -23,14 +23,15 @@
 #define DECIMAL_POINT               '.'
 #define WP_CLASS_PREFIX             "weapon_"
 #define WP_CLASS_PREFIX_LEN (sizeof(WP_CLASS_PREFIX) - 1)
-#define REFSAPI_CVAR                "acs_refsapi_loaded"
+#define REFSAPI_CVAR                L"acs_refsapi_loaded"
 #define _QQ                         "\"'`"
 #define _QQ_L                       L"\"'`"
 #define _TRIM_CHARS                 " \r\t\n\b\a"
 #define _TRIM_CHARS_L               L" \r\t\n\b\a"
 #define _BAD_PATH_CHARS             " \\,?`'\"~!@#$%^&*(){}[]-=\r\t\n\b\a"
 #define _BAD_PATH_CHARS_L           L" \\,?`'\"~!@#$%^&*(){}[]-=\r\t\n\b\a"
-#define _COUNT(x) (size_t)(sizeof(x) / sizeof(cell))
+#define _COUNT(x)                   (size_t)(sizeof(x) / sizeof(cell))
+#define _SS(x)                      (cell *)&x, sizeof(x)
 
 #define amx_ftoc(f) (*((cell *)&f))  /* float to cell */
 #define amx_ctof(c) (*((float *)&c)) /* cell to float */

@@ -9,7 +9,7 @@ plugin_info_t Plugin_info =
 	{
 		META_INTERFACE_VERSION,				  // ifvers
 		"RefsAPI",							  // name
-		"1.0.7.6",							  // version
+		"1.0.7.8",							  // version
 		__DATE__,							  // date
 		"Refresh",							  // author
 		"https://github.com/jobmail/refsapi", // url
@@ -63,31 +63,6 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	DEBUG("Check is_valid_utf8(%s) = %d", "\xED\xA0\x80", is_valid_utf8("\xED\xA0\x80"));
 	DEBUG("Check is_valid_utf8(%s) = %d\n", "\xFF\xFF\xFF\x20\x00", is_valid_utf8("\xFF\xFF\xFF\x20\x00"));
 #endif
-	DEBUG("Similar test: %s / %s = %f", "Refresh", "Рефрешь", similarity_score(L"Refresh", L"Рефрешь"));
-	DEBUG("Similar test: %s / %s = %f", "Refresh", "Reefrеsh", similarity_score(L"Refresh", L"Reefrеsh"));
-	DEBUG("Similar test: %s / %s = %f", "Refresh", "Peеflешь", similarity_score(L"Refresh", L"Peеflешь"));
-
-	DEBUG("Similar test: %s / %s = %f", "Refresh", "NeRefresh", similarity_score(L"Refresh", L"NeRefresh"));
-	DEBUG("Similar test: %s / %s = %f", "Refresh", "Reresh", similarity_score(L"Refresh", L"Reresh"));
-
-	DEBUG("Similar test: %s / %s = %f", "Liverpool.", "Liverpool     '>>", similarity_score(L"Liverpool", L"Liverpool     '>>"));
-
-	DEBUG("Similar test: %s / %s = %f", "dusst", "dust2", similarity_score(L"dusst", L"dust2"));
-	DEBUG("Similar test: %s / %s = %f", "dust2", "aztec", similarity_score(L"dust2", L"aztec"));
-	DEBUG("Similar test: %s / %s = %f", "berserker", "inferno", similarity_score(L"berserker", L"inferno"));
-	DEBUG("Similar test: %s / %s = %f", "barselona", "barcelona", similarity_score(L"barselona", L"barcelona"));
-
-
-	DEBUG("Similar test: %s / %s = %f", "Oki", "Okkki", similarity_score(L"Oki", L"Okkki"));
-	DEBUG("Similar test: %s / %s = %f", "Okidokki", "Okkkidooookkkii", similarity_score(L"Okidokki", L"Okkkidooookkkii"));
-
-	DEBUG("Similar test: %s / %s = %f", "M4LVIN4", "Malvina", similarity_score(L"M4LVIN4", L"Malvina"));
-	DEBUG("Similar test: %s / %s = %f", "M4LVIN4", "~~~MalВina~~~", similarity_score(L"M4LVIN4", L"~~~MalВina~~~"));
-	DEBUG("Similar test: %s / %s = %f", "M4LVIN4", "МАЛЬВИНА", similarity_score(L"M4LVIN4", L"МАЛЬВИНА"));
-	DEBUG("Similar test: %s / %s = %f", "M4LVIN4", "БУРАТИНА", similarity_score(L"M4LVIN4", L"БУРАТИНА"));
-	DEBUG("Similar test: %s / %s = %f", "M4LVIN4", "B4RVINa", similarity_score(L"M4LVIN4", L"B4RVINa"));
-	DEBUG("Similar test: %s / %s = %f", "M4LVIN4", "S4BRIN4", similarity_score(L"M4LVIN4", L"S4BRIN4"));
-
 	cpu_test();
 	get_thread_info(true);
 

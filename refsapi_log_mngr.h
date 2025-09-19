@@ -64,9 +64,6 @@ private:
     files_t files;
     plugins_t plugins;
     plugin_prms_t plugin_prms;
-    std::wstring log_root;
-    std::wstring log_game;
-    std::wstring log_path;
     std::atomic<uint64> m_sequence;
 public:
     void writer_thread(buffer_t *buff, const size_t local_batch_size)
@@ -224,28 +221,14 @@ public:
         auto plugin = get_plugin(amx);
         if (plugin == nullptr)
             return false;
-        path = log_root + L'/' + log_game + L'/' + (path.empty() ? log_path : path);
-        remove_chars(path, _BAD_PATH_CHARS_L);
-        rtrim(path, L" /");
-        if (!dir_exists(path) && std::filesystem::create_directories(path))
-            DEBUG("%s(): plugin = %s, created path = %s", __func__, plugin->getName(), wstos(path).c_str());
-        else
-            DEBUG("%s(): path = %s", __func__, wstos(path).c_str());
-        if (name.empty())
-        {
-            name = stows(plugin->getName());
-            DEBUG("%s(): plugin = %s", __func__, wstos(name).c_str());
-            auto pos = name.find(L".amxx");
-            if (pos != std::wstring::npos)
-                name.replace(pos, sizeof(L".amxx") - 1, L"");
-            name += L".log";
-        }
-        DEBUG("%s(): name = %s", __func__, wstos(name).c_str());
-        remove_chars(name, _BAD_PATH_CHARS_L);
+
         plugin_prm_t prm;
         prm.amx = amx;
         prm.plugin = plugin;
         prm.plugin_name = stows(plugin->getName());
+
+        api_cfg.make_path(path, name, api_cfg.log_path, prm.plugin_name, L".log");
+
         prm.path = path;
         prm.name = name;
         prm.log_level = log_level;
@@ -254,7 +237,7 @@ public:
         plugin_prms.insert({ amx, prm });
         return true;
     }
-    // NEED TO USE ===> std::lock_guard lock(prms_mutex);
+    // NEED TO USE WITH std::lock_guard lock(prms_mutex);
     plugin_prm_t* get_config(AMX *amx)
     {
         plugin_prms_it it;
@@ -355,16 +338,6 @@ public:
         delete file;
         file = nullptr;
     }
-    /*
-    void close_file(AMX *amx)
-    {
-        DEBUG("%s(): START", __func__);
-        file_t *file;
-        if (amx == nullptr || (file = get_file(amx)) == nullptr)
-            return;
-        close_file(amx, file);
-    }
-    */
     void close_file(AMX *amx, file_t *file)
     {
         DEBUG("%s(): START", __func__);
@@ -399,14 +372,10 @@ public:
             auto amx = p.first;
             auto file = p.second;
             DEBUG("%s(): amx = %p, file = %p", __func__, amx, file);
-            if (get_config(amx, prm))
-            {
-                DEBUG("%s(): plugin = %p, filename = %s", __func__, prm.plugin,  wstos(prm.plugin_name).c_str(), wstos(prm.path + L'/' + prm.name).c_str());
-                file->m.lock();
-                close(file);
-            }
-            else
-                assert(false);
+            assert(get_config(amx, prm));
+            DEBUG("%s(): plugin = %p, filename = %s", __func__, prm.plugin,  wstos(prm.plugin_name).c_str(), wstos(prm.path + L'/' + prm.name).c_str());
+            file->m.lock();
+            close(file);
         }
         files.clear();
         files.shrink_to_fit();
@@ -446,24 +415,12 @@ public:
     }
     void start_main()
     {
-        log_root = std::filesystem::current_path().wstring();
-        trim(log_root);
-        log_path = stows(LOCALINFO("amxx_logs"));
-        if (log_path.empty())
-            log_path = L"addons/amxmodx/logs";
-        trim(log_path);
-        rtrim(log_path, L" /");
-        DEBUG("%s(): dir = %s, g_amxxapi = %p", __func__, wstos(log_path).c_str(), g_amxxapi);
-        log_game = stows(g_amxxapi.GetModname());
-        if (log_game.empty())
-            log_game = L"cstrike";
-        DEBUG("%s() log_root = %s, game = %s, log_path = %s", __func__, wstos(log_root).c_str(), wstos(log_game).c_str(), wstos(log_path).c_str());
         stop_main = false;
         main_thread = std::thread(&log_mngr::main, this);
     }
     void main()
     {   
-        DEBUG("%s(): pid = %p, START", __func__, gettid());
+        // DEBUG("%s(): pid = %p, START", __func__, gettid());
         while (!stop_main)
         {
             buffer_mutex.lock();
@@ -497,7 +454,7 @@ public:
             if (!m_threads.size())
                 m_thread_t().swap(m_threads);
         }
-        DEBUG("%s(): pid = %p, END", __func__, gettid());
+        // DEBUG("%s(): pid = %p, END", __func__, gettid());
     }
     log_mngr(const size_t interval = 5000, const size_t batch = 100, const uint8 threads = 0)
     {

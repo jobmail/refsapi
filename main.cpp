@@ -19,14 +19,6 @@ void OnAmxxAttach()
 		g_szMapName[sizeof(g_szMapName) - 1] = '\0';
 	}
 
-#ifndef WITHOUT_LOG
-	g_log_mngr.start_main();
-#endif
-
-#ifndef WITHOUT_SQL
-	g_mysql_mngr.start_main();
-#endif
-
 }
 
 bool OnMetaAttach()
@@ -55,7 +47,6 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 
 #ifndef WITHOUT_SQL
 	g_mysql_mngr.start();
-	g_mysql_mngr.block_changelevel = false;
 #endif
 
 #ifndef WITHOUT_LOG
@@ -95,7 +86,6 @@ void ServerDeactivate_Post()
 	ngrams_t().swap(g_cache_ngrams);
 
 #ifndef WITHOUT_SQL
-	g_mysql_mngr.block_changelevel = true;
 	g_mysql_mngr.stop();
 #endif
 	g_cvar_mngr.clear_all();
