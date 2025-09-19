@@ -126,7 +126,20 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
     int result = FALSE;
+    std::wstring name = stows(getAmxString(amx, params[arg_name], g_buff));
+    std::wstring path = stows(getAmxString(amx, params[arg_folder], g_buff));
     auto plugin = findPluginFast(amx);
+    return g_cvar_mngr.config(
+        plugin->getId(),
+        params[arg_auto_create],
+        path,
+        name,
+        plugin->getTitle(),
+        plugin->getAuthor(),
+        plugin->getName(),
+        plugin->getVersion()
+    );
+    /*
     auto list_cvar = g_cvar_mngr.get(plugin->getId());
     if (list_cvar == nullptr)
         return FALSE;
@@ -181,7 +194,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
                     var_name = trim_c(line.substr(0, pos++));
                     var_value = trim_c(line.substr(pos, line.size() - pos));
                     if (rm_quote(var_value) == -1)
-                        AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: the parameter <%s> has a value <%s> with a wrong quotation mark", __FUNCTION__, wstos(var_name).c_str(), wstos(var_value).c_str());
+                        AMXX_Log("%s(): the parameter <%s> has a value <%s> with a wrong quotation mark", __func__, wstos(var_name).c_str(), wstos(var_value).c_str());
                     // UTIL_ServerPrint("[DEBUG] rf_config(): name = <%s>, value = <%s>\n", wstos(var_name).c_str(), wstos(var_value).c_str());
                     load_cvars.insert({var_name, var_value});
                 }
@@ -252,6 +265,8 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
         else
             AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: error opening the file <%s> (check permissions)", __FUNCTION__, wstos(path).c_str());
     }
+    */
+
     return result;
 }
 
@@ -296,7 +311,7 @@ cell AMX_NATIVE_CALL rf_bind_pcvar(AMX *amx, cell *params)
     check_global_r(params[arg_var]);
     check_type_r(params[arg_type]);
     m_cvar_t *m_cvar = (m_cvar_t *)((void *)params[arg_pcvar]);
-    g_cvar_mngr.bind(plugin, (CVAR_TYPES_t)params[arg_type], m_cvar, getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
+    g_cvar_mngr.bind((CVAR_TYPES_t)params[arg_type], m_cvar, getAmxAddr(amx, params[arg_var]), params[arg_var_size]);
     return TRUE;
 }
 

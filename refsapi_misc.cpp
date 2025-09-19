@@ -822,215 +822,26 @@ float similarity_score(const std::wstring &nick1, const std::wstring &nick2, con
     return k_lev * lev_score + k_tan * tan_score + k_lcs * (lcs_len / static_cast<double>(std::max(n1.size(), n2.size())));
 }
 
-/*
-
-
-bool is_valid_utf8(const std::vector<uint8_t> &data)
+void calc_frame_delay(const size_t interval, const uint64_t frames_count, timespec &frame_prev, double &frame_delay, size_t &frame_rate, size_t &frame_rate_max, float k1_max, float k2_max)
 {
-    int remaining_bytes = 0;
-    uint32_t code_point = 0;
-    uint8_t byte;
-    for (size_t i = 0; i < data.size(); ++i)
+    timespec frame_curr;
+    if (!(frames_count % interval))
     {
-        byte = data[i];
-        if (remaining_bytes == 0)
+        clock_gettime(CLOCK_MONOTONIC, &frame_curr);
+        if (frame_prev.tv_sec >= 0 && frame_prev.tv_nsec > 0)
         {
-            // Определяем длину символа по первому байту
-            if ((byte >> 7) == 0x00)
-            { // 0xxxxxxx (ASCII)
-                continue;
-            }
-            else if ((byte >> 5) == 0x06)
-            { // 110xxxxx (2 байта)
-                remaining_bytes = 1;
-                code_point = byte & 0x1F;
-            }
-            else if ((byte >> 4) == 0x0E)
-            { // 1110xxxx (3 байта)
-                remaining_bytes = 2;
-                code_point = byte & 0x0F;
-            }
-            else if ((byte >> 3) == 0x1E)
-            { // 11110xxx (4 байта)
-                remaining_bytes = 3;
-                code_point = byte & 0x07;
-            }
-            else
-                return false; // Недопустимый первый байт
-            // Проверка на overlong-encoding (избыточное кодирование)
-            if (remaining_bytes == 1 && code_point < 0x02)
-                return false;
-            if (remaining_bytes == 2 && code_point < 0x04)
-                return false;
-            if (remaining_bytes == 3 && code_point < 0x08)
-                return false;
-        }
-        else
-        {
-            // Проверяем continuation byte (10xxxxxx)
-            if ((byte >> 6) != 0x02)
-                return false;
-            code_point = (code_point << 6) | (byte & 0x3F);
-            remaining_bytes--;
-            // Проверяем завершенные символы на валидность диапазона
-            if (remaining_bytes == 0)
+            auto delay = timespec_diff(&frame_prev, &frame_curr);
+            if (frame_delay > 0.0)
             {
-                // Проверка на surrogate pairs (U+D800..U+DFFF)
-                if (code_point >= 0xD800 && code_point <= 0xDFFF)
-                {
-                    return false;
-                }
-                // Проверка на максимальное значение Unicode (0x10FFFF)
-                if (code_point > 0x10FFFF)
-                    return false;
+                auto k0 = interval / 1000.0;
+                auto k1 = delay > frame_delay ? k1_max * (delay - frame_delay) / (frame_delay + delay) : k0;
+                auto k2 = frame_delay > k0 ? k2_max * frame_delay : k0;
+                frame_rate = std::max(1U, (frame_rate + (size_t)std::round((k1 + k2) / k0)) >> 1);
+                if (frame_rate > frame_rate_max)
+                    frame_rate_max = frame_rate;
             }
+            frame_delay = (frame_delay + delay) / 2.0;
         }
+        frame_prev = frame_curr;
     }
-    return remaining_bytes == 0;
 }
-
-
-bool is_valid_utf8_simd(const uint8_t *data, size_t size)
-{
-    const uint8_t *end = data + size;
-    const uint8_t *aligned_end = data + (size & ~15); // Выравниваем по 16 байт
-
-    __m128i mask_80 = _mm_set1_epi8(0x80); // Маска для проверки старшего бита
-    __m128i mask_C0 = _mm_set1_epi8(0xC0); // Маска для проверки начала символа
-
-    int remaining_bytes = 0;
-    uint32_t code_point = 0;
-
-    while (data < aligned_end)
-    {
-        __m128i chunk = _mm_loadu_si128((__m128i *)data);
-        data += 16;
-
-        // Проверяем ASCII символы (быстрый путь)
-        __m128i ascii_mask = _mm_cmpeq_epi8(_mm_and_si128(chunk, mask_80), _mm_setzero_si128());
-        int ascii_bits = _mm_movemask_epi8(ascii_mask);
-
-        if (ascii_bits == 0xFFFF)
-        {
-            if (remaining_bytes == 0)
-                continue;
-            return false; // ASCII символы в середине последовательности
-        }
-
-        // Обрабатываем байты по одному (без _mm_extract_epi8)
-        alignas(16) uint8_t bytes[16];
-        _mm_store_si128((__m128i *)bytes, chunk);
-
-        for (int i = 0; i < 16; ++i)
-        {
-            uint8_t byte = bytes[i]; // Доступ через массив вместо _mm_extract_epi8
-
-            if (remaining_bytes == 0)
-            {
-                if ((byte & 0x80) == 0)
-                    continue; // ASCII
-
-                if ((byte >> 5) == 0x06)
-                { // 110xxxxx
-                    remaining_bytes = 1;
-                    code_point = byte & 0x1F;
-                }
-                else if ((byte >> 4) == 0x0E)
-                { // 1110xxxx
-                    remaining_bytes = 2;
-                    code_point = byte & 0x0F;
-                }
-                else if ((byte >> 3) == 0x1E)
-                { // 11110xxx
-                    remaining_bytes = 3;
-                    code_point = byte & 0x07;
-                }
-                else
-                {
-                    return false;
-                }
-
-                // Проверка на overlong encoding
-                if (remaining_bytes == 1 && code_point < 0x02)
-                    return false;
-                if (remaining_bytes == 2 && code_point < 0x04)
-                    return false;
-                if (remaining_bytes == 3 && code_point < 0x08)
-                    return false;
-            }
-            else
-            {
-                if ((byte >> 6) != 0x02)
-                    return false;
-                code_point = (code_point << 6) | (byte & 0x3F);
-                remaining_bytes--;
-
-                if (remaining_bytes == 0)
-                {
-                    if (code_point >= 0xD800 && code_point <= 0xDFFF)
-                        return false;
-                    if (code_point > 0x10FFFF)
-                        return false;
-                }
-            }
-        }
-    }
-
-    // Обрабатываем оставшиеся байты
-    while (data < end)
-    {
-        uint8_t byte = *data++;
-
-        if (remaining_bytes == 0)
-        {
-            if ((byte & 0x80) == 0)
-                continue;
-
-            if ((byte >> 5) == 0x06)
-            {
-                remaining_bytes = 1;
-                code_point = byte & 0x1F;
-            }
-            else if ((byte >> 4) == 0x0E)
-            {
-                remaining_bytes = 2;
-                code_point = byte & 0x0F;
-            }
-            else if ((byte >> 3) == 0x1E)
-            {
-                remaining_bytes = 3;
-                code_point = byte & 0x07;
-            }
-            else
-            {
-                return false;
-            }
-
-            if (remaining_bytes == 1 && code_point < 0x02)
-                return false;
-            if (remaining_bytes == 2 && code_point < 0x04)
-                return false;
-            if (remaining_bytes == 3 && code_point < 0x08)
-                return false;
-        }
-        else
-        {
-            if ((byte >> 6) != 0x02)
-                return false;
-            code_point = (code_point << 6) | (byte & 0x3F);
-            remaining_bytes--;
-
-            if (remaining_bytes == 0)
-            {
-                if (code_point >= 0xD800 && code_point <= 0xDFFF)
-                    return false;
-                if (code_point > 0x10FFFF)
-                    return false;
-            }
-        }
-    }
-
-    return remaining_bytes == 0;
-}
-
-*/

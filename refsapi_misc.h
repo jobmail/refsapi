@@ -37,6 +37,7 @@ void get_thread_info(bool boost = false);
 bool set_thread_priority(std::thread *t, int pri = 0);
 //int safe_poll(struct pollfd *fds, nfds_t nfds, int timeout_ms);
 float similarity_score(const std::wstring &nick1, const std::wstring &nick2, const float lcs_threshold = 0.7f, const float k_lev = 0.6f, const float k_tan = 0.3f, const float k_lcs = 0.1f);
+void calc_frame_delay(const size_t interval_ms, const uint64_t frames_count, timespec &frame_prev, double &frame_delay, size_t &frame_rate, size_t &frame_rate_max, float k1_max, float k2_max);
 
 class fmt
 {

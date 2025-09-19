@@ -450,21 +450,6 @@ public:
         tm_t t;
         if (!get_timer(t))
             return;
-        // Exec frame
-        auto repeat = [&](double &std) {
-                return false;////////////////////////////////////////////////////////////////////////////////////////////////////
-                if (stop_timer || stop_loop || !m_frames.size())
-                    return false;
-                t = m_frames.top();
-                auto curr_time = std::chrono::steady_clock::now();
-                if (t.time > curr_time)
-                    return false;
-                auto std_delay = std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - t.time).count() / 1000.0f;
-                std += std_delay;
-                DEBUG("%s(): execute timer_id = %u, group_id = %u, init_delay = %f, std_delay = %f", __func__, t.id, t.group_id, t.delay_sec, std_delay);
-                m_frames.pop();
-                return true;
-            };
         do
         {
             ret = 0;
@@ -496,11 +481,6 @@ public:
                 {
                     std::lock_guard lock(timer_mutex);
                     auto tm = get_timer_by_id(t.fwd.amx, t.group_id, t.id);
-                    if (tm == nullptr)
-                    {
-                        DEBUG("%s(): ERROR, amx = %p, timer_id = %u, group_id = %u, init_delay = %f, repeat = %d", __func__, t.fwd.amx, t.id, t.group_id, t.delay_sec, t.repeat);
-                        assert(tm != nullptr);
-                    }
                     if ((t.flags & TIMER_FLAG_RELATIVE))
                         tm->time = std::chrono::steady_clock::now() + std::chrono::milliseconds((int64_t)std::round(1000.0f * t.delay_sec));
                     else
@@ -515,28 +495,20 @@ public:
             }
             else
                 remove_timer_by_id(t.fwd.amx, t.group_id, t.id);
-        } while (!ret && repeat(total_std));
+        } while(0);
     }
     void start_frame()
     {
-        if (!(frames_count % 1000))
-        {
-            clock_gettime(CLOCK_MONOTONIC, &frame_curr);
-            if (frame_prev.tv_sec >= 0 && frame_prev.tv_nsec > 0)
-            {
-                auto delay = timespec_diff(&frame_prev, &frame_curr);
-                if (frame_delay > 0.0) {
-                    auto k1 = delay > frame_delay ? 23.0 * abs(frame_delay - delay) / (frame_delay + delay) : 1.0;
-                    auto k2 = frame_delay > 1.0 ? 3.0 * frame_delay : 1.0;
-                    frame_rate = (frame_rate + (uint8_t)std::round(k1 + k2)) / 2;
-                    if (frame_rate > frame_rate_max)
-                        frame_rate_max = frame_rate;
-                }
-                frame_delay = (frame_delay + delay) / 2.0;
-            }
-            frame_prev = frame_curr;
-            //dump(__func__);
-        }
+        calc_frame_delay(
+            api_cfg.cvars.timer_frame_pooling,
+            frames_count,
+            frame_prev,
+            frame_delay,
+            frame_rate,
+            frame_rate_max,
+            api_cfg.cvars.timer_frame_rate_k1,
+            api_cfg.cvars.timer_frame_rate_k2
+        );
         // Check frame
         if (!stop_timer && !(frames_count % frame_rate))
             frame_forward();
@@ -545,7 +517,7 @@ public:
     void main()
     {
         start();
-        DEBUG("%s(): start timer main", __func__);
+        // DEBUG("%s(): start timer main", __func__);
         while (!stop_main)
         {
             build_queue();
@@ -558,7 +530,7 @@ public:
                 {
                     auto delay_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t.time - std::chrono::steady_clock::now()).count();
                     DEBUG("%s(): set delay = %lld, timer_id = %u, group_id = %u, init_delay = %f", __func__, delay_ms, t.id, t.group_id, t.delay_sec);
-                    std::unique_lock<std::mutex> lock(loop_mutex);
+                    std::unique_lock lock(loop_mutex);
                     cv.wait_for(lock, std::chrono::milliseconds(delay_ms), [&] { return stop_timer || stop_loop; });
                 }
                 if (stop_timer || stop_loop)
@@ -569,16 +541,13 @@ public:
                 // Add timer to start
                 {
                     std::lock_guard lock(frame_mutex);
-                    
-                        auto origin_t = get_timer_by_id(t.fwd.amx, t.group_id, t.id);
-                        if (origin_t == nullptr)
-                        {
-                            DEBUG("%s(): ABORT TIMER: amx = %p, timer_id = %u, group_id = %u, init_delay = %f", __func__, t.fwd.amx, t.id, t.group_id, t.delay_sec);
-                            continue;
-                        }
-                        //assert(origin_t != nullptr);
-                        origin_t->executed = true;
-                    
+                    auto origin_t = get_timer_by_id(t.fwd.amx, t.group_id, t.id);
+                    if (origin_t == nullptr)
+                    {
+                        DEBUG("%s(): ABORT TIMER: amx = %p, timer_id = %u, group_id = %u, init_delay = %f", __func__, t.fwd.amx, t.id, t.group_id, t.delay_sec);
+                        continue;
+                    }
+                    origin_t->executed = true;
                     m_frames.push(t);
                 }
                 m_timer_queue.pop();
@@ -587,7 +556,7 @@ public:
                 continue;
             // Long timer loop
             DEBUG("%s(): timer wait signal => START", __func__);
-            std::unique_lock<std::mutex> lock(loop_mutex);
+            std::unique_lock lock(loop_mutex);
             cv.wait(lock, [&] { return !stop_timer && stop_loop; });
             DEBUG("%s(): timer wait signal => END", __func__);
         }
@@ -625,39 +594,3 @@ public:
 
 extern timer_mngr g_timer_mngr;
 #endif
-        /*
-        if (!stop_timer && has_frame && !(frames_count % frame_rate) && !frame_mutex.try_lock() && !frame_exec)
-        {
-            std::unique_lock<std::mutex> lock(frame_mutex);
-            frame_mutex.unlock();
-            DEBUG("%s(): UNLOCK FRAME = %lld, frame_end = %d", __func__, frames_count, frame_end.load());
-            cv2.wait_for(lock, std::chrono::milliseconds((uint64_t)std::round(10'000.0 * (frame_delay + 1.0))), [&]{ return frame_end || stop_timer; });
-            assert(frame_end || stop_timer);
-            frame_end = false;
-            DEBUG("%s(): frame_mutex LOCKED", __func__);
-            
-            if (frame_mutex.try_lock())
-            {
-                frame_mutex.unlock();
-                DEBUG("%s(): UNLOCK TIMER FRAME = %lld", __func__, frames_count);
-                while (!frame_mutex.try_lock())
-                    std::this_thread::sleep_for(std::chrono::microseconds(5));
-                //    std::this_thread::yield();
-                //DEBUG("%s(): UNLOCK TIMER FORWARD = %lld", __func__, frames_count);
-            }
-            else
-                frame_mutex.unlock();
-            
-        }
-                */
-
-            /*
-            if (plugin->isDebug())
-            {
-                Debugger *dbg = (Debugger *)f.amx->userdata[UD_DEBUGGER];
-                DEBUG("%s(): DEBUGGER IN TRACE => m_top = %d, m_calls = %d", __func__, dbg->m_Top, dbg->m_pCalls.length());
-                while (dbg->m_Top >= 0)
-                    std::this_thread::sleep_for(std::chrono::microseconds(1));
-                //assert(!dbg->m_pCalls.length());
-            }
-            */
