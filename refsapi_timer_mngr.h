@@ -57,14 +57,6 @@ typedef std::map<AMX *, m_timers_t> m_amxx_t;
 
 struct timer_compare
 {
-    bool operator()(const tm_t left, const tm_t right) const
-    {
-        return left.time > right.time;
-    }
-};
-
-struct frame_timer_compare
-{
     bool operator()(const tm_t &left, const tm_t &right) const
     {
         return left.time > right.time;
@@ -72,7 +64,7 @@ struct frame_timer_compare
 };
 
 typedef std::priority_queue<tm_t, std::vector<tm_t>, timer_compare> m_timer_queue_t;
-typedef std::priority_queue<tm_t, std::vector<tm_t>, frame_timer_compare> m_frame_timer_t;
+typedef std::priority_queue<tm_t, std::vector<tm_t>, timer_compare> m_frame_timer_t;
 typedef std::map<std::string, int> callback_t;
 
 class timer_mngr
