@@ -9,7 +9,7 @@ plugin_info_t Plugin_info =
 	{
 		META_INTERFACE_VERSION,				  // ifvers
 		"RefsAPI",							  // name
-		"1.0.7.8",							  // version
+		"1.0.7.9",							  // version
 		__DATE__,							  // date
 		"Refresh",							  // author
 		"https://github.com/jobmail/refsapi", // url

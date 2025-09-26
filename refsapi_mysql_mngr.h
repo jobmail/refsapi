@@ -130,20 +130,6 @@ private:
         DEBUG("%s(): q = %p, async = %d", __func__, q, q->async);
         if (q == nullptr || q->conn == nullptr || q->finished || q->aborted || (stop_threads && q->async))
             return false;
-        /*
-        if (!q->async && q->started && q->result != nullptr)
-        {
-            int res = mysql_ping(q->conn);
-            DEBUG("%s(): q = %p, PING = %d", __func__, q, res);
-            if (res)
-            {
-                q->err = mysql_errno(q->conn);
-                q->error = mysql_error(q->conn);
-                DEBUG("%s(): q = %p, connection lost (%d) = %s", __func__, q, q->err, q->error.c_str());
-                return false;
-            }
-        }
-        */
         DEBUG("%s(): q = %p, valid!", __func__, q);
         return true;
     }
@@ -154,16 +140,6 @@ private:
             return false;
         DEBUG("%s(): conn = %p, valid!", __func__, conn);
         return true;
-    }
-    void dump(const char *from)
-    {
-        DEBUG("%s-%s(): threads = %d / %d (%d), frames_count = %lld, stop = %d", from, __func__, num_threads.load(), num_finished.load(), m_threads.size(), frames_count, stop_threads.load());
-        DEBUG("%s-%s(): delay = %f, rate = %d (%d)", from, __func__, frame_delay, frame_rate, frame_rate_max);
-        threads_mutex.lock();
-        for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
-             if (m_queries[pri].size())
-                 DEBUG("%s-%s(): m_query[%d](%d)", from, __func__, pri, m_queries[pri].size());
-        threads_mutex.unlock();
     }
     int wait_for_mysql(m_query_t *q, int status, const char *from)
     {
@@ -177,7 +153,6 @@ private:
             return MYSQL_WAIT_TIMEOUT;
         }
         // DEBUG("%s(): socket = %d", __func__, pfd.fd);
-        
         pfd.events = 0;
         if (status & MYSQL_WAIT_READ)
             pfd.events |= POLLIN;
@@ -185,7 +160,6 @@ private:
             pfd.events |= POLLOUT;
         if (status & MYSQL_WAIT_EXCEPT)
             pfd.events |= POLLPRI;
-
         timeout = (status & MYSQL_WAIT_TIMEOUT) ? (q->timeout > 0 ? q->timeout : mysql_get_timeout_value_ms(q->conn)) : -1;
         DEBUG("%s-%s(): q = %p, socket = %d, events = %d, timeout = %d", from, __func__, q, pfd.fd, pfd.events, timeout);
         res = safe_poll(&pfd, 1, timeout);
@@ -296,6 +270,16 @@ public:
             poll_query();
             std::this_thread::sleep_for(std::chrono::milliseconds(QUERY_POOLING_INTERVAL));
         }
+    }
+    void dump(const char *from)
+    {
+        UTIL_ServerPrint("%s-%s(): threads = %d / %d (%d), frames_count = %lld, stop = %d\n", from, __func__, num_threads.load(), num_finished.load(), m_threads.size(), frames_count, stop_threads.load());
+        UTIL_ServerPrint("%s-%s(): delay = %f, rate = %d (%d)\n", from, __func__, frame_delay, frame_rate, frame_rate_max);
+        threads_mutex.lock();
+        for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
+             if (m_queries[pri].size())
+                 UTIL_ServerPrint("%s-%s(): m_query[%d](%d)\n", from, __func__, pri, m_queries[pri].size());
+        threads_mutex.unlock();
     }
     void poll_query()
     {

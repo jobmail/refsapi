@@ -111,6 +111,13 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
     {
         SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
     }
+    else if (src == src_command && !strcmp(cmd, "debug")) 
+    {
+#ifndef WITHOUT_SQL
+        g_mysql_mngr.dump("mysql");
+#endif
+        return;
+    }
     else if (src == src_command && !strcmp(cmd, "stats"))
     {
 

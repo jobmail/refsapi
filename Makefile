@@ -12,7 +12,7 @@ COMPILER = g++
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
 LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
-	-s -m32 -ldl -lm -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -Wl,--as-needed -l:libmariadb.a
+	-s -m32 -ldl -lm -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a
 #-l:libssl.a -l:libcrypto.a
 #-l:libmariadb.a
 # 
@@ -83,8 +83,9 @@ LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 #-s -Llib/linux32 -static-libgcc -static-libstdc++
 #-ldl -m32 -s -Llib/linux32 -static-libgcc
 
-OPT_FLAGS = -O3 -mmmx -msse -msse2 -msse3 -fno-strict-aliasing -Wno-parentheses -Wno-int-to-pointer-cast -Wno-switch -Wno-uninitialized -fpermissive -shared -pipe -pthread
+OPT_FLAGS = -O3 -mmmx -msse -msse2 -msse3 -msse4.2 -fno-strict-aliasing -Wno-parentheses -Wno-int-to-pointer-cast -Wno-switch -Wno-uninitialized -fpermissive -shared -pipe -pthread
 
+#  
 # -msse4.2
 # -funroll-loops -fomit-frame-pointer 
 # -fno-rtti
@@ -103,7 +104,6 @@ CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
 CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -g \
 	-fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions -flto=auto -fPIC
-	
 # -DNDEBUG	
 #-D_GLIBCXX_DEBUG
 #-DNDEBUG
