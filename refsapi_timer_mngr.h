@@ -188,9 +188,6 @@ private:
         delete t.data;
         t.data = nullptr;
         t.data_size = 0;
-        //assert(t.fwd.id != -1);
-        //g_amxxapi.UnregisterSPForward(t.fwd.id);
-        
     }
     void remove_data_all_timers(m_timer_t *tm)
     {
@@ -356,6 +353,7 @@ public:
         if (is_valid_index(id))
         {
             std::lock_guard lock(timer_mutex);
+            auto need_stop = false;
             for (auto &it : m_timers)
             {
                 auto amxx = &it.second;
@@ -368,10 +366,12 @@ public:
                         remove_data_all_timers(tm);
                         tm->clear();
                         m_timer_t().swap(*tm);
-                        stop();
+                        need_stop = true;
                     }
                 }
             }
+            if (need_stop)
+                stop();
         }
     }
     int create_forward(AMX *amx, std::string &callback)
@@ -446,31 +446,30 @@ public:
         {
             if (!get_timer(t))
                 break;
-            ret = 0;
             DEBUG("%s(): BEGIN, timer_id = %u, group_id = %u, init_delay = %f", __func__, t.id, t.group_id, t.delay_sec);
-            auto f = t.fwd;
-            if (stop_timer || f.amx == nullptr || t.fwd.id == -1)
+            if (stop_timer || t.fwd.amx == nullptr || t.fwd.id == -1)
                 break;
             auto tm = get_timer_by_id(t.fwd.amx, t.group_id, t.id);
             if (tm == nullptr)
                 break;
+            ret = 0;
             // Prepare array
             cell *data_tmp, data_param;
             size_t total_size = 0;
             // Callback error
-            if (amx_allot(f.amx, t.data_size, &data_param, &data_tmp))
+            if (amx_allot(t.fwd.amx, t.data_size, &data_param, &data_tmp))
             {
                 assert(t.data != nullptr);
                 Q_memcpy(data_tmp, t.data, t.data_size << 2);
                 total_size += t.data_size << 2;
-                DEBUG("%s(): EXEC, timer_id = %u, fwd_id = %d, data = %p, data_size = %d, repeat = %d", __func__, t.id, f.id, t.data, t.data_size, t.repeat);
+                DEBUG("%s(): EXEC, timer_id = %u, fwd_id = %d, data = %p, data_size = %d, repeat = %d", __func__, t.id, t.fwd.id, t.data, t.data_size, t.repeat);
                 // public TimerCallback(const group_id, const data[], const data_size, const repeat, const timer_id);
-                ret = g_amxxapi.ExecuteForward(f.id, t.group_id, data_param, t.data_size, t.repeat, t.id);
+                ret = g_amxxapi.ExecuteForward(t.fwd.id, t.group_id, data_param, t.data_size, t.repeat, t.id);
                 // Fix heap
-                if ((f.amx->hea - data_param) == total_size)
-                    f.amx->hea = data_param;
+                if ((t.fwd.amx->hea - data_param) == total_size)
+                    t.fwd.amx->hea = data_param;
                 else
-                    AMXX_LogError(f.amx, AMX_ERR_NATIVE, "%s(): can't fix amx->hea, possible memory leak!", __func__);
+                    AMXX_LogError(t.fwd.amx, AMX_ERR_NATIVE, "%s(): can't fix amx->hea, possible memory leak!", __func__);
             }
             DEBUG("%s(): END, timer_id = %u, group_id = %u, init_delay = %f", __func__, t.id, t.group_id, t.delay_sec);
             // Check repeat or loop?

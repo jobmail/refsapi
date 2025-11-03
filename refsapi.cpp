@@ -7,6 +7,10 @@ bool r_bMapHasBuyZone;
 char g_buff[4096];
 bool g_SSE4_ENABLE;
 
+// Hack ReGame
+CBasePlayer_GiveDefuser_t func_CBasePlayer_GiveDefuser = nullptr;
+CBasePlayer_RemoveDefuser_t func_CBasePlayer_RemoveDefuser = nullptr;
+
 ngrams_t g_cache_ngrams;
 const std::locale _LOCALE = std::locale("ru_RU.UTF-8");
 cvar_mngr g_cvar_mngr;
@@ -91,7 +95,7 @@ void R_ChangeLevel(const char* s1, const char* s2)
 
 void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const char *cmd, cmd_source_t src, IGameClient *client)
 {
-    if (api_cfg.cvars.block_status && src == src_client && !strcmp(cmd, "status"))
+    if (api_cfg.cvars.block_status && src == src_client && !strcasecmp(cmd, "status"))
     {
         char flags_str[32];
         auto ip = client->GetNetChan()->GetRemoteAdr()->ip;
@@ -102,23 +106,23 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
             g_engfuncs.pfnClientPrintf(client->GetEdict(), print_console, g_buff);
         return;
     }
-    else if (src == src_command && !strcmp(cmd, "cpu"))
+    else if (src == src_command && !strcasecmp(cmd, "cpu"))
     {
         cpu_test();
         return;
     }
-    else if (src == src_command && !strcmp(cmd, "changelevel"))
+    else if (src == src_command && !strcasecmp(cmd, "changelevel"))
     {
         SERVER_PRINT("[DEBUG] CHANGELEVEL\n");
     }
-    else if (src == src_command && !strcmp(cmd, "debug")) 
+    else if (src == src_command && !strcasecmp(cmd, "debug"))
     {
 #ifndef WITHOUT_SQL
         g_mysql_mngr.dump("mysql");
 #endif
         return;
     }
-    else if (src == src_command && !strcmp(cmd, "stats"))
+    else if (src == src_command && !strcasecmp(cmd, "stats"))
     {
 
 #ifndef WITHOUT_SQL

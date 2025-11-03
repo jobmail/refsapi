@@ -134,6 +134,12 @@
 #define SOUND_FLASHLIGHT_ON		"items/flashlight1.wav"
 #define SOUND_FLASHLIGHT_OFF		"items/flashlight1.wav"
 
+// Hack ReGame
+typedef void (*CBasePlayer_GiveDefuser_t)(CBasePlayer*);
+extern CBasePlayer_GiveDefuser_t func_CBasePlayer_GiveDefuser;
+typedef void (*CBasePlayer_RemoveDefuser_t)(CBasePlayer*);
+extern CBasePlayer_RemoveDefuser_t func_CBasePlayer_RemoveDefuser;
+
 // custom enum
 enum RewardType
 {
@@ -359,6 +365,7 @@ public:
 	virtual Vector GetAutoaimVector(float flDelta) = 0;
 	virtual void Blind(float flUntilTime, float flHoldTime, float flFadeTime, int iAlpha) = 0;
 	virtual void OnTouchingWeapon(CWeaponBox *pWeapon) = 0;
+
 public:
 	static CBasePlayer *Instance(edict_t *pent) { return (CBasePlayer *)GET_PRIVATE(pent ? pent : ENT(0)); }
 	static CBasePlayer *Instance(entvars_t *pev) { return Instance(ENT(pev)); }
@@ -374,6 +381,11 @@ public:
 	void AllowAutoFollow() { m_allowAutoFollowTime = 0; }
 	void SetObserverAutoDirector(bool val) { m_bObserverAutoDirector = val; }
 	bool CanSwitchObserverModes() const { return m_canSwitchObserverModes; }
+
+	// RefsAPI
+	void GiveDefuser() { if (func_CBasePlayer_GiveDefuser) func_CBasePlayer_GiveDefuser(this); };
+	void RemoveDefuser() { if (func_CBasePlayer_RemoveDefuser) func_CBasePlayer_RemoveDefuser(this); };
+
 	CCSPlayer *CSPlayer() const;
 
 	// templates

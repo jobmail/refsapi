@@ -9,7 +9,7 @@ plugin_info_t Plugin_info =
 	{
 		META_INTERFACE_VERSION,				  // ifvers
 		"RefsAPI",							  // name
-		"1.0.7.9",							  // version
+		"1.0.8.4",							  // version
 		__DATE__,							  // date
 		"Refresh",							  // author
 		"https://github.com/jobmail/refsapi", // url
@@ -65,6 +65,18 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 #endif
 	cpu_test();
 	get_thread_info(true);
+
+	/*
+	detailed_analysis("AA00000000000000");
+    detailed_analysis("YMA5512RA2518113");
+    detailed_analysis("0000_0000_0000_0");
+	detailed_analysis("E823_8FA6_BF53_0");
+	detailed_analysis("LR00000000001200");
+	detailed_analysis("30044573537");
+	detailed_analysis("2967011101");
+	detailed_analysis("00A0_7501_4B37_C");
+	detailed_analysis("0001_0000_0000_0");
+	*/
 
 	GET_HOOK_TABLES(PLID, &g_pengfuncsTable, nullptr, nullptr);
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));

@@ -40,6 +40,10 @@
 
 typedef void (*funEventCall)(void *);
 
+// Hack ReGame
+//typedef void (*CBasePlayer_GiveDefuser_t)(CBasePlayer*);
+//extern CBasePlayer_GiveDefuser_t func_CBasePlayer_GiveDefuser;
+
 typedef enum TEAMS_e
 {
 

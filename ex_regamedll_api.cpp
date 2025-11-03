@@ -71,5 +71,19 @@ bool RegamedllApi_Init()
 		return false;
 	}
 
+	// Hack ReGame
+	func_CBasePlayer_GiveDefuser = (CBasePlayer_GiveDefuser_t)Sys_GetProcAddress(gameModule, "_ZN11CBasePlayer11GiveDefuserEv");
+	if (!func_CBasePlayer_GiveDefuser)
+	{
+		UTIL_ServerPrint("[%s]: ReGame function %s not found.\n", Plugin_info.logtag, "_ZN11CBasePlayer11GiveDefuserEv");
+		return false;
+	}
+	func_CBasePlayer_RemoveDefuser = (CBasePlayer_GiveDefuser_t)Sys_GetProcAddress(gameModule, "_ZN11CBasePlayer13RemoveDefuserEv");
+	if (!func_CBasePlayer_RemoveDefuser)
+	{
+		UTIL_ServerPrint("[%s]: ReGame function %s not found.\n", Plugin_info.logtag, "_ZN11CBasePlayer13RemoveDefuserEv");
+		return false;
+	}
+	
 	return true;
 }

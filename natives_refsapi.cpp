@@ -137,8 +137,7 @@ cell AMX_NATIVE_CALL rf_config(AMX *amx, cell *params)
         plugin->getTitle(),
         plugin->getAuthor(),
         plugin->getName(),
-        plugin->getVersion()
-    );
+        plugin->getVersion());
     /*
     auto list_cvar = g_cvar_mngr.get(plugin->getId());
     if (list_cvar == nullptr)
@@ -783,7 +782,7 @@ cell AMX_NATIVE_CALL rf_set_timer(AMX *amx, cell *params)
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
     return g_timer_mngr.add_timer(amx, getAmxString(amx, params[arg_callback], g_buff),
-        amx_ctof(params[arg_delay_sec]), params[arg_timer_id], getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_flags], params[arg_repeat]);
+                                  amx_ctof(params[arg_delay_sec]), params[arg_timer_id], getAmxAddr(amx, params[arg_data]), params[arg_data_size], params[arg_flags], params[arg_repeat]);
 }
 // native rf_remove_timer(const group_id);
 cell AMX_NATIVE_CALL rf_remove_timer(AMX *amx, cell *params)
@@ -845,7 +844,7 @@ cell AMX_NATIVE_CALL rf_change_timer_id(AMX *amx, cell *params)
 }
 #endif
 
-// native rf_check_nick_imitation(const id, const Float:threshold = 0.9, const Float:lcs_threshold = 0.7, const Float:k_lev = 0.6, const Float:k_tan = 0.3, const Float:k_lcs = 0.1);
+// native Float:rf_check_nick_imitation(const id, const Float:threshold = 0.9, const Float:lcs_threshold = 0.7, const Float:k_lev = 0.6, const Float:k_tan = 0.3, const Float:k_lcs = 0.1);
 cell AMX_NATIVE_CALL rf_check_nick_imitation(AMX *amx, cell *params)
 {
     enum args_e
@@ -859,7 +858,8 @@ cell AMX_NATIVE_CALL rf_check_nick_imitation(AMX *amx, cell *params)
         arg_k_lcs,
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
-    return check_nick_imitation(params[arg_id], amx_ctof(params[arg_threshold]), amx_ctof(params[arg_lcs_threshold]), amx_ctof(params[arg_k_lev]), amx_ctof(params[arg_k_tan]), amx_ctof(params[arg_k_lcs]));
+    auto result = check_nick_imitation(params[arg_id], amx_ctof(params[arg_threshold]), amx_ctof(params[arg_lcs_threshold]), amx_ctof(params[arg_k_lev]), amx_ctof(params[arg_k_tan]), amx_ctof(params[arg_k_lcs]));
+    return amx_ftoc(result);
 }
 
 // native rf_similarity_score(const str_1[], const str_2[], const Float:lcs_threshold = 0.7, const Float:k_lev = 0.6, const Float:k_tan = 0.3, const Float:k_lcs = 0.1);
@@ -882,6 +882,163 @@ cell AMX_NATIVE_CALL rf_similarity_score(AMX *amx, cell *params)
     if (!str_1.empty() && !str_2.empty())
         result = similarity_score(str_1, str_2, amx_ctof(params[arg_lcs_threshold]), amx_ctof(params[arg_k_lev]), amx_ctof(params[arg_k_tan]), amx_ctof(params[arg_k_lcs]));
     return amx_ftoc(result);
+}
+
+// native Float:rf_artificiality_score(const str[], const Float:k1 = 0.5, const Float:k2 = 0.3, const Float:k3 = 0.2);
+cell AMX_NATIVE_CALL rf_artificiality_score(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_str,
+        arg_k1,
+        arg_k2,
+        arg_k3,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    std::string s = getAmxString(amx, params[arg_str], g_buff);
+    auto result = artificiality_score(s, amx_ctof(params[arg_k1]), amx_ctof(params[arg_k2]), amx_ctof(params[arg_k3]));
+    return amx_ftoc(result);
+}
+
+// native rf_transfer_items(const from, const to,  const skip_items = 0, const bool:replace = true, const bool:force = true);
+cell AMX_NATIVE_CALL rf_transfer_items(AMX *amx, cell *params)
+{
+    enum args_e
+    {
+        arg_count,
+        arg_from,
+        arg_to,
+        arg_skip_items,
+        arg_replace,
+        arg_force,
+    };
+    DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
+    if (!is_valid_index(params[arg_from]) || !is_valid_index(params[arg_to]))
+        return FALSE;
+    CHECK_ISPLAYER(arg_from);
+    CHECK_ISPLAYER(arg_to);
+    auto pl_from = UTIL_PlayerByIndex(params[arg_from]);
+    auto pl_to = UTIL_PlayerByIndex(params[arg_to]);
+    CHECK_CONNECTED(pl_from, arg_from);
+    CHECK_CONNECTED(pl_to, arg_to);
+    if (params[arg_replace])
+    {
+        DEBUG("%s(): from %s, REPLACE", __func__, findPluginFast(amx)->getName());
+        if (params[arg_skip_items])
+        {
+            for (auto index : g_Tries.player_entities[params[arg_to]])
+            {
+                auto ed = INDEXENT(index);
+                if (ed == nullptr || ed->free || ed->pvPrivateData == nullptr)
+                    continue;
+                auto owner = ENTINDEX(ed->v.owner);
+                DEBUG("%s(): from %s, REPLACE OWNER = %d (%d)", __func__, findPluginFast(amx)->getName(), owner, params[arg_from]);
+                if (owner != params[arg_to])
+                    continue;
+                auto item = (CBasePlayerItem *)GET_PRIVATE(ed);
+                if (item != nullptr && item->m_iId)
+                {
+                    if (((1 << item->m_iId) & params[arg_skip_items]))
+                        continue;
+                    if (pl_to->RemovePlayerItem(item))
+                        item->Kill();
+                }
+            }
+        }
+        else
+            pl_to->CSPlayer()->RemoveAllItems(true);
+    }
+    // Check shield
+    if (pl_from->m_bOwnsShield)
+    {
+        pl_to->CSPlayer()->GiveShield();
+        pl_to->m_bShieldDrawn = pl_from->m_bShieldDrawn;
+        pl_from->CSPlayer()->RemoveShield();
+    }
+    // Check nightvision
+    if (pl_from->m_bNightVisionOn)
+    {
+        pl_from->m_bNightVisionOn = false;
+        pl_to->m_bNightVisionOn = true;
+    }
+    // Check defuser
+    if (pl_from->m_bHasDefuser)
+    {
+        pl_from->RemoveDefuser();
+        if (pl_to->m_iTeam == CT)
+            pl_to->GiveDefuser();
+    }
+    CBasePlayerItem *active_item = nullptr;
+    std::vector<int> weapon_list = g_Tries.player_entities[params[arg_from]];
+    for (auto index : weapon_list)
+    {
+        DEBUG("%s(): from %s, TRANSFER ITEM = %d, ACTIVE = %d", __func__, findPluginFast(amx)->getName(), index, pl_from->m_pActiveItem ? pl_from->m_pActiveItem->entindex() : -1);
+        auto ed = INDEXENT(index);
+        if (ed == nullptr || ed->pvPrivateData == nullptr)
+            continue;
+        auto owner = ENTINDEX(ed->v.owner);
+        DEBUG("%s(): from %s, TRANSFER OWNER = %d (%d)", __func__, findPluginFast(amx)->getName(), owner, params[arg_from]);
+        if (owner != params[arg_from])
+            continue;
+        auto item = (CBasePlayerWeapon *)GET_PRIVATE(ed);
+        if (item != nullptr && item->IsWeapon())
+        {
+            DEBUG("%s(): from %s, TRANSFER ITEM = %p, m_iId = %d, NAME = %s", __func__, findPluginFast(amx)->getName(), item, item->m_iId, item->CSPlayerItem()->m_ItemInfo.pszName);
+            if ((1 << item->m_iId) & params[arg_skip_items])
+                continue;
+            // Get bpammo
+            auto ammo_type = item->PrimaryAmmoIndex();
+            auto bp_ammo = ammo_type >= 0 ? std::max(pl_from->m_rgAmmo[ ammo_type ], 0) : 0;
+            DEBUG("%s(): from %s, GET AMMO = %d, TYPE = %d", __func__, findPluginFast(amx)->getName(), bp_ammo, ammo_type);
+            // Chech grenade
+            if (((1 << item->m_iId) & ((1 << WEAPON_HEGRENADE) | (1 << WEAPON_FLASHBANG) | (1 << WEAPON_SMOKEGRENADE))) && pl_from->m_pActiveItem == item)
+            {
+                DEBUG("%s(): from %s, GRENADE RELEASE = %f, START = %f, IDLE = %f", __func__, findPluginFast(amx)->getName(), item->m_flReleaseThrow, item->m_flStartThrow, item->m_flTimeWeaponIdle);
+                if (item->m_flReleaseThrow > 0 && item->m_flTimeWeaponIdle <= gpGlobals->time && !bp_ammo)
+                {
+                    g_pGameRules->GetNextBestWeapon(pl_from, item);
+                    continue;
+                }
+                item->m_flStartThrow = 0;
+                item->m_flReleaseThrow = -1.0f;
+                item->m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
+                pl_from->edict()->v.button &= ~IN_ATTACK;
+            }
+            // Transfer item
+            if (pl_from->RemovePlayerItem(item))
+            {
+                DEBUG("%s(): from %s, REMOVE ITEM = %d", __func__, findPluginFast(amx)->getName(), index);
+                if (!(params[arg_force] || g_pGameRules->CanHavePlayerItem(pl_to, item))) {
+                    DEBUG("%s(): from %s, KILL ITEM = %d", __func__, findPluginFast(amx)->getName(), index);
+                    item->Kill();
+                    continue;
+                }
+                if (pl_to->AddPlayerItem(item))
+                {
+                    DEBUG("%s(): from %s, ADD & ATTACH ITEM = %d", __func__, findPluginFast(amx)->getName(), index);
+                    item->AttachToPlayer(pl_to);
+                    if (bp_ammo > 0)
+                        pl_to->m_rgAmmo[ ammo_type ] = bp_ammo;
+                    // Check bomb
+                    if (((1 << item->m_iId) & (1 << WEAPON_C4)) && pl_from->m_iTeam == pl_to->m_iTeam)
+                    {
+                        pl_to->m_bHasC4 = true;
+                        pl_to->CSPlayer()->SetBombIcon();
+                        g_pGameRules->m_bBombDropped = false;
+                    }
+                    DEBUG("%s(): from %s, SET AMMO = %d, TYPE = %d", __func__, findPluginFast(amx)->getName(), bp_ammo, ammo_type);
+                }
+            }
+            if (pl_from->m_pActiveItem == item)
+                active_item = item;
+        }
+    }
+    DEBUG("%s(): from %s, PLAYER ACTIVE ITEM = %d (%d)", __func__, findPluginFast(amx)->getName(), pl_to->m_pActiveItem, active_item);
+    if (active_item && pl_to->m_pActiveItem != active_item)
+        pl_to->CSPlayer()->SwitchWeapon(active_item);
+    DEBUG("%s(): from %s, END", __func__, findPluginFast(amx)->getName());
+    return TRUE;
 }
 
 AMX_NATIVE_INFO Misc_Natives[] = {
@@ -936,6 +1093,8 @@ AMX_NATIVE_INFO Misc_Natives[] = {
 #endif
     {"rf_check_nick_imitation", rf_check_nick_imitation},
     {"rf_similarity_score", rf_similarity_score},
+    {"rf_artificiality_score", rf_artificiality_score},
+    {"rf_transfer_items", rf_transfer_items},
     {nullptr, nullptr}};
 
 void RegisterNatives_Misc()

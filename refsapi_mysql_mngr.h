@@ -337,6 +337,7 @@ public:
             catch (...)
             {
                 q->started = false;
+                num_threads--;
                 AMXX_Log("Process cannot be created!");
                 continue;
             }

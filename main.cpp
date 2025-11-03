@@ -3,6 +3,20 @@
 edict_t *g_pEdicts;
 playermove_t *g_pMove;
 char g_szMapName[32] = "";
+int gmsgSendAudio, gmsgStatusIcon, gmsgArmorType, gmsgItemStatus, gmsgBarTime, gmsgBarTime2;
+
+struct
+{
+	const char* pszName;
+	int& id;
+} g_RegUserMsg[] = {
+	{ "SendAudio",  gmsgSendAudio },
+	{ "StatusIcon", gmsgStatusIcon },
+	{ "ArmorType",  gmsgArmorType },
+	{ "ItemStatus", gmsgItemStatus },
+	{ "BarTime",    gmsgBarTime },
+	{ "BarTime2",   gmsgBarTime2 },
+};
 
 void OnAmxxAttach()
 {
@@ -44,6 +58,10 @@ void OnMetaDetach()
 void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 {
 	SERVER_PRINT("[DEBUG] SERVER_ACTIVATED\n");
+
+	for (auto& msg : g_RegUserMsg) {
+		msg.id = GET_USER_MSG_ID(PLID, msg.pszName, NULL);
+	}
 
 #ifndef WITHOUT_SQL
 	g_mysql_mngr.start();
@@ -116,14 +134,20 @@ void ServerDeactivate_Post()
 	// g_ReGameHookchains->CreateWeaponBox()->unregisterHook(CreateWeaponBox_RG);
 	//g_ReGameHookchains->CSGameRules_ChangeLevel()->unregisterHook(CSGameRules_ChangeLevel_RG);
 
-	//  CLEAR TRIES
+	// Clear
 	r_bMapHasBuyZone = false;
 	memset(g_Clients, 0, sizeof(g_Clients));
 	memset(g_PlayersNum, 0, sizeof(g_PlayersNum));
+	
+	// Clear Maps
 	g_Tries.authids.clear();
 	std::map<std::string, int>().swap(g_Tries.authids);
 	g_Tries.classnames.clear();
 	std::map<int, std::string>().swap(g_Tries.classnames);
+	g_Tries.entities.clear();
+	std::map<std::string, std::vector<int>>().swap(g_Tries.entities);
+	g_Tries.names.clear();
+	std::map<std::string, int>().swap(g_Tries.names);
 
 	// Free Vectors
 	for (auto it = g_Tries.entities.begin(); it != g_Tries.entities.end(); it++)
@@ -131,11 +155,6 @@ void ServerDeactivate_Post()
 		it->second.clear();
 		it->second.shrink_to_fit();
 	}
-	g_Tries.entities.clear();
-	std::map<std::string, std::vector<int>>().swap(g_Tries.entities);
-
-	g_Tries.names.clear();
-	std::map<std::string, int>().swap(g_Tries.names);
 	g_Tries.wp_entities.clear();
 	g_Tries.wp_entities.shrink_to_fit();
 	for (int i_i = 0; i_i < MAX_PLAYERS + 1; i_i++)

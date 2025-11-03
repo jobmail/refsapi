@@ -822,6 +822,171 @@ float similarity_score(const std::wstring &nick1, const std::wstring &nick2, con
     return k_lev * lev_score + k_tan * tan_score + k_lcs * (lcs_len / static_cast<double>(std::max(n1.size(), n2.size())));
 }
 
+double calculate_entropy(std::string &s)
+{    
+    if (s.empty())
+        return 0.0;
+
+    std::unordered_map<char, int> freq;
+    for (char c : s)
+        freq[c]++;
+    
+    double entropy = 0.0;
+    double length = static_cast<double>(s.length());
+    
+    for (const auto &pair : freq) {
+        auto p = pair.second / length;
+        entropy -= p * log2(p);
+    }
+    
+    return entropy;
+}
+
+size_t max_rep_len(const std::string &s)
+{
+    auto n = s.size();
+    if (n < 2) return 0;
+    
+    int max_len = 0;
+    const char* data = s.data();
+    
+    for (size_t i = 0; i < n - max_len; i++) {
+        for (size_t j = i + 1; j < n - max_len; j++) {
+            if (data[i] != data[j]) continue;
+            
+            // Вычисляем длину совпадения
+            int k = 1;
+            int limit = n - j;
+            while (k < limit && data[i + k] == data[j + k]) {
+                k++;
+            }
+            
+            if (k > max_len) {
+                max_len = k;
+            }
+        }
+    }
+    
+    return max_len;
+}
+
+std::pair<double, double> pattern_analysis(const std::string &s)
+{
+    if (s.empty())
+        return {1.0, 1.0};
+    
+    double length = static_cast<double>(s.length());
+    
+    // Анализ повторяющихся подстрок
+    double repeat_score = max_rep_len(s) / length;
+    
+    // Анализ последовательных одинаковых символов
+    size_t max_consecutive = 1;
+    size_t current_consecutive = 1;
+    
+    for (size_t i = 1; i < s.length(); i++)
+    {
+        if (s[i] == s[i - 1])
+        {
+            current_consecutive++;
+            if (current_consecutive > max_consecutive)
+                max_consecutive = current_consecutive;
+        }
+        else
+            current_consecutive = 1;
+    }
+    
+    auto consecutive_score = max_consecutive / length;
+    
+    return {repeat_score, consecutive_score};
+}
+
+double distribution_analysis(const std::string &s)
+{
+    if (s.empty())
+        return 1.0;
+    
+    double length = static_cast<double>(s.length());
+    size_t digits = 0;
+    size_t letters = 0;
+    
+    for (char c : s) {
+        if (std::isdigit(c))
+            digits++;
+        else if (std::isalpha(c))
+            letters++;
+    }
+    
+    auto digit_ratio = digits / length;
+    auto letter_ratio = letters / length;
+    
+    // Однородность распределения (чем ближе к 0, тем лучше)
+    return std::abs(digit_ratio - 0.5) + std::abs(letter_ratio - 0.5);
+}
+
+float artificiality_score(std::string s, float k1, float k2, float k3)
+{
+    auto clean_s = remove_chars(s, "_- \r\t\n\b\a");
+    
+    if (clean_s.empty()) {
+        return 1.0;
+    }
+    
+    // 1. Оценка энтропии
+    auto entropy = calculate_entropy(clean_s);
+    
+    // Подсчет уникальных символов для максимальной энтропии
+    //std::unordered_set<char> unique_chars(clean_s.begin(), clean_s.end());
+    auto max_entropy = log2(clean_s.length()); //(unique_chars.size() > 1) ? log2(unique_chars.size()) : 0.0;
+    auto entropy_based_score = (max_entropy > 0.0) ? (1.0 - (entropy / max_entropy)) : 1.0;
+    
+    // 2. Анализ паттернов
+    auto patterns = pattern_analysis(s);
+    auto pattern_based_score = (patterns.first + patterns.second) / 2.0;
+    
+    // 3. Анализ распределения
+    auto dist_score = distribution_analysis(s);
+    
+    // Комбинированная оценка
+    auto final_score = (
+        entropy_based_score * k1 +      // Энтропия
+        pattern_based_score * k2 +      // Паттерны повторений
+        dist_score * k3                 // Распределение символов
+    );
+    
+    // Ограничиваем диапазон 0.0 - 1.0
+    return std::max(0.0, std::min(1.0, final_score));
+}
+
+void detailed_analysis(std::string s)
+{
+
+    std::cout << "Детальный анализ: '" << s << "'" << std::endl;
+
+    auto clean_s = remove_chars(s, "_- \r\t\n\b\a");
+
+    std::cout << "Очищенная строка: '" << clean_s << "'" << std::endl;
+    std::cout << "Длина: " << clean_s.length() << std::endl;
+
+    double entropy = calculate_entropy(clean_s);
+
+    std::cout << "Энтропия: " << entropy << std::endl;
+
+    auto patterns = pattern_analysis(clean_s);
+
+    std::cout << "Повторяющиеся паттерны: " << patterns.first << std::endl;
+    std::cout << "Последовательные символы: " << patterns.second << std::endl;
+
+    double dist_score = distribution_analysis(clean_s);
+
+    std::cout << "Распределение: " << dist_score << std::endl;
+
+    double final_score = artificiality_score(clean_s);
+    std::cout << "Итоговый скор искусственности: " << final_score << std::endl;
+    
+    std::cout << "----------------------------------------" << std::endl;
+}
+
 void calc_frame_delay(const size_t interval, const uint64_t frames_count, timespec &frame_prev, double &frame_delay, size_t &frame_rate, size_t &frame_rate_max, float k1_max, float k2_max)
 {
     timespec frame_curr;

@@ -87,8 +87,9 @@
 #include <signal.h>
 #include <poll.h>
 #include <mariadb/mysql.h>
-#define AMX_H_INCLUDED
-#include <debugger.h>
+
+//#define AMX_H_INCLUDED
+//#include <debugger.h>
 #endif
 
 // Refs API
