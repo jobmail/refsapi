@@ -37,6 +37,12 @@ void get_thread_info(bool boost = false);
 bool set_thread_priority(std::thread *t, int pri = 0);
 //int safe_poll(struct pollfd *fds, nfds_t nfds, int timeout_ms);
 float similarity_score(const std::wstring &nick1, const std::wstring &nick2, const float lcs_threshold = 0.7f, const float k_lev = 0.6f, const float k_tan = 0.3f, const float k_lcs = 0.1f);
+double calculate_entropy(std::string &s);
+size_t max_rep_len(const std::string &s);
+std::pair<double, double> pattern_analysis(const std::string &s);
+double distribution_analysis(const std::string &s);
+float artificiality_score(std::string s, float k1 = 0.4, float k2 = 0.3, float k3 = 0.3);
+void detailed_analysis(std::string s);///////////
 void calc_frame_delay(const size_t interval_ms, const uint64_t frames_count, timespec &frame_prev, double &frame_delay, size_t &frame_rate, size_t &frame_rate_max, float k1_max, float k2_max);
 
 class fmt

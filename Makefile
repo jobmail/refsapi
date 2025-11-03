@@ -93,17 +93,18 @@ OPT_FLAGS = -O3 -mmmx -msse -msse2 -msse3 -msse4.2 -fno-strict-aliasing -Wno-par
 # -flto -fPIC
 #-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
-INCLUDE = -I. -I$(CSSDK)/common -I$(CSSDK)/dlls -I$(CSSDK)/engine \
-        -I$(CSSDK)/game_shared -I$(CSSDK)/pm_shared -I$(CSSDK)/public -I$(METAMOD) -Iinclude -Iinclude/mariadb -I/usr/lib/gcc/i686-linux-gnu/9/include/ \
-        -Iinclude/amxmodx -Iinclude/amxmodx/public -Iinclude/amxmodx/amtl -Iinclude/amxmodx/third_party/hashing -Icommon
+INCLUDE = -I. -I$(CSSDK)/ -I$(CSSDK)/common/ -I$(CSSDK)/dlls/ -I$(CSSDK)/engine/ \
+        -I$(CSSDK)/game_shared/ -I$(CSSDK)/pm_shared/ -I$(CSSDK)/public/ -I$(CSSDK)/public/regamedll/ -I$(METAMOD) -Iinclude -Iinclude/mariadb -I/usr/lib/gcc/i686-linux-gnu/9/include/ \
+        -Iinclude/amxmodx/ -Iinclude/amxmodx/public/ -Iinclude/amxmodx/amtl/ -Iinclude/amxmodx/third_party/hashing/ -Icommon/
 		
 #-I/usr/include/mariadb
 
 BIN_DIR = Release
 CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
-CFLAGS += -m32 -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -s -g \
-	-fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions -flto=auto -fPIC
+CFLAGS += -m32 -s -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -g0 \
+	-fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions -flto=auto -fPIC -DNDEBUG
+#-fdump-tree-original -fdump-lang-class
 # -DNDEBUG	
 #-D_GLIBCXX_DEBUG
 #-DNDEBUG
