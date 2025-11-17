@@ -958,53 +958,28 @@ float artificiality_score(std::string s, float k1, float k2, float k3)
     return std::max(0.0, std::min(1.0, final_score));
 }
 
-void detailed_analysis(std::string s)
-{
-
-    std::cout << "Детальный анализ: '" << s << "'" << std::endl;
-
-    auto clean_s = remove_chars(s, "_- \r\t\n\b\a");
-
-    std::cout << "Очищенная строка: '" << clean_s << "'" << std::endl;
-    std::cout << "Длина: " << clean_s.length() << std::endl;
-
-    double entropy = calculate_entropy(clean_s);
-
-    std::cout << "Энтропия: " << entropy << std::endl;
-
-    auto patterns = pattern_analysis(clean_s);
-
-    std::cout << "Повторяющиеся паттерны: " << patterns.first << std::endl;
-    std::cout << "Последовательные символы: " << patterns.second << std::endl;
-
-    double dist_score = distribution_analysis(clean_s);
-
-    std::cout << "Распределение: " << dist_score << std::endl;
-
-    double final_score = artificiality_score(clean_s);
-    std::cout << "Итоговый скор искусственности: " << final_score << std::endl;
-    
-    std::cout << "----------------------------------------" << std::endl;
-}
-
 void calc_frame_delay(const size_t interval, const uint64_t frames_count, timespec &frame_prev, double &frame_delay, size_t &frame_rate, size_t &frame_rate_max, float k1_max, float k2_max)
 {
     timespec frame_curr;
     if (!(frames_count % interval))
     {
         clock_gettime(CLOCK_MONOTONIC, &frame_curr);
+
         if (frame_prev.tv_sec >= 0 && frame_prev.tv_nsec > 0)
         {
             auto delay = timespec_diff(&frame_prev, &frame_curr);
+            
             if (frame_delay > 0.0)
             {
-                auto k0 = interval / 1000.0;
-                auto k1 = delay > frame_delay ? k1_max * (delay - frame_delay) / (frame_delay + delay) : k0;
-                auto k2 = frame_delay > k0 ? k2_max * frame_delay : k0;
-                frame_rate = std::max(1U, (frame_rate + (size_t)std::round((k1 + k2) / k0)) >> 1);
+                auto k1 = delay > frame_delay ? k1_max * (delay - frame_delay) / (frame_delay + delay) : 1.0;
+                auto frame_delay_ms = 1000.0 * frame_delay / interval;
+                auto k2 = frame_delay_ms >= 1.0 ? k2_max * frame_delay_ms : k2_max / frame_delay_ms;
+                frame_rate = std::max(1U, (frame_rate + (size_t)(std::round(k1 + k2))) / 2U);
+                
                 if (frame_rate > frame_rate_max)
                     frame_rate_max = frame_rate;
             }
+
             frame_delay = (frame_delay + delay) / 2.0;
         }
         frame_prev = frame_curr;

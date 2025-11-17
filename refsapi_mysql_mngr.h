@@ -122,7 +122,7 @@ class mysql_mngr
     std::mutex prms_mutex;
     std::vector<MYSQL *> conns;
     time_point_t time_0;
-    struct timespec frame_prev;
+    struct timespec frame_prev{0};
 
 private:
     bool is_valid_conn(m_query_t *q)
@@ -915,6 +915,7 @@ public:
         frames_count =
             frame_prev.tv_sec =
                 frame_prev.tv_nsec = 0;
+
         frame_delay = 1.0;
 
         DEBUG("%s(): REMOVE MYSQL FRAMES", __func__);
@@ -985,6 +986,7 @@ public:
             api_cfg.cvars.mysql_frame_rate_k1,
             api_cfg.cvars.mysql_frame_rate_k2
         );
+        // Check frame
         if (!stop_threads && !(frames_count % frame_rate))
             frame_forward();
         frames_count++;

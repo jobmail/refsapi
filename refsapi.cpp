@@ -126,15 +126,15 @@ void R_ExecuteServerStringCmd(IRehldsHook_ExecuteServerStringCmd *chain, const c
     {
 
 #ifndef WITHOUT_SQL
-        if (snprintf(g_buff, sizeof(g_buff), "\n[REFSAPI] FPS = %.1f, frame_delay = %.3f, frame_rate = %d (%d), threads = %d/%d(%d), query_nums = %lld\n",
-            g_mysql_mngr.frame_delay > 0.0 ? (double)api_cfg.cvars.mysql_frame_pooling / g_mysql_mngr.frame_delay : 0.0, 1000.0 * g_mysql_mngr.frame_delay / api_cfg.cvars.mysql_frame_pooling,
+        if (snprintf(g_buff, sizeof(g_buff), "\n[REFSAPI] FPS = %.1f, frame_delay = %.3f (%d), frame_rate = %d (%d), threads = %d/%d(%d), query_nums = %lld\n",
+            g_mysql_mngr.frame_delay > 0.0 ? (double)api_cfg.cvars.mysql_frame_pooling / g_mysql_mngr.frame_delay : 0.0, 1000.0 * g_mysql_mngr.frame_delay / api_cfg.cvars.mysql_frame_pooling, api_cfg.cvars.mysql_frame_pooling,
             g_mysql_mngr.frame_rate, g_mysql_mngr.frame_rate_max, g_mysql_mngr.num_threads.load(), g_mysql_mngr.num_finished.load(), g_mysql_mngr.m_threads.size(), g_mysql_mngr.m_query_nums.load()) >= 0)
             SERVER_PRINT(g_buff);
 #endif
 
 #ifndef WITHOUT_TIMER
-        if (snprintf(g_buff, sizeof(g_buff), "[REFSAPI] std_delay = %.6f, frame_rate = %d (%d), timer_nums = %lld\n",
-            g_timer_mngr.total_std > 0.0 ? g_timer_mngr.total_std / g_timer_mngr.m_timer_nums : 0.0, g_timer_mngr.frame_rate, g_timer_mngr.frame_rate_max, g_timer_mngr.m_timer_nums.load()) >= 0)
+        if (snprintf(g_buff, sizeof(g_buff), "[REFSAPI] std_delay = %.6f (%d), frame_rate = %d (%d), timer_nums = %lld\n",
+            g_timer_mngr.total_std > 0.0 ? g_timer_mngr.total_std / g_timer_mngr.m_timer_nums : 0.0, api_cfg.cvars.timer_frame_pooling,  g_timer_mngr.frame_rate, g_timer_mngr.frame_rate_max, g_timer_mngr.m_timer_nums.load()) >= 0)
             SERVER_PRINT(g_buff);
 #endif
 

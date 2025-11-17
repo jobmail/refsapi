@@ -50,7 +50,21 @@ void CAPI_Config::Init()
 	rtrim(cfg_path, L" /");
 
 	// DEBUG("%s() root = %s, game = %s, log_path = %s, cfg_path = %s", __func__, wstos(root_path).c_str(), wstos(game_path).c_str(), wstos(log_path).c_str(), wstos(cfg_path).c_str());
+	
+	//RegisterCvars();
 
+#ifndef WITHOUT_LOG
+	g_log_mngr.start_main();
+#endif
+
+#ifndef WITHOUT_SQL
+	g_mysql_mngr.start_main();
+#endif
+
+}
+
+void CAPI_Config::RegisterCvars()
+{
 	const int cvar_flags = FCVAR_PROTECTED | FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED;
 
 	g_cvar_mngr.bind(
@@ -86,7 +100,7 @@ void CAPI_Config::Init()
 		g_cvar_mngr.add(-1,
 			L"acs_refsapi_mysql_frame_rate_k2", L"7.0", cvar_flags,
 			L"Коэффициент k2 расчета frame_rate для mysql",
-			true, 0.1f, true, 10.0f
+			true, 0.1f, true, 25.0f
 		),
 		_SS(cvars.mysql_frame_rate_k2)
 	);
@@ -114,7 +128,7 @@ void CAPI_Config::Init()
 		g_cvar_mngr.add(-1,
 			L"acs_refsapi_timer_frame_rate_k2", L"3.0", cvar_flags,
 			L"Коэффициент k2 расчета frame_rate для timer",
-			true, 0.1f, true, 10.0f
+			true, 0.1f, true, 25.0f
 		),
 		_SS(cvars.timer_frame_rate_k2)
 	);
@@ -139,15 +153,6 @@ void CAPI_Config::Init()
 		Plugin_info.name,
 		Plugin_info.version
 	);
-
-#ifndef WITHOUT_LOG
-	g_log_mngr.start_main();
-#endif
-
-#ifndef WITHOUT_SQL
-	g_mysql_mngr.start_main();
-#endif
-
 }
 
 void CAPI_Config::make_path(std::wstring &path, std::wstring &name, std::wstring def_path, std::wstring def_name, std::wstring ext)

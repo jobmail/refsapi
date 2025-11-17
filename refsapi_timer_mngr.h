@@ -76,7 +76,7 @@ class timer_mngr
     callback_t m_callbacks;
     std::condition_variable cv;
     std::mutex loop_mutex, timer_mutex, queue_mutex, frame_mutex;
-    struct timespec frame_curr, frame_prev;
+    struct timespec frame_prev{0};
 
 private:
     void push_to_queue(tm_t *t)
@@ -402,6 +402,10 @@ public:
     }
     void stop_all()
     {
+        frames_count =
+            frame_prev.tv_sec =
+                frame_prev.tv_nsec = 0;
+
         frame_delay = 1.0;
 
         DEBUG("%s(): STOP ALL TIMERS", __func__);
@@ -563,7 +567,8 @@ public:
         frame_delay = 1.0;
         frame_rate =
             frame_rate_max = 1;
-        m_timer_nums = 0;
+        frames_count =
+            m_timer_nums = 0;
         main_thread = new std::thread(&timer_mngr::main, this);
     }
     ~timer_mngr()

@@ -358,7 +358,7 @@ public:
             bind_it->second = bind_list;
         else
             cvars.bind_list[m_cvar] = bind_list;
-        // UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, cvar = %d, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, m_cvar->cvar, size);
+        //UTIL_ServerPrint("[DEBUG] bind(): type = %d, name = %s, value = <%s>, cvar = %d, size = %d\n", m_cvar->type, m_cvar->cvar->name, m_cvar->cvar->string, m_cvar->cvar, size);
         //  Set m_cvar type
         m_cvar->type = type;
         // Check range
@@ -370,7 +370,7 @@ public:
         // Bind exists?
         if (bind_it != cvars.bind_list.end())
         {
-            // UTIL_ServerPrint("[DEBUG] on_change(): name = <%s>, old_value = <%s>, new_value = <%s>\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), wstos(new_value).c_str());
+            //UTIL_ServerPrint("[DEBUG] on_change(): name = <%s>, old_value = <%s>, new_value = <%s>\n", wstos(m_cvar->name).c_str(), wstos(m_cvar->value).c_str(), wstos(new_value).c_str());
             for (auto &bind : bind_it->second)
                 copy_bind(&bind, m_cvar->cvar);
         }
