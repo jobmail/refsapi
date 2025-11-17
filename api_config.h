@@ -18,6 +18,7 @@ public:
 	std::wstring root_path, game_path, log_path, cfg_path;
 	CAPI_Config();
 	void Init();
+	void RegisterCvars();
 	void FailedReGameDllAPI();
 
 	bool hasReHLDS() const { return m_api_rehlds; }

@@ -59,6 +59,8 @@ void ServerActivate_Post(edict_t *pEdictList, int edictCount, int clientMax)
 {
 	SERVER_PRINT("[DEBUG] SERVER_ACTIVATED\n");
 
+	api_cfg.RegisterCvars();
+
 	for (auto& msg : g_RegUserMsg) {
 		msg.id = GET_USER_MSG_ID(PLID, msg.pszName, NULL);
 	}

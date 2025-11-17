@@ -42,7 +42,7 @@ size_t max_rep_len(const std::string &s);
 std::pair<double, double> pattern_analysis(const std::string &s);
 double distribution_analysis(const std::string &s);
 float artificiality_score(std::string s, float k1 = 0.4, float k2 = 0.3, float k3 = 0.3);
-void calc_frame_delay(const size_t interval_ms, const uint64_t frames_count, timespec &frame_prev, double &frame_delay, size_t &frame_rate, size_t &frame_rate_max, float k1_max, float k2_max);
+void calc_frame_delay(const size_t interval, const uint64_t frames_count, timespec &frame_prev, double &frame_delay, size_t &frame_rate, size_t &frame_rate_max, float k1_max, float k2_max);
 
 class fmt
 {
