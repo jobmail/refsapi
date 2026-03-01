@@ -110,7 +110,7 @@ private:
             }
         }
         // Clear loop
-        //std::lock_guard lock(loop_mutex);
+        std::lock_guard lock(loop_mutex);
         stop_loop = false;
         DEBUG("%s(): BUILD, queue_size = %d", __func__, m_timer_queue.size());
     }
@@ -118,7 +118,7 @@ private:
     {
         // Send signal
         {
-            //std::lock_guard lock(loop_mutex);
+            std::lock_guard lock(loop_mutex);
             stop_loop = true;
             if (all_timers)
                 stop_timer = true;
@@ -402,7 +402,7 @@ public:
     {
         // Send signal
         {
-            //std::lock_guard lock(loop_mutex);
+            std::lock_guard lock(loop_mutex);
             stop_timer = false;
             stop_loop = true;
         }
