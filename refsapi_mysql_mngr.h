@@ -57,8 +57,8 @@ typedef struct prm_s
 
 typedef std::list<prm_t> prm_list_t;
 // typedef prm_list_t::iterator prm_list_it;
-typedef std::chrono::_V2::system_clock::time_point time_point_t;
-typedef std::chrono::_V2::steady_clock::time_point steady_point_t;
+typedef std::chrono::system_clock::time_point time_point_t;
+typedef std::chrono::steady_clock::time_point steady_point_t;
 typedef std::chrono::duration<double> elapsed_time_t;
 typedef std::map<std::thread::id, std::thread *> m_thread_t;
 typedef std::map<std::string, size_t> f_names_t;
@@ -379,26 +379,25 @@ public:
     void run_query(m_query_t *q)
     {
         DEBUG("%s(): START", __func__);
-        std::thread::id pid = gettid();
         assert(!q->finished);
-        DEBUG("%s(): pid = %p, q = %p, started = %d, successful = %d, finished = %d, aborted = %d, stop = %d", __func__, pid, q, q->started.load(), q->successful.load(), q->finished.load(), q->aborted.load(), stop_threads.load());
+        DEBUG("%s(): q = %p, started = %d, successful = %d, finished = %d, aborted = %d, stop = %d", __func__, q, q->started.load(), q->successful.load(), q->finished.load(), q->aborted.load(), stop_threads.load());
 
         do
         {
             if (stop_threads || q->aborted)
                 break;
 
-            if (q->successful = exec_async_query(q, pid))
+            if (q->successful = exec_async_query(q))
                 get_result(q, false);
             q->queuetime = (q->time_end = get_time()) - q->time_start;
-            DEBUG("%s(): pid = %p, start = %f, end = %f, time = %f, successful = %d, stop = %d",
-                __func__, pid, q->time_start, q->time_end, q->queuetime, q->successful.load(), stop_threads.load());
+            DEBUG("%s(): start = %f, end = %f, time = %f, successful = %d, stop = %d",
+                __func__, q->time_start, q->time_end, q->queuetime, q->successful.load(), stop_threads.load());
 
             auto f = &q->prms.fwd;
-            DEBUG("%s(): prepare frame => pid = %p, q = %p, abort = %d, stop = %d, amx = %p, fwd = %d", __func__, pid, q, q->aborted.load(), stop_threads.load(), f->amx, f->id);
+            DEBUG("%s(): prepare frame => q = %p, abort = %d, stop = %d, amx = %p, fwd = %d", __func__, q, q->aborted.load(), stop_threads.load(), f->amx, f->id);
             if (stop_threads || q->aborted || f->amx == nullptr || f->id == -1)
             {
-                DEBUG("%s(): ABORT, pid = %p, q = %p", __func__, pid, q);
+                DEBUG("%s(): ABORT, q = %p", __func__, q);
                 break;
             }
                 
@@ -467,12 +466,20 @@ public:
         m_frames.pop();
         return q;
     }
-    m_query_t *prepare_query(MYSQL *conn, const char *query, bool async = false, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 0, size_t conn_id = 0, cell *data = nullptr, size_t data_size = 0)
+    m_query_t *prepare_query(MYSQL *conn, const char *query, bool async = false, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 0, size_t conn_id = 0, cell *data = nullptr, size_t data_size = 0UZ)
     {
+        m_query_t *q;
         DEBUG("%s(): START", __func__);
         if (*query == '\0' || pri > MAX_QUERY_PRIORITY)
             return nullptr;
-        auto q = new m_query_t{0};
+        try
+        {
+            q = new m_query_t{0};
+        }
+        catch (...)
+        {
+            return nullptr;
+        }
         q->tid = std::thread::id(0);
         q->conn = conn;
         q->result = nullptr;
@@ -490,8 +497,16 @@ public:
         q->retry_count = 0;
         q->timeout = timeout;
         q->conn_id = conn_id;
-        q->data_size = clamp(data_size, 1U, 4096U);
-        q->data = new cell[q->data_size]{0};
+        q->data_size = clamp(data_size, 1UZ, 4096UZ);
+        try
+        {
+            q->data = new cell[q->data_size]{0};
+        }
+        catch (...)
+        {
+            delete q;
+            return nullptr;
+        }
         if (data != nullptr)
             Q_memcpy(q->data, data, data_size << 2);
         threads_mutex.lock();
@@ -499,21 +514,21 @@ public:
         threads_mutex.unlock();
         return q;
     }
-    bool push_query(size_t conn_id, const char *query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 60U)
+    bool push_query(size_t conn_id, const char *query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 60UZ)
     {
         DEBUG("%s(): START", __func__);
         auto q = prepare_query(nullptr, query, true, pri, 1000 * timeout, conn_id, data, data_size);
         DEBUG("%s(): q = %p, query = %s, pri = %d, count = %d", __func__, q, query, pri, m_queries[pri].size());
         return q != nullptr;
     }
-    bool exec_async_query(m_query_t *q, std::thread::id &pid)
+    bool exec_async_query(m_query_t *q)
     {
         DEBUG("%s(): START", __func__);
         int status;
         q->failstate = TQUERY_SUCCESS;
         if (async_connect(q))
         {
-            DEBUG("%s(): pid = %p, mtid = %p, q = %p, start = %f, query = %s", __func__, pid, mysql_thread_id(q->conn), q, q->time_start, q->query.c_str());
+            DEBUG("%s(): mtid = %p, q = %p, start = %f, query = %s", __func__, mysql_thread_id(q->conn), q, q->time_start, q->query.c_str());
             status = mysql_real_query_start(&q->err, q->conn, q->query.c_str(), q->query.size());
             while (status)
             {
@@ -795,6 +810,8 @@ public:
         MYSQL *ret;
         if (q == nullptr || q->finished || q->aborted || !q->async)
             return false;
+        if (q->conn)
+            return true;
         if (!get_connect(q->conn_id, q->prms) || (q->conn = mysql_init(nullptr)) == nullptr)
             return false;
         auto p = &q->prms;
