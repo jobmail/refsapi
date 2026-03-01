@@ -275,11 +275,10 @@ public:
     {
         UTIL_ServerPrint("%s-%s(): threads = %d / %d (%d), frames_count = %lld, stop = %d\n", from, __func__, num_threads.load(), num_finished.load(), m_threads.size(), frames_count, stop_threads.load());
         UTIL_ServerPrint("%s-%s(): delay = %f, rate = %d (%d)\n", from, __func__, frame_delay, frame_rate, frame_rate_max);
-        threads_mutex.lock();
+        std::lock_guard lock(threads_mutex);
         for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
              if (m_queries[pri].size())
                  UTIL_ServerPrint("%s-%s(): m_query[%d](%d)\n", from, __func__, pri, m_queries[pri].size());
-        threads_mutex.unlock();
     }
     void poll_query()
     {
@@ -287,80 +286,82 @@ public:
         std::thread::id key;
         std::vector<m_query_t *> start_queries, finished_queries;
         std::vector<std::thread *> finished_threads;
-        threads_mutex.lock();
-        for (pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
         {
-            for (auto &it : m_queries[pri])
+            std::lock_guard lock(threads_mutex);
+            for (pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
             {
-                auto q = it.second;
-                if (q->finished || q->aborted)
+                for (auto &it : m_queries[pri])
                 {
-                    if (q->async && q->started && (q->finished || q->aborted && q->framed))
+                    auto q = it.second;
+                    if (q->finished || q->aborted)
                     {
-                        key = q->tid;
-                        auto t = m_threads[key];
-                        assert(t != nullptr);
-                        finished_threads.push_back(t);
-                        num_threads--;
-                        if (q->finished)
-                            num_finished--;
-                        m_threads.erase(key);
-                        // Free memory
-                        if (m_threads.empty())
-                            m_thread_t().swap(m_threads);
+                        if (q->async && q->started && (q->finished || q->aborted && q->framed))
+                        {
+                            key = q->tid;
+                            auto it = m_threads.find(key);
+                            assert(it != m_threads.end());
+                            finished_threads.push_back(it->second);
+                            num_threads--;
+                            if (q->finished)
+                                num_finished--;
+                            m_threads.erase(it);
+                            // Free memory
+                            if (m_threads.empty())
+                                m_thread_t().swap(m_threads);
+                        }
+                        if (q->async && !q->aborted && !q->successful && ++q->retry_count < QUERY_RETRY_COUNT)
+                        {
+                            q->started = false;
+                            q->finished = false;
+                        }
+                        else if (!q->async || q->finished || (q->aborted && (!q->started || q->framed)))
+                            finished_queries.push_back(q);
                     }
-                    if (q->async && !q->aborted && !q->successful && ++q->retry_count < QUERY_RETRY_COUNT)
+                    else if (!stop_threads && q->async && !q->started && threads_count() < (max_threads << (MAX_QUERY_PRIORITY - q->pri)))
                     {
-                        q->started = false;
-                        q->finished = false;
+                        q->started = true;
+                        q->time_start = get_time();
+                        start_queries.push_back(q);
+                        num_threads++;
                     }
-                    else if (!q->async || q->finished || (q->aborted && (!q->started || q->framed)))
-                        finished_queries.push_back(q);
                 }
-                else if (!stop_threads && q->async && !q->started && threads_count() < (max_threads << (MAX_QUERY_PRIORITY - q->pri)))
+            }
+            // Start queries
+            for (auto q : start_queries)
+            {
+                std::thread *t;
+                try
                 {
-                    q->started = true;
-                    q->time_start = get_time();
-                    start_queries.push_back(q);
-                    num_threads++;
+                    t = new std::thread(&mysql_mngr::run_query, this, q);
                 }
+                catch (...)
+                {
+                    q->started = false;
+                    num_threads--;
+                    AMXX_Log("Process cannot be created!");
+                    continue;
+                }
+                assert(t != nullptr);
+                auto result = m_threads.emplace((key = t->get_id()), t);
+                assert(result.second);
+                assert(key != std::thread::id(0));
+                q->tid = key;
+                DEBUG("%s(): starting pid = %p, key = %p, q = %p, num_threads = %d (%d)", __func__, t, key, q, num_threads.load(), m_threads.size());
             }
         }
-        // Start queries
-        for (auto q : start_queries)
-        {
-            std::thread *t;
-            try
-            {
-                t = new std::thread(&mysql_mngr::run_query, this, q);
-            }
-            catch (...)
-            {
-                q->started = false;
-                num_threads--;
-                AMXX_Log("Process cannot be created!");
-                continue;
-            }
-            assert(t != nullptr);
-            auto result = m_threads.emplace((key = t->get_id()), t);
-            assert(result.second);
-            assert(key != std::thread::id(0));
-            q->tid = key;
-            DEBUG("%s(): starting pid = %p, key = %p, q = %p, num_threads = %d (%d)", __func__, t, key, q, num_threads.load(), m_threads.size());
-        }
-        threads_mutex.unlock();
         // Cleaner queries
         for (auto q : finished_queries)
         {
             // DEBUG("%s(): free query = %p", __func__, q);
             assert(q != nullptr);
             free_query(q);
-            threads_mutex.lock();
-            m_queries[q->pri].erase(q->id);
-            // Free memory
-            if (m_queries[q->pri].empty())
-                m_query_list_t().swap(m_queries[q->pri]);
-            threads_mutex.unlock();
+            {
+                std::lock_guard lock(threads_mutex);
+                m_queries[q->pri].erase(q->id);
+                // Free memory
+                if (m_queries[q->pri].empty())
+                    m_query_list_t().swap(m_queries[q->pri]);
+            }
             assert(q != nullptr);
             // Free query
             delete q;
@@ -509,9 +510,10 @@ public:
         }
         if (data != nullptr)
             Q_memcpy(q->data, data, data_size << 2);
-        threads_mutex.lock();
-        m_queries[pri].insert({q->id, q});
-        threads_mutex.unlock();
+        {
+            std::lock_guard lock(threads_mutex);
+            m_queries[pri].insert({q->id, q});
+        }
         return q;
     }
     bool push_query(size_t conn_id, const char *query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 60UZ)
@@ -795,9 +797,8 @@ public:
         ret = mysql_real_connect(conn, p.sql.db_host.c_str(), p.sql.db_user.c_str(), p.sql.db_pass.c_str(), p.sql.db_name.c_str(), p.sql.db_port, NULL, SQL_FLAGS);
         if (ret != nullptr)
         {
-            conn_mutex.lock();
+            std::lock_guard lock(conn_mutex);
             conns.push_back(ret);
-            conn_mutex.unlock();
         }
         *err = mysql_errno(conn);
         set_amx_string(error, mysql_error(conn), error_size);
@@ -852,9 +853,10 @@ public:
     {
         DEBUG("%s(): START", __func__);
         std::vector<MYSQL *> _conns;
-        conn_mutex.lock();
-        _conns.swap(conns);
-        conn_mutex.unlock();
+        {
+            std::lock_guard lock(conn_mutex);
+            _conns.swap(conns);
+        }
         for (auto it : _conns)
         {
             assert(it != nullptr);
@@ -875,9 +877,10 @@ public:
         prms.sql.db_name = db_name;
         prms.sql.db_chrs = db_chrs;
         prms.sql.timeout = timeout;
-        prms_mutex.lock();
-        m_conn_prms.push_back(prms);
-        prms_mutex.unlock();
+        {
+            std::lock_guard lock(prms_mutex);
+            m_conn_prms.push_back(prms);
+        }
         DEBUG("%s(): conn = %d", __func__, m_conn_prms.size());
         return m_conn_prms.size();
     }
@@ -936,37 +939,37 @@ public:
         frame_delay = 1.0;
 
         DEBUG("%s(): REMOVE MYSQL FRAMES", __func__);
-        frame_mutex.lock();
-        m_frame_query_t().swap(m_frames);
-
-        DEBUG("%s(): LOCK MYSQL THREAD", __func__);
-        threads_mutex.lock();
-        for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
-            for (auto &it : m_queries[pri])
+        {
+            std::lock_guard lock(frame_mutex);
+            m_frame_query_t().swap(m_frames);
+            DEBUG("%s(): LOCK MYSQL THREAD", __func__);
             {
-                auto q = it.second;
-                assert(q != nullptr);
-                q->aborted = true;
-            }    
-        DEBUG("%s(): UNLOCK MYSQL THREAD", __func__);
-        threads_mutex.unlock();
-        frame_mutex.unlock();
+                std::lock_guard lock(threads_mutex);
+                for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
+                    for (auto &it : m_queries[pri])
+                    {
+                        auto q = it.second;
+                        assert(q != nullptr);
+                        q->aborted = true;
+                    }    
+                DEBUG("%s(): UNLOCK MYSQL THREAD", __func__);
+            }
+        }
 
         stop_threads = false;
 
         DEBUG("%s(): CLOSE ALL MYSQL", __func__);
         close_all();
-
-        prms_mutex.lock();
-        m_conn_prms.clear();
-        prm_list_t().swap(m_conn_prms);
-        prms_mutex.unlock();
-
+        {
+            std::lock_guard lock(prms_mutex);
+            m_conn_prms.clear();
+            prm_list_t().swap(m_conn_prms);
+        }
 #ifndef NDEBUG
         // STATUS
         if (m_threads.size())
             DEBUG("[REFSAPI_SQL] m_threads(%d) not empty! num_threads = %d, num_finished = %d\n", m_threads.size(), num_threads.load(), num_finished.load());
-        threads_mutex.lock();
+        std::lock_guard lock(threads_mutex);
         for (uint8 pri = 0; pri < MAX_QUERY_PRIORITY + 1; pri++)
             if (m_queries[pri].size())
             {
@@ -977,7 +980,6 @@ public:
                     DEBUG("q = %lld, start = %d, finish = %d, success = %d, aborted = %d, str = %s", q->id, q->started.load(), q->finished.load(), q->successful.load(), q->aborted.load(), q->query.c_str());
                 }
             }
-        threads_mutex.unlock();
 #endif
     }
     double get_time()
