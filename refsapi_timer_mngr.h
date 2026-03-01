@@ -30,9 +30,9 @@ typedef struct fwd_prm_s
     int id;
     AMX *amx;
 } fwd_prms_t;
-typedef std::chrono::_V2::system_clock::time_point time_point_t;
+typedef std::chrono::system_clock::time_point time_point_t;
 typedef std::chrono::duration<double> elapsed_time_t;
-typedef std::chrono::_V2::steady_clock::time_point steady_point_t;
+typedef std::chrono::steady_clock::time_point steady_point_t;
 #endif
 
 typedef struct tm_s
@@ -81,16 +81,16 @@ class timer_mngr
 private:
     void push_to_queue(tm_t *t)
     {
-        queue_mutex.lock();
+        std::lock_guard lock(queue_mutex);
         m_timer_queue.push(*t);
-        queue_mutex.unlock();
         DEBUG("%s(): timer_id = %u, group_id = %u, queue_size = %d", __func__, t->id, t->group_id, m_timer_queue.size());
     }
     void build_queue()
     {
-        queue_mutex.lock();
-        m_timer_queue_t().swap(m_timer_queue);
-        queue_mutex.unlock();
+        {
+            std::lock_guard lock(queue_mutex);
+            m_timer_queue_t().swap(m_timer_queue);
+        }
         {
             std::lock_guard lock(timer_mutex);
             if (stop_timer)
@@ -333,16 +333,24 @@ public:
         t.group_id = group_id;
         t.delay_sec = std::clamp(delay_sec, 0.01f, 9999.999f);
         t.time = std::chrono::steady_clock::now() + std::chrono::milliseconds((int64_t)(std::round(1000.0f * t.delay_sec)));
-        t.data_size = clamp(data_size, 1U, 4096U);
-        t.data = new cell[t.data_size]{0};
+        t.data_size = clamp(data_size, 1UZ, 4096UZ);
+        try
+        {
+            t.data = new cell[t.data_size]{0};
+        }
+        catch (...)
+        {
+            return false;
+        }
         if (data != nullptr)
             Q_memcpy(t.data, data, data_size << 2);
         t.flags = flags;
         t.repeat = repeat;
         // Add timer
-        timer_mutex.lock();
-        m_timers[amx][group_id].push_back(t);
-        timer_mutex.unlock();
+        {
+            std::lock_guard lock(timer_mutex);
+            m_timers[amx][group_id].push_back(t);
+        }
         DEBUG("%s(): amx = %p, group_id = %u, timer_count = %d", __func__, amx, group_id, m_timers[amx][group_id].size());
         stop();
         return t.id;
@@ -412,23 +420,22 @@ public:
         stop(true);
         
         DEBUG("%s(): REMOVE TIMER QUEUE AND FRAMES", __func__);
-        frame_mutex.lock();
-        queue_mutex.lock();
-
-            m_frame_timer_t().swap(m_frames);
-            m_timer_queue_t().swap(m_timer_queue);
-            DEBUG("%s(): REMOVE ALL TIMERS", __func__);
-            remove_all_timers();
-            // Remove callbacks
+        {
+            std::lock_guard lock(frame_mutex);
             {
-                //std::lock_guard lock(callback_mutex);
-                m_callbacks.clear();
-                callback_t().swap(m_callbacks);
+                std::lock_guard lock(queue_mutex);
+                m_frame_timer_t().swap(m_frames);
+                m_timer_queue_t().swap(m_timer_queue);
+                DEBUG("%s(): REMOVE ALL TIMERS", __func__);
+                remove_all_timers();
+                // Remove callbacks
+                {
+                    //std::lock_guard lock(callback_mutex);
+                    m_callbacks.clear();
+                    callback_t().swap(m_callbacks);
+                }
             }
-
-        queue_mutex.unlock();
-        frame_mutex.unlock();
-
+        }
         DEBUG("%s(): RESTART TIMERS", __func__);
         if (!stop_main)
             start();
