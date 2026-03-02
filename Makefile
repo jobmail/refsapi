@@ -12,8 +12,7 @@ COMPILER = g++
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
 
 LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
-	-s -m32 -ldl -lm -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a
-#-l:libssl.a -l:libcrypto.a
+	-s -m32 -ldl -lm -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a -l:libssl.a -l:libcrypto.a
 #-l:libmariadb.a
 # 
 #-static-libgcc 

@@ -467,7 +467,7 @@ public:
         m_frames.pop();
         return q;
     }
-    m_query_t *prepare_query(MYSQL *conn, const char *query, bool async = false, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 0, size_t conn_id = 0, cell *data = nullptr, size_t data_size = 0UZ)
+    m_query_t *prepare_query(MYSQL *conn, const char *query, bool async = false, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 0, size_t conn_id = 0, cell *data = nullptr, size_t data_size = 0)
     {
         m_query_t *q;
         DEBUG("%s(): START", __func__);
@@ -498,7 +498,7 @@ public:
         q->retry_count = 0;
         q->timeout = timeout;
         q->conn_id = conn_id;
-        q->data_size = clamp(data_size, 1UZ, 4096UZ);
+        q->data_size = clamp(data_size, size_t{1}, size_t{4096});
         try
         {
             q->data = new cell[q->data_size]{0};
@@ -516,7 +516,7 @@ public:
         }
         return q;
     }
-    bool push_query(size_t conn_id, const char *query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 60UZ)
+    bool push_query(size_t conn_id, const char *query, cell *data, size_t data_size, uint8 pri = MAX_QUERY_PRIORITY, size_t timeout = 60)
     {
         DEBUG("%s(): START", __func__);
         auto q = prepare_query(nullptr, query, true, pri, 1000 * timeout, conn_id, data, data_size);
