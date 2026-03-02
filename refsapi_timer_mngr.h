@@ -333,7 +333,7 @@ public:
         t.group_id = group_id;
         t.delay_sec = std::clamp(delay_sec, 0.01f, 9999.999f);
         t.time = std::chrono::steady_clock::now() + std::chrono::milliseconds((int64_t)(std::round(1000.0f * t.delay_sec)));
-        t.data_size = clamp(data_size, 1UZ, 4096UZ);
+        t.data_size = clamp(data_size, size_t{1}, size_t{4096});
         try
         {
             t.data = new cell[t.data_size]{0};

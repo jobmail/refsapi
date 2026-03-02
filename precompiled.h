@@ -122,3 +122,5 @@
 //asm (".symver fcntl,fcntl@@GLIBC_2.0");
 //#include "force_link_glibc_2.9.h"
 //cmake ../ -DWITH_SSL=OFF -DCMAKE_TOOLCHAIN_FILE=../cmake/linux_x86_toolchain.cmake
+
+//cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/linux_x86_toolchain.cmake          -DWITH_SSL=OPENSSL          -DOPENSSL_ROOT_DIR=/usr/local/openssl-1.1.1-x86          -DOPENSSL_CRYPTO_LIBRARY=/usr/local/openssl-1.1.1-x86/lib/libcrypto.so          -DOPENSSL_SSL_LIBRARY=/usr/local/openssl-1.1.1-x86/lib/libssl.so          -DDEFAULT_SSL_VERIFY_SERVER_CERT=OFF
