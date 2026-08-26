@@ -75,7 +75,8 @@ public:
         DEBUG("%s(): START", __func__);
         local_batch.reserve(local_batch_size);
         std::sort(buff->begin(), buff->end(), [](const data_t &a, const data_t &b) {
-            return a.amx >= b.amx && a.time > b.time; 
+            return a.amx > b.amx || (a.amx == b.amx && a.time > b.time);
+            //return a.amx >= b.amx && a.time > b.time; Неправильный вариант сортировки
         });
         size_t skip_count = 0;
         while (buff->size())
@@ -145,7 +146,65 @@ public:
         assert(num >= 0);
         return num;
     }
+
     bool write_to_disk()
+    {
+        if (buffer.empty())
+            return true;
+
+        DEBUG("%s(): START", __func__);
+
+        std::lock_guard lock(thread_mutex);
+
+        if (get_num_threads() >= max_writer_threads)
+        {
+            if (num_productivity > 0)
+                num_productivity--;
+            else
+                return false;
+            DEBUG("%s(): UPDATE! batch_size = %u, new write_interval = %u ***", __func__, batch_size, write_interval.load());
+        }
+        else if (num_productivity < MAX_PRODUCTIVITY)
+            num_productivity++;
+
+        // unique_ptr автоматически удалит буфер при любом исключении
+        auto buff = std::make_unique<buffer_t>();
+        buff->swap(buffer);
+        buffer.reserve(MAX_LOG_BUFFER_SIZE);
+
+        if (buff->empty())
+            return true;
+
+        DEBUG("%s(): local_buffer = %p, size = %zu, str = %s",
+            __func__, (void*)buff.get(), buff->size(),
+            wstos(buff->front().str).c_str());
+
+        // Поток на стеке — при исключении автоматически уничтожится
+        std::thread t(&log_mngr::writer_thread, this, buff.get(),
+                    batch_size << (MAX_PRODUCTIVITY - num_productivity));
+
+        // Поток создан успешно → передаём владение буфером потоку
+        // (writer_thread сам сделает delete в конце)
+        buff.release();
+
+        // Перемещаем поток в кучу для хранения в m_threads
+        auto *thread_ptr = new std::thread(std::move(t));
+        auto tid = thread_ptr->get_id();
+
+        auto result = m_threads.emplace(tid, thread_ptr);
+        if (!result.second)
+        {
+            thread_ptr->join();
+            delete thread_ptr;
+            return false;
+        }
+
+        num_threads++;
+        DEBUG("%s(): END", __func__);
+        return true;
+    }
+
+    bool write_to_disk_old()
     {
         if (!buffer.empty())
         {

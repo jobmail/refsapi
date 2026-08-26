@@ -597,7 +597,7 @@ public:
         {
             DEBUG("%s(): FREE DATA, q = %p", __func__, q);
             assert(q->data != nullptr);
-            delete q->data;
+            delete[] q->data;
             q->data = nullptr;
             q->data_size = 0;
         }

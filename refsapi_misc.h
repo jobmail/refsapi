@@ -63,7 +63,7 @@ public:
     ~fmt()
     {
         if (buff)
-            delete buff;
+            delete[] buff;
         buff = nullptr;
     }
     char *c_str()
@@ -93,13 +93,13 @@ public:
         catch (...)
         {
             *buff = 0;
-            DEBUG("*** CRITICAL *** %s(): fmt = %s", __func__, fmt);
+            DEBUG("*** CRITICAL *** %s(): fmt = %ls", __func__, fmt);
         }
     }
     ~wfmt()
     {
         if (buff)
-            delete buff;
+            delete[] buff;
         buff = nullptr;
     }
     wchar_t *c_str()
@@ -212,7 +212,7 @@ inline double stod(std::string s, bool has_min = false, float min_val = 0.0f, bo
     // UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f\n", s.c_str(), result);
     if (has_min && result < min_val)
         result = min_val;
-    if (has_min && result > max_val)
+    if (has_max && result > max_val)
         result = max_val;
     return result;
 }

@@ -19,6 +19,17 @@ private:
     }
 
 public:
+    recoil_mngr() : 
+        IMPULSE_OFFSET(0),
+        is_enabled(false)
+    {
+        weapon_recoil.fill(nullptr);
+        last_fired.fill(0.0f);
+    }
+
+    recoil_mngr(const recoil_mngr&) = delete;
+    recoil_mngr& operator=(const recoil_mngr&) = delete;
+
     void init()
     {
         add(RECOIL_ALL, "weapon_all");
@@ -35,10 +46,12 @@ public:
     }
     void enable(int _offset = 0)
     {
-        disable();
+        if (is_enabled)
+            disable();
         init();
         is_enabled = true;
         IMPULSE_OFFSET = _offset;
+        last_fired.fill(0.0f);
         g_ReGameHookchains->CBasePlayer_PostThink()->registerHook(RG_CBasePlayer_PostThink);
     }
     void disable()
@@ -63,7 +76,7 @@ public:
     }
     void think_post(CBasePlayer *player)
     {
-        if (!is_enabled || !player->IsAlive() || player->IsBot())
+        if (!is_enabled || player == nullptr || player->IsBot() || !player->IsAlive())
             return;
         auto ped = player->edict();
         auto index = player->entindex();
@@ -76,11 +89,11 @@ public:
                 auto wed = weapon->edict();
                 auto m_cvar = weapon_recoil[player->m_pActiveItem->m_iId];
                 auto m_cvar_all = weapon_recoil[RECOIL_ALL];
-                auto recoil = IMPULSE_OFFSET > 0 && (wed->v.iuser4 - IMPULSE_OFFSET) >= 0 && wed->v.impulse == wed->v.iuser4 ? wed->v.fuser1 : m_cvar != nullptr ? m_cvar->cvar->value
-                                                                                                                                                                 : 1.0f;
+                auto recoil = (IMPULSE_OFFSET > 0) && ((wed->v.iuser4 - IMPULSE_OFFSET) >= 0) && (wed->v.impulse == wed->v.iuser4) ?
+                    wed->v.fuser1 : m_cvar != nullptr && m_cvar->cvar != nullptr ? m_cvar->cvar->value : 1.0f;
                 // UTIL_ServerPrint("[DEBUG] think_post(): offset = %d, pcvar = %d, pcvar_recoil = %f, weapon_id = %d, recoil = %f\n", IMPULSE_OFFSET, pcvar, pcvar->value, player->m_pActiveItem->m_iId, recoil);
                 bool is_recoil_set = recoil >= 0.0f && recoil < 1.0f || recoil > 1.0f;
-                if (!is_recoil_set && m_cvar_all != nullptr && (is_recoil_set = m_cvar_all->cvar->value >= 0.0f && m_cvar_all->cvar->value < 1.0f || m_cvar_all->cvar->value > 1.0f))
+                if (!is_recoil_set && m_cvar_all != nullptr && m_cvar_all->cvar != nullptr && (is_recoil_set = m_cvar_all->cvar->value >= 0.0f && m_cvar_all->cvar->value < 1.0f || m_cvar_all->cvar->value > 1.0f))
                     recoil = m_cvar_all->cvar->value;
                 // UTIL_ServerPrint("[DEBUG] think_post(): is_recoil_set = %d, pcvar = %d, recoil = %f\n", is_recoil_set, pcvar_all, recoil);
                 if (is_recoil_set)

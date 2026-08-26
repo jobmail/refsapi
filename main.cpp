@@ -105,6 +105,8 @@ void ServerDeactivate_Post()
 	g_cache_ngrams.clear();
 	ngrams_t().swap(g_cache_ngrams);
 
+	g_recoil_mngr.disable();
+
 #ifndef WITHOUT_SQL
 	g_mysql_mngr.stop();
 #endif
