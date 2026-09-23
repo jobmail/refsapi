@@ -528,6 +528,8 @@ public:
         DEBUG("%s(): START", __func__);
         int status;
         q->failstate = TQUERY_SUCCESS;
+        q->error.clear();
+        q->err = 0;
         if (async_connect(q))
         {
             DEBUG("%s(): mtid = %p, q = %p, start = %f, query = %s", __func__, mysql_thread_id(q->conn), q, q->time_start, q->query.c_str());
@@ -540,6 +542,7 @@ public:
             if (q->err)
             {
                 q->error = mysql_error(q->conn);
+                q->err = mysql_errno(q->conn);
                 q->failstate = TQUERY_QUERY_FAILED;
             }
         }
@@ -554,16 +557,21 @@ public:
             return false;
         q->started = true;
         q->time_start = get_time();
+        q->error.clear();
+        q->err = 0;
         DEBUG("%s(): conn = %p, start = %f, query = %s", __func__, q->conn, q->time_start, q->query.c_str());
         auto ret = mysql_query(q->conn, q->query.c_str());
+        q->queuetime = (q->time_end = get_time()) - q->time_start;
         if (ret)
         {
             q->error = mysql_error(q->conn);
             q->err = mysql_errno(q->conn);
+            q->failstate = TQUERY_QUERY_FAILED;
             return false;
         }
         DEBUG("%s(): ret = %d", __func__, ret);
         q->successful = true;
+        q->failstate = TQUERY_SUCCESS;
         get_result(q, true);
         return true;
     }
@@ -772,13 +780,50 @@ public:
             return false;
         if (q->result != nullptr)
             return true;
-        q->result = (q->is_buffered = is_buffered) ? mysql_store_result(q->conn) : mysql_use_result(q->conn);
+
+        q->is_buffered = is_buffered;
+        q->result = q->is_buffered ? mysql_store_result(q->conn) : mysql_use_result(q->conn);
+
         DEBUG("%s(): result = %p, query = %p, conn = %p, is_buffered = %d, state = %s", __func__, q->result, q, q->conn, is_buffered, q->conn->net.sqlstate);
         q->f_names.clear();
         q->f_count = mysql_field_count(q->conn);
         for (size_t i = 0; i < q->f_count; i++)
             q->f_names.insert({q->result->fields[i].name, i});
         DEBUG("%s(): field count = %d", __func__, q->f_count);
+
+        // Для случая, когда основной результат пуст (INSERT/UPDATE)
+        // Также необходимо пропустить все последующие результаты
+        while (mysql_next_result(q->conn) == 0)
+        {
+            MYSQL_RES *extra = q->is_buffered ? mysql_store_result(q->conn) : mysql_use_result(q->conn);
+            if (extra != nullptr)
+            {
+                if (!q->is_buffered)
+                {
+                    // Для небуферизованного результата нужно сначала прочитать все строки
+                    // (если они есть), иначе соединение сломается
+                    MYSQL_ROW row;
+                    int status;
+                    do {
+                        status = mysql_fetch_row_start(&row, extra);
+                        while (status) {
+                            status = wait_for_mysql(q, status, __func__);
+                            status = mysql_fetch_row_cont(&row, extra, status);
+                        }
+                    } while (row != nullptr);
+                    
+                    // Теперь можно освобождать
+                    status = mysql_free_result_start(extra);
+                    while (status) {
+                        status = wait_for_mysql(q, status, __func__);
+                        status = mysql_free_result_cont(extra, status);
+                    }
+                }
+                else
+                    mysql_free_result(extra);
+            }
+        }
+
         return q->result != nullptr;
     }
     uint32 num_rows(m_query_t *q)
@@ -846,7 +891,6 @@ public:
         }
         mysql_close(conn);
         DEBUG("%s(): STATIC, conn = %p, closed!", __func__, conn);
-        conn = nullptr;
         return true;
     }
     void close_all()
@@ -1025,9 +1069,13 @@ public:
     {
         stop();
         stop_main = true;
-        if (main_thread->joinable())
-            main_thread->join();
-        delete main_thread;
+        if (main_thread != nullptr)
+        {
+            if (main_thread->joinable())
+                main_thread->join();
+            delete main_thread;
+            main_thread = nullptr;
+        }
     }
 };
 
