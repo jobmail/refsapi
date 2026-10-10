@@ -206,9 +206,42 @@ inline std::wstring stows(const std::string s)
     }
 }
 
+inline bool safe_stod(const char *str, double &out)
+{
+    if (str == nullptr || *str == '\0')
+        return false;
+
+    errno = 0;
+    char *end = nullptr;
+    double result = std::strtod(str, &end);
+
+    // Ничего не распарсилось?
+    if (end == str)
+        return false;
+
+    // Хвост после числа? (пробелы/мусор)
+    while (*end && std::isspace(static_cast<unsigned char>(*end)))
+        ++end;
+    if (*end != '\0')
+        return false;
+
+    // Переполнение / underflow?
+    if (errno == ERANGE)
+    {
+        // Для переполнения можно вернуть HUGE_VAL, для underflow — 0,
+        // но для cvar лучше считать это ошибкой
+        return false;
+    }
+
+    out = result;
+    return true;
+}
+
 inline double stod(std::string s, bool has_min = false, float min_val = 0.0f, bool has_max = false, float max_val = 0.0f)
 {
-    auto result = std::stod(s); // std::strtof(s.c_str(), 0); //(float)std::stod(s);
+    double result;
+    if (!safe_stod(s.c_str(), result))
+        result = 0.0;
     // UTIL_ServerPrint("[DEBUG] stod(): in = %s, out = %f\n", s.c_str(), result);
     if (has_min && result < min_val)
         result = min_val;
@@ -333,23 +366,24 @@ inline int rm_quote(std::string &s)
 {
     int result = 0;
     bool f[2];
-    for (auto &ch : _QQ)
-    {
-        f[0] = f[1] = 0;
-        if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
+    if (!s.empty())
+        for (auto &ch : _QQ)
         {
-            s.erase(s.begin());
-            s.erase(s.end() - 1);
-            trim(s);
-            result = 1;
-            break;
+            f[0] = f[1] = 0;
+            if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
+            {
+                s.erase(s.begin());
+                s.erase(s.end() - 1);
+                trim(s);
+                result = 1;
+                break;
+            }
+            else if (f[0] != f[1])
+            {
+                result = -1;
+                break;
+            }
         }
-        else if (f[0] != f[1])
-        {
-            result = -1;
-            break;
-        }
-    }
     return result;
 }
 
@@ -357,49 +391,52 @@ inline int rm_quote(std::wstring &s)
 {
     int result = 0;
     bool f[2];
-    for (auto &ch : _QQ_L)
-    {
-        f[0] = f[1] = 0;
-        if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
+    if (!s.empty())
+        for (auto &ch : _QQ_L)
         {
-            s.erase(s.begin());
-            s.erase(s.end() - 1);
-            result = 1;
-            break;
+            f[0] = f[1] = 0;
+            if ((f[0] = s.front() == ch) && (f[1] = s.back() == ch))
+            {
+                s.erase(s.begin());
+                s.erase(s.end() - 1);
+                result = 1;
+                break;
+            }
+            else if (f[0] != f[1])
+            {
+                result = -1;
+                break;
+            }
         }
-        else if (f[0] != f[1])
-        {
-            result = -1;
-            break;
-        }
-    }
     return result;
 }
 
 inline std::string rm_quote_c(std::string &s)
 {
-    for (auto &ch : _QQ)
-    {
-        if (s.front() == ch && s.back() == ch)
+    if (!s.empty())
+        for (auto &ch : _QQ)
         {
-            s.erase(s.begin());
-            s.erase(s.end() - 1);
-            break;
+            if (s.front() == ch && s.back() == ch)
+            {
+                s.erase(s.begin());
+                s.erase(s.end() - 1);
+                break;
+            }
         }
-    }
     return s;
 }
 
 inline std::wstring rm_quote_c(std::wstring &s)
 {
-    for (auto &ch : _QQ_L)
-    {
-        if (s.front() == ch && s.back() == ch)
+    if (!s.empty())
+        for (auto &ch : _QQ_L)
         {
-            s.erase(s.begin());
-            s.erase(s.end() - 1);
-            break;
+            if (s.front() == ch && s.back() == ch)
+            {
+                s.erase(s.begin());
+                s.erase(s.end() - 1);
+                break;
+            }
         }
-    }
     return s;
 }

@@ -21,6 +21,8 @@
 #include <bits/stdc++.h>
 #include <map>
 #include <charconv>
+#include <cerrno>
+#include <cstdlib>
 
 // platform defs
 #include "platform.h"

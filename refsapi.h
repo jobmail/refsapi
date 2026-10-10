@@ -152,9 +152,9 @@ void Client_Disconnected(edict_t *p, bool crash, char *format);
 void Alloc_EntPrivateData(edict_t *p);
 void Free_EntPrivateData(edict_t *p);
 
-int trie_add(std::map<std::string, std::vector<int>> &trie, std::string key, int value);
-int trie_remove(std::map<std::string, std::vector<int>> &trie, std::string key, int value);
-void trie_transfer(std::map<std::string, std::vector<cell>> &trie, std::string key_from, std::string key_to, int value);
+size_t trie_add(std::map<std::string, std::vector<int>> &trie, const std::string &key, int value);
+size_t trie_remove(std::map<std::string, std::vector<int>> &trie, const std::string &key, int value);
+void trie_transfer(std::map<std::string, std::vector<cell>> &trie, const std::string &key_from, const std::string &key_to, int value);
 int vector_add(std::vector<cell> &v, int value);
 int vector_remove(std::vector<cell> &v, int value);
 size_t copy_entities(std::vector<int> &v, std::string &key, cell *dest, size_t max_size);

@@ -100,8 +100,15 @@ private:
             CVAR_SET_STRING(m_cvar->cvar->name, "0");
             return false;
         }
+
+        double result;
+        if (!safe_stod(s.c_str(), result))       // <-- без исключений
+        {
+            CVAR_SET_STRING(m_cvar->cvar->name, "0");
+            return false;
+        }
+        
         bool is_override = false;
-        auto result = std::stod(s);
         // Check bind type and conver
         if (m_cvar->type == CVAR_TYPE_NUM)
             result = result >= 0.0 ? (int)result : -(int)(-result);
@@ -126,8 +133,11 @@ private:
         switch (bind->type)
         {
         case CVAR_TYPE_NUM:
-            *bind->ptr = (int)std::stod(cvar->string);
-            break;
+            double d;
+            if (!safe_stod(cvar->string, d))
+                d = 0.0;
+            *bind->ptr = (int)d;
+            break;            
         case CVAR_TYPE_FLT:
             *bind->ptr = amx_ftoc(cvar->value);
             break;
@@ -136,6 +146,7 @@ private:
             break;
         case CVAR_TYPE_FLG:
             *bind->ptr = UTIL_ReadFlags(cvar->string);
+            break;
         }
     }
     cvar_t *create_cvar(std::wstring name, std::wstring value, int flags = 0)
@@ -506,6 +517,7 @@ public:
                 break;
             case CVAR_TYPE_FLG:
                 result = UTIL_ReadFlags(wstos(m_cvar->value).c_str());
+                break;
             }
         }
         return result;
@@ -539,6 +551,7 @@ public:
             char flags_string[32];
             UTIL_GetFlags(flags_string, (int)*ptr);
             direct_set(m_cvar->cvar, flags_string);
+            break;
         }
     }
     void set(CVAR_TYPES_t type, std::wstring name, cell *ptr)

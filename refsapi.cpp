@@ -491,31 +491,32 @@ void R_MessageEnd_Post(void)
     RETURN_META(MRES_IGNORED);
 }
 
-int trie_add(std::map<std::string, std::vector<int>> &trie, std::string key, int value)
+size_t trie_add(std::map<std::string, std::vector<int>> &trie, const std::string &key, int value)
 {
     auto &v = trie[key];
-    if (v.size() < v.max_size())
-        v.push_back(value);
+    v.push_back(value);
     return v.size();
 }
 
-int trie_remove(std::map<std::string, std::vector<int>> &trie, std::string key, int value)
+size_t trie_remove(std::map<std::string, std::vector<int>> &trie, const std::string &key, int value)
 {
-    auto &v = trie[key];
-    if (v.size())
+    auto map_it = trie.find(key);          // НЕ создаём ключ
+    if (map_it == trie.end())
+        return 0;
+    auto &v = map_it->second;
+    if (!v.empty())
     {
         auto it = std::find(v.begin(), v.end(), value);
         if (it != v.end())
-        {
             v.erase(it);
-            if (!v.size())
-                trie.erase(key);
-        }
     }
-    return v.size();
+    auto sz = v.size();
+    if (sz == 0)
+        trie.erase(map_it);
+    return sz;
 }
 
-void trie_transfer(std::map<std::string, std::vector<cell>> &trie, std::string key_from, std::string key_to, int value)
+void trie_transfer(std::map<std::string, std::vector<cell>> &trie, const std::string &key_from, const std::string &key_to, int value)
 {
     trie_remove(trie, key_from, value);
     g_Tries.classnames[value] = key_to;
@@ -538,16 +539,18 @@ int vector_remove(std::vector<cell> &v, int value)
 
 size_t copy_entities(std::vector<int> &v, std::string &key, cell *dest, size_t max_size)
 {
+    v.erase(std::remove_if(v.begin(), v.end(), [](int entity) {
+        if (!is_valid_entity(INDEXENT(entity)))
+            return true;
+        return g_Tries.classnames.find(entity) == g_Tries.classnames.end();
+    }), v.end());
+
     size_t result = 0;
     for (auto &entity : v)
     {
         auto p = INDEXENT(entity);
-        if (!is_valid_entity(p))
-        {
-            vector_remove(v, entity);
-            continue;
-        }
-        if (g_Tries.classnames[entity] != STRING(p->v.classname))
+        auto it = g_Tries.classnames.find(entity);
+        if (it->second != STRING(p->v.classname))
             trie_transfer(g_Tries.entities, g_Tries.classnames[entity], STRING(p->v.classname), entity);
         if (key != STRING(p->v.classname))
             continue;

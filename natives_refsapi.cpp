@@ -391,17 +391,25 @@ cell AMX_NATIVE_CALL rf_set_pcvar(AMX *amx, cell *params)
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
     m_cvar_t *m_cvar = (m_cvar_t *)((void *)params[arg_pcvar]);
-    cell *ptr;
+    if (m_cvar == nullptr)
+        return FALSE;
+    cell *ptr = nullptr;
     switch (params[arg_type])
     {
     case CVAR_TYPE_NUM:
     case CVAR_TYPE_FLT:
+    case CVAR_TYPE_FLG:
         ptr = getAmxAddr(amx, params[arg_var]);
         // UTIL_ServerPrint("[DEBUG] rf_set_pcvar(): value_int = %d, value_float = %f\n", *ptr, *ptr);
         break;
     case CVAR_TYPE_STR:
         ptr = (cell *)getAmxString(amx, params[arg_var], g_buff);
+        break;
+    default:
+        return FALSE;
     }
+    if (ptr == nullptr)
+        return FALSE;
     g_cvar_mngr.set((CVAR_TYPES_t)params[arg_type], m_cvar, ptr);
     return TRUE;
 }
@@ -418,17 +426,25 @@ cell AMX_NATIVE_CALL rf_set_cvar(AMX *amx, cell *params)
     };
     DEBUG("%s(): from %s, START", __func__, findPluginFast(amx)->getName());
     std::wstring name = stows(getAmxString(amx, params[arg_cvar], g_buff));
-    cell *ptr;
+    if (name.empty())
+        return FALSE;
+    cell *ptr = nullptr;
     switch (params[arg_type])
     {
     case CVAR_TYPE_NUM:
     case CVAR_TYPE_FLT:
+    case CVAR_TYPE_FLG:
         ptr = getAmxAddr(amx, params[arg_var]);
         // UTIL_ServerPrint("[DEBUG] rf_set_pcvar(): value_int = %d, value_float = %f\n", *ptr, *ptr);
         break;
     case CVAR_TYPE_STR:
         ptr = (cell *)getAmxString(amx, params[arg_var], g_buff);
+        break;
+    default:
+        return FALSE;
     }
+    if (ptr == nullptr)
+        return FALSE;
     g_cvar_mngr.set((CVAR_TYPES_t)params[arg_type], name, ptr);
     return TRUE;
 }

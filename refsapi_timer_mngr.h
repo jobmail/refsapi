@@ -185,7 +185,7 @@ private:
     {
         DEBUG("%s(): timer_id = %u, group_id = %u, data = %p, size = %d", __func__, t.id, t.group_id, t.data, t.data_size);
         assert(t.data != nullptr);
-        delete t.data;
+        delete[] t.data;
         t.data = nullptr;
         t.data_size = 0;
     }
@@ -197,9 +197,16 @@ private:
     }
     void remove_timer_by_id(AMX *amx, size_t group_id, size_t id)
     {
+
         std::lock_guard lock(timer_mutex);
         DEBUG("%s: timer_id = %u, group_id = %u, amx = %p", __func__, id, group_id, amx);
-        m_timers[amx][group_id].remove_if([&](tm_t &t) {
+        auto amxx = m_timers.find(amx);
+        if (amxx == m_timers.end())
+            return;
+        auto group = amxx->second.find(group_id);
+        if (group == amxx->second.end())
+            return;
+        group->second.remove_if([&](tm_t &t) {
             if (t.id == id)
                 remove_data_timer(t);
             return t.id == id;
@@ -257,7 +264,7 @@ public:
     }
     bool remove_timer_by_id(AMX *amx, size_t id)
     {
-        bool result;
+        bool result = false;
         std::lock_guard lock(timer_mutex);
         auto amxx = m_timers.find(amx);
         if (amxx == m_timers.end())

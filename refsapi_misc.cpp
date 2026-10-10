@@ -65,6 +65,7 @@ bool is_valid_utf8(const std::vector<uint8_t> &data)
             }
             else if ((byte >> 4) == 0x0E)
             { // 1110xxxx (3 байта)
+                if (i + 1 >= data.size()) return false;
                 remaining_bytes = 2;
                 code_point = byte & 0x0F;
                 // Минимальное значение для 3-байтовой последовательности: U+0800
@@ -73,6 +74,7 @@ bool is_valid_utf8(const std::vector<uint8_t> &data)
             }
             else if ((byte >> 3) == 0x1E)
             { // 11110xxx (4 байта)
+                if (i + 1 >= data.size()) return false;
                 remaining_bytes = 3;
                 code_point = byte & 0x07;
                 // Минимальное значение для 4-байтовой последовательности: U+10000
@@ -724,9 +726,11 @@ int fast_levenshtein(const std::wstring &s1, const std::wstring &s2)
         return len2;
     if (len2 == 0)
         return len1;
+    if (len1 > 255 || len2 > 255)
+        return std::max(len1, len2);
 
     // Используем стековый массив для скорости
-    std::array<int, 32> prev, curr;
+    std::array<int, 256> prev, curr;
     for (size_t j = 0; j <= len2; ++j)
         prev[j] = j;
 
@@ -766,15 +770,18 @@ int longest_common_substring(const std::wstring &s1, const std::wstring &s2)
 
 std::unordered_set<std::wstring> get_cached_ngrams(const std::wstring &s, int n)
 {
+    if (s.size() < n)
+        return {};
+
     if (g_cache_ngrams.count(s))
         return g_cache_ngrams[s];
-
+    
     std::unordered_set<std::wstring> ngrams;
     for (size_t i = 0; i <= s.size() - n; ++i)
-    {
         ngrams.insert(s.substr(i, n));
-    }
+    
     g_cache_ngrams[s] = ngrams;
+    
     return ngrams;
 }
 

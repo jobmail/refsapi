@@ -509,7 +509,7 @@ public:
             return nullptr;
         }
         if (data != nullptr)
-            Q_memcpy(q->data, data, data_size << 2);
+            Q_memcpy(q->data, data, q->data_size << 2);
         {
             std::lock_guard lock(threads_mutex);
             m_queries[pri].insert({q->id, q});
