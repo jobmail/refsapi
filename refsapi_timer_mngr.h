@@ -350,7 +350,7 @@ public:
             return false;
         }
         if (data != nullptr)
-            Q_memcpy(t.data, data, data_size << 2);
+            Q_memcpy(t.data, data, t.data_size << 2);
         t.flags = flags;
         t.repeat = repeat;
         // Add timer

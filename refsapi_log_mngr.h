@@ -342,6 +342,7 @@ public:
         catch (...)
         {
             assert(file != nullptr);
+            file->m.unlock();
             delete file;
             file = nullptr;
         }
