@@ -101,7 +101,7 @@ DLL_FUNCTIONS g_FunctionTable_Post =
 		NULL,					   // pfnRegisterEncoders
 		NULL,					   // pfnGetWeaponData
 		NULL,					   // pfnCmdStart
-		CmdEnd_Post,			   // pfnCmdEnd
+		NULL,			   		   // pfnCmdEnd
 		NULL,					   // pfnConnectionlessPacket
 		NULL,					   // pfnGetHullBounds
 		NULL,					   // pfnCreateInstancedBaselines

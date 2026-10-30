@@ -202,6 +202,9 @@ void CBasePlayer_Spawn_RG(IReGameHook_CBasePlayer_Spawn *chain, CBasePlayer *pPl
     // FIX TEAMS DEAD COUNT
     if (is_valid_index(id) && is_valid_team(g_Clients[id].team) && pPlayer->edict()->v.deadflag != DEAD_NO && g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1] > 0)
         g_PlayersNum[TEAM_DEAD_TT + g_Clients[id].team - 1]--;
+
+    g_recoil_mngr.reset_player(id);   // NEW
+
     chain->callNext(pPlayer);
 }
 
@@ -289,6 +292,7 @@ void R_ClientDisconnect(edict_t *p)
 {
     // UTIL_ServerPrint("[DEBUG] R_ClientDisconnect() ===>\n");
     Client_Disconnected(p, false, 0);
+    g_recoil_mngr.on_client_disconnected(p);   // NEW
 #ifndef WITHOUT_TIMER
     g_timer_mngr.on_client_disconnected(p);
 #endif
@@ -299,9 +303,14 @@ void SV_DropClient_RH(IRehldsHook_SV_DropClient *chain, IGameClient *cl, bool cr
 {
 
     char buffer[1024];
+    auto p = cl->GetEdict();
     // UTIL_ServerPrint("[DEBUG] SV_DropClient_RH() ===>\n");
     Q_strcpy_s(buffer, (char *)format);
-    Client_Disconnected(cl->GetEdict(), crash, buffer);
+    Client_Disconnected(p, crash, buffer);
+    g_recoil_mngr.on_client_disconnected(p);   // NEW
+#ifndef WITHOUT_TIMER
+    g_timer_mngr.on_client_disconnected(p);
+#endif
     chain->callNext(cl, crash, format);
 }
 

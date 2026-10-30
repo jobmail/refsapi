@@ -99,5 +99,6 @@
         "valarray": "cpp",
         "variant": "cpp"
     },
-    "C_Cpp.default.compilerPath": "C:\\Dev\\Tools\\msys64\\ucrt64\\bin\\gcc.exe"
+    "C_Cpp.default.compilerPath": "C:\\Dev\\Tools\\msys64\\ucrt64\\bin\\gcc.exe",
+    "cmake.sourceDirectory": "C:/Dev/Projects/metamod/refsapi/refsapi/revoice-plus"
 }

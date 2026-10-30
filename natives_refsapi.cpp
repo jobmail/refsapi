@@ -1020,6 +1020,14 @@ cell AMX_NATIVE_CALL rf_transfer_items(AMX *amx, cell *params)
                 item->m_flReleaseThrow = -1.0f;
                 item->m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
                 pl_from->edict()->v.button &= ~IN_ATTACK;
+                // FIX DEPLOY
+                const float now = gpGlobals->time;
+                item->m_flTimeWeaponIdle = now + 0.55f;
+                item->m_flNextPrimaryAttack = now;
+                item->m_flNextSecondaryAttack = now;
+                // FIX
+                if (pl_to->m_pActiveItem == item)
+                    pl_to->m_flNextAttack = now;
             }
             // Transfer item
             if (pl_from->RemovePlayerItem(item))

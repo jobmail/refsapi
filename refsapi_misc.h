@@ -14,8 +14,8 @@ bool is_valid_utf8(char *str, size_t length);
 bool is_valid_utf8(const char *str, size_t length);
 
 #ifdef __SSE4_2__
+bool ref_utf8(const uint8_t *p, size_t n);
 bool is_valid_utf8_simd(const uint8_t *data, size_t size);
-bool is_valid_utf8_simd(const std::vector<uint8_t> &data);
 bool is_valid_utf8_simd(const char *str);
 bool is_valid_utf8_simd(const std::string &str);
 bool is_valid_utf8_simd(const char *str, size_t length);
@@ -29,7 +29,7 @@ bool is_mutex_locked(std::mutex &mutex);
 CPluginMngr::CPlugin * get_plugin(AMX *amx);
 bool amx_allot(AMX *amx, int cells, cell *amx_addr, cell **phys_addr);
 double timespec_diff(const struct timespec *start, const struct timespec *end);
-void checkCPUFeatures();
+void check_cpu_features();
 void cpu_test();
 int64_t cpu_benchmark();
 std::string get_cpu_name();

@@ -1,96 +1,12 @@
 CSSDK = include/cssdk
 METAMOD = include/metamod
-
 NAME = refsapi
-
 COMPILER = g++
-#g++
-#g++
-#clang++
-#g++
-
 OBJECTS = *.cpp include/cssdk/public/interface.cpp 
-
 LINK = -L./lib/ -L/usr/lib/i386-linux-gnu/ \
 	-s -m32 -ldl -lm -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a -l:libssl.a -l:libcrypto.a
-#-l:libmariadb.a
-# 
-#-static-libgcc 
-#-l:libmariadb.a
-#-Wl,--as-needed 
-#-lmariadb -lssl -lcrypto
-#-l:libmariadb.a -l:libssl.a -l:libcrypto.a
-#-s
-#-static-libgcc -static-libstdc++ -lstdc++fs 
-# -l:libmariadb.a -l:libssl.a -l:libcrypto.a
-#-static-libgcc -lpthread
-# -lgcc_s
-# -Wl,-Bstatic -lgcc -Wl,-Bdynamic 
-#-static-libasan -static-libubsan
-#-l:libssl.a -l:libcrypto.a
-
-#-lm -lrt -Wl,--whole-archive -lmariadbd -lmariadb -lpcre -lz -llz4 -laio -ldl -lsnappy -lcrypt -Wl,--no-whole-archive
-
-#-lp11-kit -lgnutls -lidn2 -lunistring -ltasn1 -lnettle -lhogweed -lgmp -lc -ldl -lffi \
--lpcre -lz -llz4 
-#-l:libmariadbd.a -l:libmariadb.a
-# -l:libz.a -l:liblz4.a -l:libpcre.a -l:libsnappy.a -l:libcrypt.a -l:libaio.a #-l:libmariadb.a -l:libpcre.a #-DWITH_SSL=OFF #-lmariadb
-#
-#
-#-L./lib/ 
-#-static -lpthread -lmariadb -lssl -lcrypto -DWITH_SSL=OFF
-
-#-DWITH_SSL=OFF \	
-#-l:libmariadb.a -l:libssl.a -l:libcrypto.a \
-	-l:libgnutls.a -l:libz.a -l:libidn2.a -l:libunistring.a -l:libtasn1.a -l:libnettle.a -l:libhogweed.a -l:libgmp.a -l:libffi.a #-lmariadb 
-	
-#-static-libgcc -static-libstdc++ -lstdc++fs
-#-l:libmariadb.a #-l:libssl.a -l:libcrypto.a
-
-#-static-libgcc -static-libstdc++ -lstdc++fs -lpthread -l:libmariadb.a -l:libssl.a -l:libcrypto.a
-	
-# -l:libmariadb.a -l:libssl.a -l:libcrypto.a
-#-static-libgcc -static-libstdc++
-#	-Wl,--whole-archive -l:libmariadb.a -l:libz.a -l:libgnutls.a -l:libidn2.a \
-#	-l:libunistring.a -l:libtasn1.a -l:libnettle.a -l:libhogweed.a -l:libgmp.a -l:libffi.a -l:libpcre.a -Wl,--no-whole-archive
-#LINK = -L/lib/ -L/usr/lib/i386-linux-gnu/ -L/lib/i386-linux-gnu/ \
-#    -m32 -static-libgcc -static-libstdc++ -lstdc++fs -lpthread -Wl,--whole-archive -l:libmariadb.a -l:libz.a -l:libssl.a -l:libcrypto.a -l:libzstd.a -Wl,--no-whole-archive
-# -lz -lgnutls -lanl -lp11-kit -lidn2 -lunistring -lasan -lnettle -lhogweed -lgmp -lffi
-#-static-libgcc -static-libstdc++ -lstdc++fs 
-#-Wl,--as-needed 
-#-static-libgcc -static-libstdc++
-#	-l:libmariadb.a -l:libssl.a -l:libgnutls.a -l:libcrypto.a \
-#	-l:librt.a -l:libz.a -l:libanl.a -l:libnettle.a \
-#	-l:libidn2.a -l:libunistring.a -l:libffi.a -l:libhogweed.a \
-#	-l:libgmp.a -l:libpcre.a -lpthread -L/lib/i386-linux-gnu/ -L/usr/lib/i386-linux-gnu/ -L/lib/
-#
-
-
-
-# -lpthread -L/usr/lib/i386-linux-gnu/ -L/libs/
-# 
-#-l:libmariadb.a -l:libssl.a -l:libcrypto.a -l:libm.a  -l:librt.a -l:libz.a -lpthread -L/usr/lib/i386-linux-gnu/ -L/lib/
-#-l:libmariadb.a -l:libm.a -l:librt.a -l:libz.a
-#-lpthread -lm -lrt
-#-L/usr/lib/i386-linux-gnu/
-#-l:libmysqlclient_r.a -l:libmariadbd.a -l:libmariadbclient.a -l:libpthread.a
-#-lmariadb -lpthread 
-#-lmariadb
-#-L/usr/lib/i386-linux-gnu/ -lmariadb
-
-#-l:libm.a -l:libc.a
-#-s -Llib/linux32 -static-libgcc -static-libstdc++
-#-ldl -m32 -s -Llib/linux32 -static-libgcc
 
 OPT_FLAGS = -O3 -mmmx -msse -msse2 -msse3 -msse4.2 -fno-strict-aliasing -Wno-parentheses -Wno-int-to-pointer-cast -Wno-switch -Wno-uninitialized -fpermissive -shared -pipe -pthread
-
-#  
-# -msse4.2
-# -funroll-loops -fomit-frame-pointer 
-# -fno-rtti
-#-fno-split-stack
-# -flto -fPIC
-#-O3 -msse3 -flto=auto -funroll-loops -fomit-frame-pointer -fno-stack-protector -fPIC -mtune=generic -fno-sized-deallocation -Wno-strict-aliasing
 
 INCLUDE = -I. -I$(CSSDK)/ -I$(CSSDK)/common/ -I$(CSSDK)/dlls/ -I$(CSSDK)/engine/ \
         -I$(CSSDK)/game_shared/ -I$(CSSDK)/pm_shared/ -I$(CSSDK)/public/ -I$(CSSDK)/public/regamedll/ -I$(METAMOD) -Iinclude -Iinclude/mariadb -I/usr/lib/gcc/i686-linux-gnu/9/include/ \
@@ -103,44 +19,6 @@ CFLAGS = $(OPT_FLAGS) -Wno-unused-result
 
 CFLAGS += -m32 -s -fvisibility=hidden -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -g0 \
 	-fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions -flto=auto -fPIC -DNDEBUG
-#-fdump-tree-original -fdump-lang-class
-# -DNDEBUG	
-#-D_GLIBCXX_DEBUG
-#-DNDEBUG
-# -DWITHOUT_LOG
-# -DWITHOUT_SQL
-# -fno-stack-protector -ffunction-sections -fdata-sections -fnon-call-exceptions
-#-flto -fPIC 
-# -fPIC -msse4.2 -mavx 
-#-fno-rtti -fomit-frame-pointer
-#-fno-stack-protector -ffunction-sections -fdata-sections -fno-rtti -fomit-frame-pointer -fnon-call-exceptions
-#-fPIC
-#CFLAGS += -Wl,--gc-sections -D_FORTIFY_SOURCE=2 -DHAVE_STDINT_H -D__STDC_CONSTANT_MACROS
-#CFLAGS += -ffunction-sections -fdata-sections -fno-rtti -funroll-loops -fomit-frame-pointer
-
-#-g0 -fno-stack-protector -ffunction-sections -fdata-sections -fno-rtti -fomit-frame-pointer
-#-Wl,--gc-sections 
-#-ffunction-sections -fdata-sections -fno-rtti 
-#-fomit-frame-pointer
-#-fPIC -fno-exceptions -pipe
-#-funroll-loops -mmmx -msse -msse2 -mfpmath=sse 
-
-#-DWITHOUT_SQL
-#-g3
-#-fsanitize=undefined
-#-fsanitize=address
-#-g3 -ggdb
-#-g -DWITHOUT_SQL
-#-Wl,--as-needed
-#-D_GLIBCXX_USE_CXX11_ABI=0 
-#-Wl,--as-needed
-#-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--as-needed
-#-static
-#-Wl,--allow-multiple-definition
-#-Wl,--as-needed -Wl,--whole-archive
-#-D_GLIBCXX_USE_CXX11_ABI=0
-#-fabi-version=11 -fabi-compat-version=11 -Wabi=11 -fno-exceptions 
-#-g0 -DNDEBUG -Dlinux -D__linux__ -std=gnu++14 -shared -m32 -D_GLIBCXX_USE_CXX11_ABI=0 -DHAVE_STRONG_TYPEDEF
 
 OBJ_LINUX := $(OBJECTS:%.c=$(BIN_DIR)/%.o)
 
